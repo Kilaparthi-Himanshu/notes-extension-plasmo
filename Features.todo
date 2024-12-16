@@ -1,0 +1,31 @@
+1. Core Note Functionality
+    ✔ ✨ Create floating notes @done(24-12-16 19:13)
+    ✔ 🎯 Draggable notes @done(24-12-16 19:13)
+    ✔ 📏 Resizable notes @done(24-12-16 19:13)
+    ✔ 🔝 Z-index management (click to bring to front) @done(24-12-16 19:13)
+2. Positioning
+    ✔ 🎲 Random spawn position @done(24-12-16 19:13)
+    ✔ 🖱️ Right-click context menu spawn @done(24-12-16 19:13)
+    ✔ 📌 Pin/Unpin functionality @done(24-12-16 19:13)
+    ✔ 📜 Scroll with page content @done(24-12-16 19:13)
+3. Styling & Themes
+    ✔ 🌓 Light/Dark theme toggle @done(24-12-16 19:13)
+    ✔ 🎨 Custom color picker @done(24-12-16 19:13)
+    ✔ 💫 Fade-out animation on close @done(24-12-16 19:13)
+    ✔ 📝 Custom scrollbar styling @done(24-12-16 19:13)
+4. UI Elements
+    ✔ ✏️ Title input field @done(24-12-16 19:13)
+    ✔ 📝 Text area for content @done(24-12-16 19:13)
+    ✔ ❌ Close button @done(24-12-16 19:13)
+    ✔ 🎨 Color picker with tooltip @done(24-12-16 19:13)
+    ✔ 📌 Pin button with color indication @done(24-12-16 19:13)
+5. UX Features
+    ✔ 🔄 Theme persistence @done(24-12-16 19:13)
+    ✔ 🎯 Smart positioning system @done(24-12-16 19:13)
+    ✔ 💨 Smooth animations @done(24-12-16 19:13)
+    ✔ 🛡️ Shadow DOM encapsulation @done(24-12-16 19:13)
+6. Technical Features
+    ✔ 🔧 Chrome extension integration @done(24-12-16 19:13)
+    ✔ 📨 Background-content script communication @done(24-12-16 19:13)
+    ✔ 🖱️ Context menu integration @done(24-12-16 19:13)
+    ✔ 🎯 Position tracking system @done(24-12-16 19:13)

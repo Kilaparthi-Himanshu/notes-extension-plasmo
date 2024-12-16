@@ -1,0 +1,209 @@
+.injectedComponent {
+    min-width: 203;
+    min-height: 204;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background: gray;
+    border: none;
+    color: black;
+    width: 300px;
+    height: 200px;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px hsla(0, 0%, 0%, 0.527);
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 30px;
+}
+
+.topbarInput {
+    background-color: white;
+    outline: 0;
+    border: none;
+    border-bottom: 1px solid transparent;
+    color: Black;
+    text-align: center;
+    height: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    transition: border-bottom 0.2s ease;
+}
+
+.topbarInput:focus {
+    border-bottom-color: #007bff;
+}
+
+.textAreaContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;  /* This helps the textarea expand */
+    align-items: center;
+    justify-content: center;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    overflow: hidden;
+}
+
+.textArea {
+    box-sizing: border-box;
+    border-radius: 5px;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    resize: none;  /* Optional: prevents textarea's own resize handle */
+    outline: none;
+    border: 1px solid transparent;
+    transition: border 0.2s ease;
+    margin: 7px;
+    background-color: rgb(51, 51, 51);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+.textArea:focus {
+    border: 1px solid #007bff;
+}
+
+.themeToggle {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    z-index: 1;
+    padding: 3px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.1);  /* Subtle dark background */
+    backdrop-filter: blur(2px);       /* Optional: adds frosted glass effect */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+}
+
+/* Modern radio button styling */
+.themeToggle input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    margin: 0 2px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* The dot inside radio button */
+.themeToggle input[type="radio"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #007bff;  /* or any color you prefer */
+}
+
+/* Hover effect */
+.themeToggle input[type="radio"]:hover {
+    border-color: #007bff;
+}
+
+/* When checked */
+.themeToggle input[type="radio"]:checked {
+    border-color: #007bff;
+}
+
+/* Label styling */
+.themeToggle label {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Optional: add hover effect to label */
+.themeToggle label:hover {
+    color: #007bff;
+}
+
+.closeButton {
+    width: 18px;
+    background: red;
+    border: none;
+    border-radius: 200px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 1px;
+    padding-left: 4px;
+    padding-right: 4px;
+    position: absolute;
+    right: 7px;
+}
+
+.colorSelector {
+    all: unset;
+    border: none;
+    outline: none;
+    height: 20px;
+    width: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 1px;
+    padding-left: 4px;
+    padding-right: 4px;
+    position: absolute;
+    left: 5px;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+.fadeOut {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+/* styles.module.css */
+.textArea::-webkit-scrollbar {
+    width: 8px;  /* Width of vertical scrollbar */
+}
+
+.textArea::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);  /* Scrollbar track */
+    border-radius: 4px;
+}
+
+.textArea::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);  /* Scrollbar handle */
+    border-radius: 4px;
+}
+
+/* Hover effects */
+.textArea::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.pinIcon {
+    position: absolute;
+    left: 27px;
+    cursor: pointer;
+}

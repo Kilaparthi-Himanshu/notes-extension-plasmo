@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { Pin } from "lucide-react";
+import { Pin, X } from "lucide-react";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -184,9 +184,15 @@ function InjectReact({
                     onClick={handleClose}
                     className={style.closeButton}
                 >
-                    x
+                    <X
+                        style={{
+                            position: "relative",
+                            color: "red",
+                            marginTop: "2px"
+                        }}
+                    />
                 </button>
-                <input 
+                <input
                     title="Choose note color..."
                     className={style.colorSelector} type="color"
                     onChange={(e) => setTextAreaColor(e.target.value)}
@@ -206,7 +212,7 @@ function InjectReact({
             <div className={style.textAreaContainer}
                 style={{backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)")}}
             >
-                <textarea 
+                <textarea
                     className={style.textArea}
                     onKeyDown={(e) => {
                         // To check if both Shift and Enter keys are pressed
@@ -235,7 +241,7 @@ function InjectReact({
                         backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
                         color: theme === "light" ? "black" : "white"
                     }}
-                    placeholder="Start Typing..." 
+                    placeholder="Start Typing..."
                 ></textarea>
 
                 <div className={style.themeToggle}>

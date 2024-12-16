@@ -1,15 +1,16 @@
 .injectedComponent {
-    min-width: 203;
-    min-height: 204;
+    min-width: 230px;
+    min-height: 204px;
     display: flex;
     flex-direction: column;
     position: absolute;
     background: gray;
+    background-color: transparent;
     border: none;
     color: black;
     width: 300px;
     height: 200px;
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
     box-shadow: 0px 0px 10px hsla(0, 0%, 0%, 0.527);
 }
@@ -139,17 +140,10 @@
 }
 
 .closeButton {
-    width: 18px;
-    background: red;
-    border: none;
-    border-radius: 200px;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 1px;
-    padding-left: 4px;
-    padding-right: 4px;
+    all: unset;
     position: absolute;
-    right: 7px;
+    right: 3px;
+    cursor: pointer;
 }
 
 .colorSelector {

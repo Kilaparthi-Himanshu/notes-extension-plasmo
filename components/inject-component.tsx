@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { Pin, X } from "lucide-react";
+import { Pin, X, Save } from "lucide-react";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -19,7 +19,7 @@ function InjectReact({
 }) {
 
     const [position, setPosition] = useState(() => {
-        if (rightClickPos.x !== undefined && rightClickPos.y !== undefined) {
+        if (rightClickPos?.x !== undefined && rightClickPos?.y !== undefined) {
             return {
                 x: rightClickPos.x,
                 y: rightClickPos.y
@@ -40,6 +40,8 @@ function InjectReact({
             y: window.scrollY + Math.max(0, randomY)  // Add scroll position
         };
     });
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [theme, setTheme] = useState('light');
@@ -97,7 +99,7 @@ function InjectReact({
                 maxZ = Math.max(maxZ, z);
             }
         });
-    
+
         // Set new z-index higher than the maximum
         setZIndex(maxZ + 1);
     };
@@ -149,6 +151,39 @@ function InjectReact({
         setPinned(!pinned);
     };
 
+    const saveNote = async () => {
+        try {
+            const result = await chrome.storage.local.get("notes");
+
+            const note = {
+                id: noteId,
+                title: title,
+                content: content,
+                position: position,
+                theme: theme,
+                color: customColor,
+                isPinned: pinned,
+                timestamp: Date.now()
+            };
+
+            const notes = result.notes || [];
+            const noteIndex = notes.findIndex(n => n.id === noteId);
+
+            if (noteIndex !== -1) {
+                notes[noteIndex] = note;
+            } else {
+                notes.push(note);
+            }
+
+            await chrome.storage.local.set({ "notes": notes });
+
+            const finalState = await chrome.storage.local.get("notes");
+            console.log("finalState", finalState);
+        } catch (error) {
+            console.error("Error saving note:", error);
+        }
+    }
+
     return (
         <div
             id="react-injected-component"
@@ -173,6 +208,8 @@ function InjectReact({
                 onMouseDown={handleMouseDown}
             >
                 <input 
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     className={style.topbarInput}
                     style={{
                         backgroundColor: theme === "light" ? "white" : "rgb(31, 31, 31)",
@@ -180,7 +217,19 @@ function InjectReact({
                     }}
                     placeholder="Enter The Title..."
                 />
-                <button 
+                <button
+                    onClick={saveNote}
+                    className={style.saveButton}
+                >
+                    <Save
+                        style={{
+                            position: "relative",
+                            color: "green",
+                            marginTop: "2px",
+                        }}
+                    />
+                </button>
+                <button
                     onClick={handleClose}
                     className={style.closeButton}
                 >
@@ -194,7 +243,8 @@ function InjectReact({
                 </button>
                 <input
                     title="Choose note color..."
-                    className={style.colorSelector} type="color"
+                    className={style.colorSelector}
+                    type="color"
                     onChange={(e) => setTextAreaColor(e.target.value)}
                 />
                 <Pin 
@@ -214,6 +264,8 @@ function InjectReact({
             >
                 <textarea
                     className={style.textArea}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
                     onKeyDown={(e) => {
                         // To check if both Shift and Enter keys are pressed
                         if (e.key === 'Enter' && e.shiftKey) {

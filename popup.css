@@ -5,6 +5,7 @@ body {
 }
 
 .add-note-button {
+    /* background: linear-gradient(135deg, #c0c0c0 25%, #494949 25%, #494949 50%, #c0c0c0 50%, #c0c0c0 75%, #494949 75%, #494949); */
     background-color: rgb(230, 230, 230);
     padding: 10px;
     border-radius: 10px;
@@ -106,3 +107,9 @@ body {
     box-shadow: 0 0 10px 0 rgb(163, 79, 79);
 }
 
+.no-notes-container {
+    text-align: center;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}

@@ -1,1 +1,5 @@
 ✔ 1. Added save button to save the note to the local storage @done(24-12-17 23:54)
+✔ 2. Added load button to load the note from the local storage @done(24-12-18 22:18)
+✔ 3. Added delete button to delete the note from the local storage @done(24-12-18 22:18)
+✔ 4. Added search functionality to search the note from the local storage @done(24-12-18 22:18)
+

@@ -14,3 +14,14 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         });
     }
 });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "GET_NOTES") {
+        // Retrieve notes from storage
+        chrome.storage.local.get("notes", (result) => {
+            const notes = result.notes || [];
+            sendResponse({ notes });
+        });
+        return true; // Keep the message channel open for sendResponse
+    }
+});

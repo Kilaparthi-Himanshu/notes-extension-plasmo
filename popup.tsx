@@ -1,38 +1,53 @@
 import React, { useState } from 'react';
 import './popup.css';
 
-function IndexPopup() {
+function IndexPopup () {
     const [isPremium, setIsPremium] = useState(true);
     const [search, setSearch] = useState("");
+    const [notes, setNotes] = useState([]);
 
-    const notes = [{
-        id: "note_1",
-        title: "Shopping List",
-        content: "1. Milk\n2. Eggs\n3. Bread\n4. Coffee",
-        position: { x: 150, y: 200 },
-        theme: "light",
-        color: "#f5f5dc",
-        isPinned: false,
-        timestamp: 1709564230000
-    },{
-        id: "note_2",
-        title: "Meeting Notes",
-        content: "Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs",
-        position: { x: 400, y: 300 },
-        theme: "dark",
-        color: "#2f4f4f",
-        isPinned: true,
-        timestamp: 1709650630000
-    }, {
-        id: "note_3",
-        title: "Travel Plans",
-        content: "1. Book flights\n2. Reserve hotel\n3. Create itinerary\n4. Pack bags\n5. Check weather",
-        position: { x: 250, y: 150 },
-        theme: "light",
-        color: "#e0f7fa",
-        isPinned: false,
-        timestamp: 1709737030000
-    }]
+    const getNotes = () => {
+        chrome.runtime.sendMessage({ type: "GET_NOTES" }, (response) => {
+            if (response && response.notes) {
+                setNotes(response.notes);
+                // Handle the received notes here
+            } else {
+                console.log("No notes found.");
+            }
+        });
+    };
+
+    // Call the function to get notes
+    getNotes();
+
+    // const notes = [{
+    //     id: "note-0",
+    //     title: "Shopping List",
+    //     content: "1. Milk\n2. Eggs\n3. Bread\n4. Coffee",
+    //     position: { x: 150, y: 200 },
+    //     theme: "light",
+    //     color: "#f5f5dc",
+    //     isPinned: false,
+    //     timestamp: 1709564230000
+    // },{
+    //     id: "note-1",
+    //     title: "Meeting Notes",
+    //     content: "Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs",
+    //     position: { x: 400, y: 300 },
+    //     theme: "dark",
+    //     color: "#2f4f4f",
+    //     isPinned: true,
+    //     timestamp: 1709650630000
+    // }, {
+    //     id: "note-2",
+    //     title: "Travel Plans",
+    //     content: "1. Book flights\n2. Reserve hotel\n3. Create itinerary\n4. Pack bags\n5. Check weather",
+    //     position: { x: 250, y: 150 },
+    //     theme: "light",
+    //     color: "#e0f7fa",
+    //     isPinned: false,
+    //     timestamp: 1709737030000
+    // }];
 
     const handleInject = async () => {
         try {
@@ -52,12 +67,21 @@ function IndexPopup() {
         }
     };
 
-    const handleLoadNote = (id: string) => {
-        console.log("Loading note:", id);
+    const handleLoadNote = (note) => {
+        console.log("Loading note:");
+        console.dir(note, { depth: null });
     }
 
-    const handleDeleteNote = (id: string) => {
-        console.log("Deleting note:", id);
+    const handleDeleteNote = async (note) => {
+        console.log(note.id);
+
+        const result = await chrome.storage.local.get("notes");
+        const notes = result.notes;
+
+        const newNotes = notes.filter((n) => n.id != note.id);
+        console.log(newNotes);
+
+        await chrome.storage.local.set({ "notes": newNotes });
     }
 
     return (
@@ -82,6 +106,7 @@ function IndexPopup() {
                 />
             </div>
 
+            {notes.length > 0 ? (
             <div
                 className="saved-notes-container"
             >
@@ -92,7 +117,7 @@ function IndexPopup() {
                     <div className="saved-note">
                         <div className="saved-note-content">
                             <h2>{note.title}</h2>
-                            <p>{note.content.length > 30 
+                            <p>{note.content.length > 30
                                 ? note.content.slice(0, 30) + '...' 
                                 : note.content}
                             </p>
@@ -101,14 +126,14 @@ function IndexPopup() {
                         <div className="saved-note-buttons">
                             <button 
                                 className="load-button"
-                                onClick={() => handleLoadNote(note.id)}
+                                onClick={() => handleLoadNote(note)}
                             >
                                 Load
                             </button>
 
                             <button 
                                 className="delete-button"
-                                onClick={() => handleDeleteNote(note.id)}
+                                onClick={() => handleDeleteNote(note)}
                             >
                                 Delete
                             </button>
@@ -116,6 +141,11 @@ function IndexPopup() {
                     </div>
                 ))}
             </div>
+            ) : (
+                <div className="no-notes-container">
+                    <p>No Notes To Load 😞.</p>
+                </div>
+            )}
         </div>
     );
 }

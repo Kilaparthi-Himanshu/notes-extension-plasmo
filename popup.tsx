@@ -1,3 +1,5 @@
+import React from 'react';
+
 function IndexPopup() {
     const handleInject = async () => {
         try {

@@ -10,6 +10,8 @@
     "**/*.js", "**/*.jsx", "popup.tsx", "**/*.css", "**/*.module.css"
 ],
   "compilerOptions": {
+    "jsx": "react",
+    "esModuleInterop": true,
     "paths": {
       "~*": [
         "./*"

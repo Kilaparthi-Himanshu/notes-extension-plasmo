@@ -40,6 +40,7 @@ function InjectReact({
             y: window.scrollY + Math.max(0, randomY)  // Add scroll position
         };
     });
+    const [isPremium, setIsPremium] = useState(true);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [isDragging, setIsDragging] = useState(false);
@@ -217,21 +218,26 @@ function InjectReact({
                     }}
                     placeholder="Enter The Title..."
                 />
+
                 <button
                     onClick={saveNote}
                     className={style.saveButton}
+                    disabled={!isPremium}
+                    title={!isPremium ? "Premium Required" : "Save Note"}
                 >
                     <Save
                         style={{
                             position: "relative",
-                            color: "green",
-                            marginTop: "2px",
+                            color: isPremium ? "green" : "gray",
+                            marginTop: "3px",
                         }}
                     />
                 </button>
+
                 <button
                     onClick={handleClose}
                     className={style.closeButton}
+                    title="Close Note"
                 >
                     <X
                         style={{

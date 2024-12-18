@@ -143,7 +143,7 @@
 .closeButton {
     all: unset;
     position: absolute;
-    right: 3px;
+    right: 2px;
     cursor: pointer;
 }
 
@@ -163,6 +163,21 @@
 .saveButton:active svg {
     color: darkgreen !important;
     transform: scale(0.95);
+}
+
+.saveButton[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.saveButton[disabled]:active {
+    pointer-events: none;
+}
+
+.saveButton[disabled]:active svg {
+    pointer-events: none;
+    transform: none !important;  /* Prevent scale animation */
+    color: gray !important;     /* Keep color gray */
 }
 
 .colorSelector {

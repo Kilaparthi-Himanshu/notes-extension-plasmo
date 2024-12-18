@@ -1,6 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
+import './popup.css';
 
 function IndexPopup() {
+    const [isPremium, setIsPremium] = useState(true);
+    const [search, setSearch] = useState("");
+
+    const notes = [{
+        id: "note_1",
+        title: "Shopping List",
+        content: "1. Milk\n2. Eggs\n3. Bread\n4. Coffee",
+        position: { x: 150, y: 200 },
+        theme: "light",
+        color: "#f5f5dc",
+        isPinned: false,
+        timestamp: 1709564230000
+    },{
+        id: "note_2",
+        title: "Meeting Notes",
+        content: "Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs",
+        position: { x: 400, y: 300 },
+        theme: "dark",
+        color: "#2f4f4f",
+        isPinned: true,
+        timestamp: 1709650630000
+    }, {
+        id: "note_3",
+        title: "Travel Plans",
+        content: "1. Book flights\n2. Reserve hotel\n3. Create itinerary\n4. Pack bags\n5. Check weather",
+        position: { x: 250, y: 150 },
+        theme: "light",
+        color: "#e0f7fa",
+        isPinned: false,
+        timestamp: 1709737030000
+    }]
+
     const handleInject = async () => {
         try {
             const [tab] = await chrome.tabs.query({ 
@@ -19,19 +52,70 @@ function IndexPopup() {
         }
     };
 
+    const handleLoadNote = (id: string) => {
+        console.log("Loading note:", id);
+    }
+
+    const handleDeleteNote = (id: string) => {
+        console.log("Deleting note:", id);
+    }
+
     return (
-        <div>
-            <button onClick={handleInject}
+        <div className="popup">
+            <button 
+                onClick={handleInject}
+                className="add-note-button"
                 style={{
-                    backgroundColor: 'lightblue',
-                    padding: '10px',
-                    border: 'none',
-                    borderRadius: '10px',
-                    cursor: 'pointer'
+                    width: '100%',
                 }}
             >
-                Add Note
+                Add New Note
             </button>
+
+            <div>
+                <input 
+                    type="text" 
+                    placeholder="Search..."
+                    className="search-input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
+
+            <div
+                className="saved-notes-container"
+            >
+                {notes.filter((note) =>
+                note.title.toLowerCase().includes(search.toLowerCase()) 
+                || note.content.toLowerCase().includes(search.toLowerCase()))
+                .map((note) => (
+                    <div className="saved-note">
+                        <div className="saved-note-content">
+                            <h2>{note.title}</h2>
+                            <p>{note.content.length > 30 
+                                ? note.content.slice(0, 30) + '...' 
+                                : note.content}
+                            </p>
+                        </div>
+
+                        <div className="saved-note-buttons">
+                            <button 
+                                className="load-button"
+                                onClick={() => handleLoadNote(note.id)}
+                            >
+                                Load
+                            </button>
+
+                            <button 
+                                className="delete-button"
+                                onClick={() => handleDeleteNote(note.id)}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

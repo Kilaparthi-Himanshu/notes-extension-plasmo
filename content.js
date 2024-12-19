@@ -22,11 +22,49 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
     }
 });
 
-// content.ts
-let noteCounter = 0;  // Keep track of notes
+chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
+    if (request.type === "LOAD_NOTE") {
+        const noteId = request.note.id;
+        const notes = document.querySelectorAll('plasmo-csui');
+        let noteExists = false;
 
-const injectComponent = (data) => {
-    const noteId = `note-${noteCounter++}`;  // Generate unique ID
+        notes.forEach(note => {
+            const element = note.shadowRoot?.querySelector('#react-injected-component');
+            if (element.getAttribute("data-id") === noteId) {
+                noteExists = true;
+            }
+        });
+
+        if (noteExists) {
+            alert("Note already exists");
+            return;
+        } else {
+            injectComponent({
+                note: request.note,
+                fromContextMenu: false,
+            });
+        }
+    }
+});
+
+const getNextId = async () => {
+    const result = await chrome.storage.local.get("notes");
+    const notes = result.notes || [];
+
+    // Extract existing IDs
+    const existingIds = notes.map(note => parseInt(note.id.split('-')[1]));
+
+    // Find the next available ID
+    let nextId = 0;
+    while (existingIds.includes(nextId)) {
+        nextId++;
+    }
+
+    return `note-${nextId}`; // Return the new ID in the same format
+};
+
+const injectComponent = async (data) => {
+    const noteId = data.note ? data.note.id : await getNextId();  // Generate unique ID
 
     const position = data.fromContextMenu && lastRightClickPos
         ? lastRightClickPos
@@ -51,6 +89,7 @@ const injectComponent = (data) => {
         <InjectReact 
             noteId={noteId} 
             rightClickPos={position}
+            note={data.note}
         />
     ); // Pass ID to component
 };

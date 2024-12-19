@@ -67,9 +67,24 @@ function IndexPopup () {
         }
     };
 
-    const handleLoadNote = (note) => {
-        console.log("Loading note:");
-        console.dir(note, { depth: null });
+    const handleLoadNote = async (note) => {
+        try {
+            const [tab] = await chrome.tabs.query({ 
+                active: true, 
+                currentWindow: true 
+            });
+
+            if (!tab.id) return;
+
+            await chrome.tabs.sendMessage(tab.id, {
+                type: "LOAD_NOTE",
+                fromLoadNote: true,
+                note: note
+            });
+
+        } catch (err) {
+            console.error("Failed:", err);
+        }
     }
 
     const handleDeleteNote = async (note) => {
@@ -113,6 +128,7 @@ function IndexPopup () {
                 {notes.filter((note) =>
                 note.title.toLowerCase().includes(search.toLowerCase()) 
                 || note.content.toLowerCase().includes(search.toLowerCase()))
+                .reverse()
                 .map((note) => (
                     <div className="saved-note">
                         <div className="saved-note-content">

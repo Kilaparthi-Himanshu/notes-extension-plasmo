@@ -12,10 +12,21 @@ export const getStyle = () => {
 
 function InjectReact({
     noteId,
-    rightClickPos
+    rightClickPos,
+    note
 }: {
     noteId: string,
-    rightClickPos?: { x: number, y: number }
+    rightClickPos?: { x: number, y: number },
+    note?: {
+        id: string,
+        title: string,
+        content: string,
+        position: { x: number, y: number },
+        theme: string,
+        color: string,
+        isPinned: boolean,
+        saved: boolean
+    }
 }) {
 
     const [position, setPosition] = useState(() => {
@@ -49,6 +60,19 @@ function InjectReact({
     const [zIndex, setZIndex] = useState(9999);
     const [customColor, setCustomColor] = useState('');
     const [pinned, setPinned] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    useEffect(() => {
+        if (note) {
+            setTitle(note.title);
+            setContent(note.content);
+            setPosition(note.position);
+            setTheme(note.theme);
+            setCustomColor(note.color);
+            setPinned(note.isPinned);
+            setSaved(note.saved);
+        }
+    }, [note]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -164,7 +188,8 @@ function InjectReact({
                 theme: theme,
                 color: customColor,
                 isPinned: pinned,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                saved: true
             };
 
             const notes = result.notes || [];
@@ -185,8 +210,15 @@ function InjectReact({
         }
     }
 
+    useEffect(() => {
+        if (saved) {
+            saveNote();
+        }
+    }, [title, content, position, theme, customColor, pinned]);
+
     return (
         <div
+            data-id={noteId}
             id="react-injected-component"
             className={style.injectedComponent}
             style={{
@@ -220,7 +252,7 @@ function InjectReact({
                 />
 
                 <button
-                    onClick={saveNote}
+                    onClick={() => {saveNote(); setSaved(true);}}
                     className={style.saveButton}
                     disabled={!isPremium}
                     title={!isPremium ? "Premium Required" : "Save Note"}

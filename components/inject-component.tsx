@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { Pin, X, Save } from "lucide-react";
+import { Pin, X, Save, Check } from "lucide-react";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -25,7 +25,9 @@ function InjectReact({
         theme: string,
         color: string,
         isPinned: boolean,
-        saved: boolean
+        saved: boolean,
+        width: number,
+        height: number
     }
 }) {
 
@@ -61,6 +63,8 @@ function InjectReact({
     const [customColor, setCustomColor] = useState('');
     const [pinned, setPinned] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [width, setWidth] = useState(300);
+    const [height, setHeight] = useState(200);
 
     useEffect(() => {
         if (note) {
@@ -71,6 +75,8 @@ function InjectReact({
             setCustomColor(note.color);
             setPinned(note.isPinned);
             setSaved(note.saved);
+            setWidth(note.width);
+            setHeight(note.height);
         }
     }, [note]);
 
@@ -189,7 +195,9 @@ function InjectReact({
                 color: customColor,
                 isPinned: pinned,
                 timestamp: Date.now(),
-                saved: true
+                saved: true,
+                width: width,
+                height: height
             };
 
             const notes = result.notes || [];
@@ -204,7 +212,7 @@ function InjectReact({
             await chrome.storage.local.set({ "notes": notes });
 
             const finalState = await chrome.storage.local.get("notes");
-            console.log("finalState", finalState);
+            // console.log("finalState", finalState);
         } catch (error) {
             console.error("Error saving note:", error);
         }
@@ -214,7 +222,18 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned]);
+    }, [title, content, position, theme, customColor, pinned, width, height]);
+
+    const handleResize = (e: any) => {
+        const noteElement = document.getElementById(noteId);
+        if (noteElement) {
+            const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
+            if (component) {
+                setWidth(component.clientWidth);
+                setHeight(component.clientHeight);
+            }
+        }
+    }
 
     return (
         <div
@@ -222,6 +241,8 @@ function InjectReact({
             id="react-injected-component"
             className={style.injectedComponent}
             style={{
+                width: `${width}px`,
+                height: `${height}px`,
                 left: `${position.x}px`,
                 top: `${position.y}px`,
                 zIndex: zIndex,
@@ -231,6 +252,7 @@ function InjectReact({
                 position: pinned ? 'fixed' : 'absolute'
             }}
             onMouseDown={bringToFront}
+            onMouseUp={handleResize}
         >
             <div 
                 className={style.topbar}
@@ -257,13 +279,22 @@ function InjectReact({
                     disabled={!isPremium}
                     title={!isPremium ? "Premium Required" : "Save Note"}
                 >
-                    <Save
+                    {saved ? 
+                        <Check
                         style={{
                             position: "relative",
                             color: isPremium ? "green" : "gray",
-                            marginTop: "3px",
+                            marginTop: "2px",
                         }}
-                    />
+                        /> : 
+                        <Save
+                            style={{
+                                position: "relative",
+                                color: isPremium ? "green" : "gray",
+                                marginTop: "2px",
+                            }}
+                        />
+                    }
                 </button>
 
                 <button
@@ -285,7 +316,7 @@ function InjectReact({
                     type="color"
                     onChange={(e) => setTextAreaColor(e.target.value)}
                 />
-                <Pin 
+                <Pin
                     style={{
                         color: pinned
                             ? "red"

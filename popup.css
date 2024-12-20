@@ -32,6 +32,35 @@ body {
     margin-bottom: 10px;
 }
 
+.saved-notes-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.saved-notes-container.scrolling {
+    padding-right: 3px; /* Adjust this value as needed */
+}
+
+.saved-notes-container::-webkit-scrollbar {
+    padding-left: 3px;
+    width: 8px;  /* Width of vertical scrollbar */
+}
+
+.saved-notes-container::-webkit-scrollbar-track {
+    background: rgba(136, 136, 136, 0.1);  /* Scrollbar track */
+    border-radius: 4px;
+}
+
+.saved-notes-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);  /* Scrollbar handle */
+    border-radius: 4px;
+}
+
+/* Hover effects */
+.saved-notes-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 156, 156, 0.3);
+}
+
 .saved-note {
     color: white;
     /* border: 0.5px solid rgb(255, 255, 255); */
@@ -42,6 +71,7 @@ body {
     margin-bottom: 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
+    min-height: 46px;
 }
 
 .search-input {
@@ -87,6 +117,7 @@ body {
     font-size: 15px;
     font-weight: bold;
     transition: all 0.3s ease;
+    max-height: 32.19px;
 }
 
 .load-button {

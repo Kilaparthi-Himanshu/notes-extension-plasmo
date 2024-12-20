@@ -36,21 +36,6 @@
       "scripting",
       "contextMenus"
     ],
-    "pnpm": {
-      "overrides": {
-        "@swc/helpers@~0.4": "0.4.36"
-      }
-    },
-    "has": {
-      "content": {
-        "matches": [
-          "<all_urls>"
-        ],
-        "excludeFiles": [
-          "../contents/inject-component.tsx"
-        ]
-      }
-    },
     "web_accessible_resources": [
       {
         "resources": [

@@ -1,6 +1,7 @@
-import { createRoot } from "react-dom/client"
-import React from "react"
-import InjectReact, { getStyle } from "~components/inject-component"
+import { createRoot } from "react-dom/client";
+import React from "react";
+import InjectReact, { getStyle } from "~components/inject-component";
+import * as style from "~components/styles.module.css";
 
 let lastRightClickPos = { x: 0, y: 0 };
 
@@ -35,7 +36,20 @@ chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
             }
         });
 
-        if (noteExists) {
+        if (noteExists && request.doubleClick) {
+            const noteElement = document.getElementById(noteId);
+            if (noteElement) {
+                // Add fade-out animation
+                const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
+                if (component) {
+                    component.classList.add(style.fadeOut);
+                    // Remove element after animation
+                    setTimeout(() => {
+                        noteElement.remove();
+                    }, 300); // Match this with animation duration
+                }
+            }
+        } else if (noteExists) {
             alert("Note already exists");
             return;
         } else {
@@ -43,6 +57,23 @@ chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
                 note: request.note,
                 fromContextMenu: false,
             });
+        }
+    }
+});
+
+chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
+    if (request.type === "REMOVE_NOTE") {
+        const noteElement = document.getElementById(request.noteId);
+        if (noteElement) {
+            // Add fade-out animation
+            const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
+            if (component) {
+                component.classList.add(style.fadeOut);
+                // Remove element after animation
+                setTimeout(() => {
+                    noteElement.remove();
+                }, 300); // Match this with animation duration
+            }
         }
     }
 });
@@ -87,7 +118,7 @@ const injectComponent = async (data) => {
     const root = createRoot(rootContainer);
     root.render(
         <InjectReact 
-            noteId={noteId} 
+            noteId={noteId}
             rightClickPos={position}
             note={data.note}
         />

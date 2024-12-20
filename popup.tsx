@@ -38,10 +38,10 @@ function IndexPopup () {
         }
     };
 
-    const handleLoadNote = async (note) => {
+    const handleLoadNote = async (note, doubleClick = false) => {
         try {
-            const [tab] = await chrome.tabs.query({ 
-                active: true, 
+            const [tab] = await chrome.tabs.query({
+                active: true,
                 currentWindow: true 
             });
 
@@ -50,7 +50,8 @@ function IndexPopup () {
             await chrome.tabs.sendMessage(tab.id, {
                 type: "LOAD_NOTE",
                 fromLoadNote: true,
-                note: note
+                note: note,
+                doubleClick: doubleClick
             });
 
         } catch (err) {
@@ -60,6 +61,23 @@ function IndexPopup () {
 
     const handleDeleteNote = async (note) => {
         console.log(note.id);
+
+        try {
+            const [tab] = await chrome.tabs.query({ 
+                active: true, 
+                currentWindow: true 
+            });
+
+            if (!tab.id) return;
+
+            await chrome.tabs.sendMessage(tab.id, {
+                type: "REMOVE_NOTE",
+                noteId: note.id
+            });
+
+        } catch (err) {
+            console.error("Failed To Remove Note:", err);
+        }
 
         const result = await chrome.storage.local.get("notes");
         const notes = result.notes;
@@ -101,32 +119,34 @@ function IndexPopup () {
                 || note.content.toLowerCase().includes(search.toLowerCase()))
                 .reverse()
                 .map((note) => (
-                    <div className="saved-note">
-                        <div className="saved-note-content">
-                            <h2>{note.title}</h2>
-                            <p>{note.content.length > 30
-                                ? note.content.slice(0, 30) + '...' 
-                                : note.content}
-                            </p>
-                        </div>
+                        <div className="saved-note"
+                            onDoubleClick={() => handleLoadNote(note, true)}
+                        >
+                            <div className="saved-note-content">
+                                <h2>{note.title}</h2>
+                                <p>{note.content.length > 30
+                                    ? note.content.slice(0, 30) + '...' 
+                                    : note.content}
+                                </p>
+                            </div>
 
-                        <div className="saved-note-buttons">
-                            <button 
-                                className="load-button"
-                                onClick={() => handleLoadNote(note)}
-                            >
-                                Load
-                            </button>
+                            <div className="saved-note-buttons">
+                                <button 
+                                    className="load-button"
+                                    onClick={() => handleLoadNote(note)}
+                                >
+                                    Load
+                                </button>
 
-                            <button 
-                                className="delete-button"
-                                onClick={() => handleDeleteNote(note)}
-                            >
-                                Delete
-                            </button>
+                                <button 
+                                    className="delete-button"
+                                    onClick={() => handleDeleteNote(note)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
             </div>
             ) : (
                 <div className="no-notes-container">

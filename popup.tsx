@@ -20,35 +20,6 @@ function IndexPopup () {
     // Call the function to get notes
     getNotes();
 
-    // const notes = [{
-    //     id: "note-0",
-    //     title: "Shopping List",
-    //     content: "1. Milk\n2. Eggs\n3. Bread\n4. Coffee",
-    //     position: { x: 150, y: 200 },
-    //     theme: "light",
-    //     color: "#f5f5dc",
-    //     isPinned: false,
-    //     timestamp: 1709564230000
-    // },{
-    //     id: "note-1",
-    //     title: "Meeting Notes",
-    //     content: "Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs- Project deadline: Next Friday\n- Call John about budget\n- Review design specs",
-    //     position: { x: 400, y: 300 },
-    //     theme: "dark",
-    //     color: "#2f4f4f",
-    //     isPinned: true,
-    //     timestamp: 1709650630000
-    // }, {
-    //     id: "note-2",
-    //     title: "Travel Plans",
-    //     content: "1. Book flights\n2. Reserve hotel\n3. Create itinerary\n4. Pack bags\n5. Check weather",
-    //     position: { x: 250, y: 150 },
-    //     theme: "light",
-    //     color: "#e0f7fa",
-    //     isPinned: false,
-    //     timestamp: 1709737030000
-    // }];
-
     const handleInject = async () => {
         try {
             const [tab] = await chrome.tabs.query({ 

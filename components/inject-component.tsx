@@ -3,6 +3,7 @@ import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
 import { Pin, X, Save, Check } from "lucide-react";
+import { removeNoteIdFromAddedNotesIds } from "../content";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -61,7 +62,7 @@ function InjectReact({
     const [theme, setTheme] = useState('light');
     const [zIndex, setZIndex] = useState(9999);
     const [customColor, setCustomColor] = useState('');
-    const [pinned, setPinned] = useState(false);
+    const [pinned, setPinned] = useState(true);
     const [saved, setSaved] = useState(false);
     const [width, setWidth] = useState(300);
     const [height, setHeight] = useState(200);
@@ -111,6 +112,7 @@ function InjectReact({
             if (component) {
                 component.classList.add(style.fadeOut);
                 // Remove element after animation
+                removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
                 setTimeout(() => {
                     noteElement.remove();
                 }, 300); // Match this with animation duration
@@ -274,7 +276,10 @@ function InjectReact({
                 />
 
                 <button
-                    onClick={() => {saveNote(); setSaved(true);}}
+                    onClick={() => {
+                        saveNote();
+                        setSaved(true);
+                    }}
                     className={style.saveButton}
                     disabled={!isPremium}
                     title={!isPremium ? "Premium Required" : "Save Note"}

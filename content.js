@@ -78,6 +78,17 @@ chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
     }
 });
 
+let addedNotesIds = [];
+
+export function removeNoteIdFromAddedNotesIds(noteId) {
+    for(let i = 0; i < addedNotesIds.length; i++) {
+        if(addedNotesIds[i] === noteId) {
+            addedNotesIds.splice(i, 1);
+            break;
+        }
+    }
+}
+
 const getNextId = async () => {
     const result = await chrome.storage.local.get("notes");
     const notes = result.notes || [];
@@ -87,9 +98,11 @@ const getNextId = async () => {
 
     // Find the next available ID
     let nextId = 0;
-    while (existingIds.includes(nextId)) {
+    while (existingIds.includes(nextId) || addedNotesIds.includes(nextId)) {
         nextId++;
     }
+
+    addedNotesIds.push(nextId);
 
     return `note-${nextId}`; // Return the new ID in the same format
 };

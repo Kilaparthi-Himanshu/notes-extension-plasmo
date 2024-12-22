@@ -1,6 +1,6 @@
 body {
     background-color: rgb(31, 31, 31);
-    width: 300px;
+    width: 350px;
     height: auto;
 }
 
@@ -25,6 +25,9 @@ body {
 .popup {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .add-note-button {
@@ -34,11 +37,12 @@ body {
 
 .saved-notes-container {
     max-height: 400px;
+    width: 100%;
     overflow-y: auto;
-}
-
-.saved-notes-container.scrolling {
-    padding-right: 3px; /* Adjust this value as needed */
+    padding-top: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .saved-notes-container::-webkit-scrollbar {
@@ -71,11 +75,15 @@ body {
     margin-bottom: 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
-    min-height: 46px;
+    height: auto;
+    width: 95%;
+    
+    cursor: pointer;
 }
 
 .search-input {
-    width: 295px;
+    width: 328.5px;
+    margin-top: 4px;
     margin-bottom: 10px;
     outline: none;
     height: 25px;
@@ -104,6 +112,7 @@ body {
 .saved-note-buttons {
     display: flex;
     align-items: center;
+    min-height: 35px;
 }
 
 .load-button, .delete-button {

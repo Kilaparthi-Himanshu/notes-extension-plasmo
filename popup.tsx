@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './popup.css';
 
 function IndexPopup () {
     const [isPremium, setIsPremium] = useState(true);
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState([]);
+    const searchRef = useRef<HTMLInputElement | null>(null);
+
+    const handleSearch = () => {
+        searchRef.current?.focus();
+    }
+
+    useEffect(() => {
+        document.addEventListener("keydown", handleSearch);
+        return () => document.removeEventListener("keydown", handleSearch);
+    }, []);
 
     const getNotes = () => {
         chrome.runtime.sendMessage({ type: "GET_NOTES" }, (response) => {
@@ -102,6 +112,7 @@ function IndexPopup () {
 
             <div>
                 <input 
+                    ref = {searchRef}
                     type="text" 
                     placeholder="Search..."
                     className="search-input"

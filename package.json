@@ -34,7 +34,8 @@
       "activeTab",
       "storage",
       "scripting",
-      "contextMenus"
+      "contextMenus",
+      "unlimitedStorage"
     ],
     "web_accessible_resources": [
       {

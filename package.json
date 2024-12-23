@@ -35,17 +35,8 @@
       "storage",
       "scripting",
       "contextMenus",
-      "unlimitedStorage"
-    ],
-    "web_accessible_resources": [
-      {
-        "resources": [
-          "content.js"
-        ],
-        "matches": [
-          "<all_urls>"
-        ]
-      }
+      "unlimitedStorage",
+      "notifications"
     ]
   }
 }

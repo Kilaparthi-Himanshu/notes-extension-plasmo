@@ -3,7 +3,7 @@ import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
 import { Pin, X, Save, Check } from "lucide-react";
-import { removeNoteIdFromAddedNotesIds } from "../content";
+import { removeNoteIdFromAddedNotesIds } from "../contents/content";
 
 export const getStyle = () => {
     const style = document.createElement("style");

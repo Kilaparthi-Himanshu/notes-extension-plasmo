@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { Pin, X, Save, Check } from "lucide-react";
+import { Pin, X, Save, Check, Globe } from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
 
 export const getStyle = () => {
@@ -28,7 +28,8 @@ function InjectReact({
         isPinned: boolean,
         saved: boolean,
         width: number,
-        height: number
+        height: number,
+        persistAcrossTabs: boolean
     }
 }) {
 
@@ -66,6 +67,7 @@ function InjectReact({
     const [saved, setSaved] = useState(false);
     const [width, setWidth] = useState(300);
     const [height, setHeight] = useState(200);
+    const [persistAcrossTabs, setPersistAcrossTabs] = useState(false);
 
     useEffect(() => {
         if (note) {
@@ -78,6 +80,7 @@ function InjectReact({
             setSaved(note.saved);
             setWidth(note.width);
             setHeight(note.height);
+            setPersistAcrossTabs(note.persistAcrossTabs);
         }
     }, [note]);
 
@@ -113,6 +116,7 @@ function InjectReact({
                 component.classList.add(style.fadeOut);
                 // Remove element after animation
                 removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
+                setPersistAcrossTabs(false);
                 setTimeout(() => {
                     noteElement.remove();
                 }, 300); // Match this with animation duration
@@ -163,27 +167,6 @@ function InjectReact({
         setCustomColor(''); // Reset custom color when theme changes
     };
 
-    const handlePin = () => {
-        if (pinned) {
-            // When unpinning, convert fixed position to absolute
-            const scrollX = window.scrollX;
-            const scrollY = window.scrollY;
-            setPosition({
-                x: position.x + scrollX,
-                y: position.y + scrollY
-            });
-        } else {
-            // When pinning, convert absolute position to fixed
-            const scrollX = window.scrollX;
-            const scrollY = window.scrollY;
-            setPosition({
-                x: position.x - scrollX,
-                y: position.y - scrollY
-            });
-        }
-        setPinned(!pinned);
-    };
-
     const saveNote = async () => {
         try {
             const result = await chrome.storage.local.get("notes");
@@ -199,7 +182,8 @@ function InjectReact({
                 timestamp: Date.now(),
                 saved: true,
                 width: width,
-                height: height
+                height: height,
+                persistAcrossTabs: persistAcrossTabs
             };
 
             const notes = result.notes || [];
@@ -224,7 +208,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height]);
+    }, [title, content, position, theme, customColor, pinned, width, height, persistAcrossTabs]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -236,6 +220,31 @@ function InjectReact({
             }
         }
     }
+
+    const handlePin = () => {
+        if (pinned) {
+            // When unpinning, convert fixed position to absolute
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+            setPosition({
+                x: position.x + scrollX,
+                y: position.y + scrollY
+            });
+        } else {
+            // When pinning, convert absolute position to fixed
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+            setPosition({
+                x: position.x - scrollX,
+                y: position.y - scrollY
+            });
+        }
+        setPinned(!pinned);
+    };
+
+    const handlePersistAcrossTabs = () => {
+        setPersistAcrossTabs(!persistAcrossTabs);
+    };
 
     return (
         <div
@@ -264,7 +273,7 @@ function InjectReact({
                 }}
                 onMouseDown={handleMouseDown}
             >
-                <input 
+                <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className={style.topbarInput}
@@ -296,7 +305,7 @@ function InjectReact({
                             style={{
                                 position: "relative",
                                 color: isPremium ? "green" : "gray",
-                                marginTop: "2px",
+                                marginTop: "3px",
                             }}
                         />
                     }
@@ -316,20 +325,11 @@ function InjectReact({
                     />
                 </button>
                 <input
-                    title="Choose note color..."
+                    title="Choose Note Color"
                     className={style.colorSelector}
                     type="color"
+                    value={customColor}
                     onChange={(e) => setTextAreaColor(e.target.value)}
-                />
-                <Pin
-                    style={{
-                        color: pinned
-                            ? "red"
-                            : theme === "light" ? "black" : "white"
-                    }}
-                    size={20}  // Adjust size as needed
-                    className={style.pinIcon}
-                    onClick={handlePin}
                 />
             </div>
 
@@ -391,6 +391,36 @@ function InjectReact({
                         />
                         🌙
                     </label>
+                </div>
+                <div className={style.pinsContainer}>
+                    <div title="Pin Note">
+                        <Pin
+                            style={{
+                                color: pinned
+                                    ? "red"
+                                    : theme === "light" ? "black" : "white",
+                                marginTop: "3.3px"
+                            }}
+                            size={20}
+                            className={style.pinIcon}
+                            onClick={handlePin}
+                        />
+                    </div>
+
+                    <div title="Persist Across Tabs [Upcoming Feature]">
+                        <Globe
+                            className={`${style.globeIcon} ${style.disabled}`}
+                            style={{
+                                // color: persistAcrossTabs 
+                                //     ? "red"
+                                //     : theme === "light" ? "black" : "white",
+                                color: theme === "light" ? "rgb(88, 88, 88)" : "rgb(192, 192, 192)",
+                                marginTop: "2px"
+                            }}
+                            size={20}
+                            onClick={handlePersistAcrossTabs}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

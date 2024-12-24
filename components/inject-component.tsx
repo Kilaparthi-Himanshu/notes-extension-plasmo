@@ -55,7 +55,6 @@ function InjectReact({
             y: window.scrollY + Math.max(0, randomY)  // Add scroll position
         };
     });
-    const [isPremium, setIsPremium] = useState(true);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [isDragging, setIsDragging] = useState(false);
@@ -290,22 +289,21 @@ function InjectReact({
                         setSaved(true);
                     }}
                     className={style.saveButton}
-                    disabled={!isPremium}
-                    title={!isPremium ? "Premium Required" : "Save Note"}
+                    title={!saved ? "Note Is Saved" : "Save Note"}
                 >
                     {saved ? 
                         <Check
                         style={{
                             position: "relative",
-                            color: isPremium ? "green" : "gray",
+                            color: "green",
                             marginTop: "2px",
                         }}
                         /> : 
                         <Save
                             style={{
                                 position: "relative",
-                                color: isPremium ? "green" : "gray",
-                                marginTop: "3px",
+                                color: "green",
+                                marginTop: "1px",
                             }}
                         />
                     }
@@ -406,20 +404,6 @@ function InjectReact({
                             onClick={handlePin}
                         />
                     </div>
-
-                    {/* <div title="Persist Across Tabs [Upcoming Feature]">
-                        <Globe
-                            className={style.globeIcon}
-                            style={{
-                                color: persistAcrossTabs 
-                                    ? "red"
-                                    : theme === "light" ? "black" : "white",
-                                marginTop: "2px"
-                            }}
-                            size={20}
-                            onClick={handlePersistAcrossTabs}
-                        />
-                    </div> */}
                 </div>
             </div>
         </div>

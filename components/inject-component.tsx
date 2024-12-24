@@ -401,26 +401,25 @@ function InjectReact({
                                     : theme === "light" ? "black" : "white",
                                 marginTop: "3.3px"
                             }}
-                            size={20}
+                            size={24}
                             className={style.pinIcon}
                             onClick={handlePin}
                         />
                     </div>
 
-                    <div title="Persist Across Tabs [Upcoming Feature]">
+                    {/* <div title="Persist Across Tabs [Upcoming Feature]">
                         <Globe
-                            className={`${style.globeIcon} ${style.disabled}`}
+                            className={style.globeIcon}
                             style={{
-                                // color: persistAcrossTabs 
-                                //     ? "red"
-                                //     : theme === "light" ? "black" : "white",
-                                color: theme === "light" ? "rgb(88, 88, 88)" : "rgb(192, 192, 192)",
+                                color: persistAcrossTabs 
+                                    ? "red"
+                                    : theme === "light" ? "black" : "white",
                                 marginTop: "2px"
                             }}
                             size={20}
                             onClick={handlePersistAcrossTabs}
                         />
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

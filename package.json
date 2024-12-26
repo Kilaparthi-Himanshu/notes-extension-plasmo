@@ -35,8 +35,7 @@
       "storage",
       "scripting",
       "contextMenus",
-      "unlimitedStorage",
-      "notifications"
+      "unlimitedStorage"
     ]
   }
 }

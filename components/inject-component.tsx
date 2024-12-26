@@ -259,7 +259,7 @@ function InjectReact({
             // Add listeners to the shadow root to catch all events
             const eventTypes = ['keydown', 'keyup', 'keypress'];
             eventTypes.forEach(eventType => {
-                noteElement.shadowRoot.addEventListener(eventType, stopAllEvents, true);
+                noteElement.shadowRoot?.addEventListener(eventType, stopAllEvents, true);
             });
         }
 

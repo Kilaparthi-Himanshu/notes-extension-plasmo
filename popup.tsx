@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import './popup.css';
 
 function IndexPopup () {
-    const [isPremium, setIsPremium] = useState(true);
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState([]);
     const searchRef = useRef<HTMLInputElement | null>(null);
@@ -129,9 +128,10 @@ function IndexPopup () {
                 note.title.toLowerCase().includes(search.toLowerCase()) 
                 || note.content.toLowerCase().includes(search.toLowerCase()))
                 .reverse()
-                .map((note) => (
+                .map((note, index) => (
                         <div className="saved-note"
                             onDoubleClick={() => handleLoadNote(note, true)}
+                            key={note.id || index}
                         >
                             <div className="saved-note-content">
                                 <h2>{note.title}</h2>

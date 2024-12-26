@@ -3,6 +3,29 @@ import React from "react";
 import InjectReact, { getStyle } from "~components/inject-component";
 import * as style from "~components/styles.module.css";
 
+console.log("content.js loaded");
+
+const loadActiveNotes = async () => {
+    try {
+        const result = await chrome.storage.local.get("notes");
+        const notes = result.notes || [];
+
+        const activeNotes = notes.filter(note => note.active);
+
+        activeNotes.forEach(note => {
+            injectComponent({
+                note: note,
+                fromContextMenu: false,
+                fromActiveNotes: true
+            });
+        })
+    } catch (error) {
+        console.error("Error loading active notes:", error);
+    }
+};
+
+loadActiveNotes();
+
 let lastRightClickPos = { x: 0, y: 0 };
 
 // Track right-click position

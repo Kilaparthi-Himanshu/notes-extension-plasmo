@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { Pin, X, Save, Check, Globe } from "lucide-react";
+import { Pin, X, Save, Check, Repeat } from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
 
 export const getStyle = () => {
@@ -29,7 +29,7 @@ function InjectReact({
         saved: boolean,
         width: number,
         height: number,
-        persistAcrossTabs: boolean
+        active: boolean
     }
 }) {
 
@@ -61,12 +61,12 @@ function InjectReact({
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [theme, setTheme] = useState('light');
     const [zIndex, setZIndex] = useState(9999);
-    const [customColor, setCustomColor] = useState('');
+    const [customColor, setCustomColor] = useState("#C0C0C0");
     const [pinned, setPinned] = useState(true);
     const [saved, setSaved] = useState(false);
     const [width, setWidth] = useState(300);
     const [height, setHeight] = useState(200);
-    const [persistAcrossTabs, setPersistAcrossTabs] = useState(false);
+    const [active, setActive] = useState(false);
 
     useEffect(() => {
         if (note) {
@@ -79,7 +79,7 @@ function InjectReact({
             setSaved(note.saved);
             setWidth(note.width);
             setHeight(note.height);
-            setPersistAcrossTabs(note.persistAcrossTabs);
+            setActive(note.active);
         }
     }, [note]);
 
@@ -107,6 +107,7 @@ function InjectReact({
     };
 
     const handleClose = () => {
+        setActive(false);
         const noteElement = document.getElementById(noteId);
         if (noteElement) {
             // Add fade-out animation
@@ -115,7 +116,6 @@ function InjectReact({
                 component.classList.add(style.fadeOut);
                 // Remove element after animation
                 removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
-                setPersistAcrossTabs(false);
                 setTimeout(() => {
                     noteElement.remove();
                 }, 300); // Match this with animation duration
@@ -163,7 +163,7 @@ function InjectReact({
 
     const handleThemeChange = (newTheme: string) => {
         setTheme(newTheme);
-        setCustomColor(''); // Reset custom color when theme changes
+        setCustomColor(newTheme === "light" ? "#C0C0C0" : "#333333"); // Reset custom color when theme changes
     };
 
     const saveNote = async () => {
@@ -182,7 +182,7 @@ function InjectReact({
                 saved: true,
                 width: width,
                 height: height,
-                persistAcrossTabs: persistAcrossTabs
+                active: active
             };
 
             const notes = result.notes || [];
@@ -207,7 +207,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, persistAcrossTabs]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -241,9 +241,38 @@ function InjectReact({
         setPinned(!pinned);
     };
 
-    const handlePersistAcrossTabs = () => {
-        setPersistAcrossTabs(!persistAcrossTabs);
-    };
+    const handleActive = () => {
+        setActive(!active);
+        console.log("active", !active);
+    }
+
+    useEffect(() => {
+        // Create event handler for the entire note component
+        const stopAllEvents = (e: Event) => {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        };
+
+        // Get the note element
+        const noteElement = document.getElementById(noteId);
+        if (noteElement?.shadowRoot) {
+            // Add listeners to the shadow root to catch all events
+            const eventTypes = ['keydown', 'keyup', 'keypress'];
+            eventTypes.forEach(eventType => {
+                noteElement.shadowRoot.addEventListener(eventType, stopAllEvents, true);
+            });
+        }
+
+        // Cleanup
+        return () => {
+            if (noteElement?.shadowRoot) {
+                const eventTypes = ['keydown', 'keyup', 'keypress'];
+                eventTypes.forEach(eventType => {
+                    noteElement.shadowRoot?.removeEventListener(eventType, stopAllEvents, true);
+                });
+            }
+        };
+    }, [noteId]); // To stop keyboard events from interacting with the outer DOM
 
     return (
         <div
@@ -259,7 +288,7 @@ function InjectReact({
                 userSelect: 'none', // Prevents text selection while dragging
                 resize: 'both',     // Enable native resizing
                 overflow: 'auto',    // Required for resize to work
-                position: pinned ? 'fixed' : 'absolute'
+                position: pinned ? 'fixed' : 'absolute',
             }}
             onMouseDown={bringToFront}
             onMouseUp={handleResize}
@@ -275,6 +304,7 @@ function InjectReact({
                 <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
                     className={style.topbarInput}
                     style={{
                         backgroundColor: theme === "light" ? "white" : "rgb(31, 31, 31)",
@@ -366,6 +396,27 @@ function InjectReact({
                         color: theme === "light" ? "black" : "white"
                     }}
                     placeholder="Start Typing..."
+                    onFocus={(e) => {
+                        // When textarea is focused, create an invisible overlay just for keyboard events
+                        const overlay = document.createElement('div');
+                        overlay.id = 'keyboard-overlay';
+                        overlay.style.cssText = `
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100vw;
+                            height: 100vh;
+                            z-index: 2147483646;
+                            background: transparent;
+                            pointer-events: none;
+                        `;
+                        document.body.appendChild(overlay);
+                    }}
+                    onBlur={() => {
+                        // Remove overlay when textarea loses focus
+                        const overlay = document.getElementById('keyboard-overlay');
+                        if (overlay) overlay.remove();
+                    }}
                 ></textarea>
 
                 <div className={style.themeToggle}>
@@ -402,6 +453,20 @@ function InjectReact({
                             size={24}
                             className={style.pinIcon}
                             onClick={handlePin}
+                        />
+                    </div>
+
+                    <div title="Persist">
+                        <Repeat
+                            className={style.repeatIcon}
+                            style={{
+                                color: active 
+                                    ? "red"
+                                    : theme === "light" ? "black" : "white",
+                                marginTop: "2px"
+                            }}
+                            size={20}
+                            onClick={handleActive}
                         />
                     </div>
                 </div>

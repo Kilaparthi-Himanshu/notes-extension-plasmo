@@ -319,7 +319,7 @@ function InjectReact({
                         setSaved(true);
                     }}
                     className={style.saveButton}
-                    title={!saved ? "Note Is Saved" : "Save Note"}
+                    title={saved ? "Note Is Saved" : "Save Note"}
                 >
                     {saved ? 
                         <Check

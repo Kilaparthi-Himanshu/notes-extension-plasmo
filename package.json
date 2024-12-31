@@ -30,10 +30,8 @@
       "<all_urls>"
     ],
     "permissions": [
-      "tabs",
       "activeTab",
       "storage",
-      "scripting",
       "contextMenus",
       "unlimitedStorage"
     ]

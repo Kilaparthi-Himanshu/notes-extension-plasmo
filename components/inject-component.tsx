@@ -4,6 +4,7 @@ import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
 import { Pin, X, Save, Check, Repeat } from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
+import DropDown from './Dropdown'
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -358,6 +359,9 @@ function InjectReact({
                     type="color"
                     value={customColor}
                     onChange={(e) => setTextAreaColor(e.target.value)}
+                />
+                <DropDown 
+                    theme={theme}
                 />
             </div>
 

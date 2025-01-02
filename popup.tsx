@@ -20,8 +20,6 @@ function IndexPopup () {
             if (response && response.notes) {
                 setNotes(response.notes);
                 // Handle the received notes here
-            } else {
-                console.log("No notes found.");
             }
         });
     };
@@ -130,12 +128,26 @@ function IndexPopup () {
                 .reverse()
                 .map((note, index) => (
                         <div className="saved-note"
+                            // style={{
+                            //     backgroundColor: note.color
+                            // }}
                             onDoubleClick={() => handleLoadNote(note, true)}
                             key={note.id || index}
                         >
                             <div className="saved-note-content">
-                                <h2>{note.title}</h2>
-                                <p>{note.content.length > 30
+                                <h2
+                                    // style={{
+                                    //     color: note.theme === "light" ? "black" : "white"
+                                    // }}
+                                >
+                                    {note.title}
+                                </h2>
+                                <p 
+                                // style={{
+                                //         color: note.theme === "light" ? "black" : "white"
+                                //     }}
+                                >
+                                    {note.content.length > 30
                                     ? note.content.slice(0, 30) + '...' 
                                     : note.content}
                                 </p>

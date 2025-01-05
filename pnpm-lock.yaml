@@ -11,6 +11,9 @@ importers:
       '@expo/spawn-async':
         specifier: ^1.7.2
         version: 1.7.2
+      '@types/css-modules':
+        specifier: ^1.0.5
+        version: 1.0.5
       lucide-react:
         specifier: ^0.468.0
         version: 0.468.0(react@18.2.0)
@@ -1332,6 +1335,9 @@ packages:
 
   '@types/chrome@0.0.258':
     resolution: {integrity: sha512-vicJi6cg2zaFuLmLY7laG6PHBknjKFusPYlaKQ9Zlycskofy71rStlGvW07MUuqUIVorZf8k5KH+zeTTGcH2dQ==}
+
+  '@types/css-modules@1.0.5':
+    resolution: {integrity: sha512-oeKafs/df9lwOvtfiXVliZsocFVOexK9PZtLQWuPeuVCFR7jwiqlg60lu80JTe5NFNtH3tnV6Fs/ySR8BUPHAw==}
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
@@ -4636,6 +4642,8 @@ snapshots:
     dependencies:
       '@types/filesystem': 0.0.36
       '@types/har-format': 1.2.16
+
+  '@types/css-modules@1.0.5': {}
 
   '@types/estree@1.0.6': {}
 

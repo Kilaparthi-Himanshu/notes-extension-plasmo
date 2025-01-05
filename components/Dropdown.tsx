@@ -3,6 +3,10 @@ import { Menu } from 'lucide-react';
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
 import { useState } from 'react';
+import ThemeToggle from './DropdownItems/ThemeToggle';
+import ColorToggle from './DropdownItems/ColorToggle';
+import PinToggle from './DropdownItems/PinToggle';
+import PersistToggle from './DropdownItems/PersistToggle';
 
 interface DropDownProps {
     theme: string;
@@ -16,7 +20,7 @@ export const getStyle = () => {
 
 const Dropdown = ({ theme }: DropDownProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    
+
     return (
         <div>
             <div className={style.hamburger}>
@@ -31,49 +35,17 @@ const Dropdown = ({ theme }: DropDownProps) => {
             </div>
             {isOpen && (
                 <div className={style.dropdown}>
-                    <div style={{
-                        backgroundColor: "gray",
-                        width: "90%",
-                        height: "50px",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        display: "flex",
-                        flexDirection: "column",
-                        margin: "10px",
-                        cursor: "pointer",
-                        borderRadius: "10px",
-                    }}>GG</div>
-                    <div style={{
-                        backgroundColor: "gray",
-                        width: "90%",
-                        height: "50px",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        display: "flex",
-                        flexDirection: "column",
-                        margin: "10px",
-                        cursor: "pointer",
-                        borderRadius: "10px",
-                    }}>GG</div>
-                    <div style={{
-                        backgroundColor: "gray",
-                        width: "90%",
-                        height: "50px",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        display: "flex",
-                        flexDirection: "column",
-                        margin: "10px",
-                        cursor: "pointer",
-                        borderRadius: "10px",
-                    }}>GG</div>
+                    <ThemeToggle />
+                    <div className={style.borderBottom}></div>
+                    <ColorToggle />
+                    <div className={style.borderBottom}></div>
+                    <PinToggle />
+                    <div className={style.borderBottom}></div>
+                    <PersistToggle />
                 </div>
             )}
         </div>
     )
 }
 
-export default Dropdown
+export default Dropdown;

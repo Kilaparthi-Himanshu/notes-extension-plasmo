@@ -1,13 +1,39 @@
-<div title="Persist Across Tabs [Upcoming Feature]">
-                        <Globe
-                            className={style.globeIcon}
-                            style={{
-                                color: persistAcrossTabs 
-                                    ? "red"
-                                    : theme === "light" ? "black" : "white",
-                                marginTop: "2px"
-                            }}
-                            size={20}
-                            onClick={handlePersistAcrossTabs}
-                        />
-                    </div>
+<div style={{
+                        backgroundColor: "gray",
+                        width: "90%",
+                        height: "50px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        margin: "10px",
+                        cursor: "pointer",
+                        borderRadius: "10px",
+                    }}>GG</div>
+                    <div style={{
+                        backgroundColor: "gray",
+                        width: "90%",
+                        height: "50px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        margin: "10px",
+                        cursor: "pointer",
+                        borderRadius: "10px",
+                    }}>GG</div>
+                    <div style={{
+                        backgroundColor: "gray",
+                        width: "90%",
+                        height: "50px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        margin: "10px",
+                        cursor: "pointer",
+                        borderRadius: "10px",
+                    }}>GG</div>

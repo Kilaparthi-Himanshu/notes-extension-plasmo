@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import React from "react";
 import InjectReact, { getStyle } from "~components/inject-component";
 import * as style from "~components/styles.module.css";
+import { getDropdownStyle } from "~components/DropdownItems/PinToggle";
 
 const loadActiveNotes = async () => {
     try {
@@ -143,8 +144,12 @@ const injectComponent = async (data) => {
     document.body.appendChild(container);
 
     const shadowRoot = container.attachShadow({ mode: "open" });
+
     const style = getStyle();
     shadowRoot.appendChild(style);
+
+    const dropdownStyle = getDropdownStyle();
+    shadowRoot.appendChild(dropdownStyle);
 
     const rootContainer = document.createElement("div");
     shadowRoot.appendChild(rootContainer);

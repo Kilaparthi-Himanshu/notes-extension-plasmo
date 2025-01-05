@@ -5,10 +5,9 @@
   ],
   "include": [
     ".plasmo/index.d.ts",
-    "./**/*.ts",
-    "./**/*.tsx",
-    "**/*.js", "**/*.jsx", "popup.tsx", "**/*.css", "**/*.module.css"
-],
+    ".plasmo/**/*",
+    "**/*"
+  ],
   "compilerOptions": {
     "jsx": "react",
     "esModuleInterop": true,

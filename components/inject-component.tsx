@@ -422,28 +422,21 @@ function InjectReact({
                         if (overlay) overlay.remove();
                     }}
                 ></textarea>
-
                 <div className={style.themeToggle}>
-                    <label title="Light">
-                        <input
-                            type="radio"
-                            name="theme"
-                            value="light"
-                            checked={theme === 'light'}
-                            onChange={(e) => handleThemeChange(e.target.value)}
-                        />
+                    <button
+                        className={`${style.themeButton} ${theme === 'light' ? style.active : ''}`}
+                        onClick={() => handleThemeChange('light')}
+                        title="Light Theme"
+                    >
                         🌞
-                    </label>
-                    <label title="Dark">
-                        <input
-                            type="radio"
-                            name="theme"
-                            value="dark"
-                            checked={theme === 'dark'}
-                            onChange={(e) => handleThemeChange(e.target.value)}
-                        />
+                    </button>
+                    <button
+                        className={`${style.themeButton} ${theme === 'dark' ? style.active : ''}`}
+                        onClick={() => handleThemeChange('dark')}
+                        title="Dark Theme"
+                    >
                         🌙
-                    </label>
+                    </button>
                 </div>
                 <div className={style.pinsContainer}>
                     <div title="Pin Note">

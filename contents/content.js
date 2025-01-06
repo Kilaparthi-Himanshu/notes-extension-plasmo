@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import React from "react";
 import InjectReact, { getStyle } from "~components/inject-component";
 import * as style from "~components/styles.module.css";
-import { getDropdownStyle } from "~components/DropdownItems/PinToggle";
+import { getDropdownStyle } from "~components/DropdownItems/ThemeToggle";
 
 const loadActiveNotes = async () => {
     try {

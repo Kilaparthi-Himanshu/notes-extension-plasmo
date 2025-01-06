@@ -73,78 +73,6 @@
     border: 1px solid #007bff;
 }
 
-.themeToggle {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    z-index: 1;
-    padding: 2px 4px;
-    border-radius: 3px;
-    background: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(2px);
-}
-
-.themeButton {
-    background: none;
-    border: 2px solid transparent;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 1px;
-    transition: all 0.2s ease;
-    font-size: 14px;
-}
-
-.themeButton:hover {
-    transform: scale(1.1);
-}
-
-.themeButton.active {
-    border-color: #007bff;
-}
-
-.pinsContainer {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    z-index: 1;
-    padding: 3px 5px;
-    min-width: 24px;
-    min-height: 24px;
-    justify-content: center;  /* Center horizontally */
-    border-radius: 3px;
-    font-size: 12px;
-    background: rgba(0, 0, 0, 0.1);  /* Subtle dark background */
-    backdrop-filter: blur(2px);       /* Optional: adds frosted glass effect */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
-    flex-direction: row;
-}
-
-.repeatIcon {
-    position: relative;
-    cursor: pointer;
-}
-
-.repeatIcon:active {
-    color: darkred !important;
-    transform: scale(0.95);
-}
-
-.pinIcon {
-    position: relative;
-    cursor: pointer;
-}
-
-.pinIcon:active {
-    color: darkred !important;
-    transform: scale(0.95);
-}
-
 .closeButton {
     all: unset;
     position: absolute;
@@ -183,22 +111,6 @@
     pointer-events: none;
     transform: none !important;  /* Prevent scale animation */
     color: gray !important;     /* Keep color gray */
-}
-
-.colorSelector {
-    all: unset;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-    height: 20px;
-    width: 15px;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 1px;
-    padding-left: 4px;
-    padding-right: 4px;
-    position: absolute;
-    left: 5px;
 }
 
 @keyframes fadeIn {
@@ -258,7 +170,7 @@
     padding-left: 4px;
     padding-right: 4px;
     position: absolute;
-    left: 22px;
+    left: 1px;
     top: 0px;
     transform: scale(0.8);
 }
@@ -266,23 +178,50 @@
 .dropdown {
     position: absolute;
     top: 25px;
-    left: 20px;
-    background-color: rgb(175, 175, 175);
-    width: 200px;
-    height: 200px;
+    left: 8px;
     z-index: 99999;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
     align-items: center;
+    justify-content: space-between;
     width: 200px;
     height: auto;
     border-radius: 10px;
     border: 2px solid rgb(99, 99, 228);
-    /* box-shadow: 0 0 10px 2px rgb(99, 99, 228); */
     overflow: hidden;
     padding: 5px;
     gap: 5px;
+    animation: dropDown 0.2s ease-out forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform-origin: top center;
+}
+
+.dropdownClose {
+    animation: dropUp 0.2s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes dropDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dropUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
 }
 
 .borderBottom {

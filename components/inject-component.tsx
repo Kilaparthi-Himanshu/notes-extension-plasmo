@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { Pin, X, Save, Check, Repeat } from "lucide-react";
+import { X, Save, Check} from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
-import DropDown from './Dropdown'
+import DropDown from './Dropdown';
+import { DropdownContext } from "./context";
+import type { PlasmoGetStyle } from "plasmo";
 
-export const getStyle = () => {
+export const getStyle: PlasmoGetStyle = () => {
     const style = document.createElement("style");
     style.textContent = styleText;
     return style;
@@ -353,16 +355,9 @@ function InjectReact({
                         }}
                     />
                 </button>
-                <input
-                    title="Choose Note Color"
-                    className={style.colorSelector}
-                    type="color"
-                    value={customColor}
-                    onChange={(e) => setTextAreaColor(e.target.value)}
-                />
-                <DropDown 
-                    theme={theme}
-                />
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive}}>
+                    <DropDown />
+                </DropdownContext.Provider>
             </div>
 
             <div className={style.textAreaContainer}
@@ -422,51 +417,6 @@ function InjectReact({
                         if (overlay) overlay.remove();
                     }}
                 ></textarea>
-                <div className={style.themeToggle}>
-                    <button
-                        className={`${style.themeButton} ${theme === 'light' ? style.active : ''}`}
-                        onClick={() => handleThemeChange('light')}
-                        title="Light Theme"
-                    >
-                        🌞
-                    </button>
-                    <button
-                        className={`${style.themeButton} ${theme === 'dark' ? style.active : ''}`}
-                        onClick={() => handleThemeChange('dark')}
-                        title="Dark Theme"
-                    >
-                        🌙
-                    </button>
-                </div>
-                <div className={style.pinsContainer}>
-                    <div title="Pin Note">
-                        <Pin
-                            style={{
-                                color: pinned
-                                    ? "red"
-                                    : theme === "light" ? "black" : "white",
-                                marginTop: "3.3px"
-                            }}
-                            size={24}
-                            className={style.pinIcon}
-                            onClick={handlePin}
-                        />
-                    </div>
-
-                    <div title="Persist">
-                        <Repeat
-                            className={style.repeatIcon}
-                            style={{
-                                color: active 
-                                    ? "red"
-                                    : theme === "light" ? "black" : "white",
-                                marginTop: "2px"
-                            }}
-                            size={20}
-                            onClick={handleActive}
-                        />
-                    </div>
-                </div>
             </div>
         </div>
     );

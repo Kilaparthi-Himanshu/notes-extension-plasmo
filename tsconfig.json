@@ -6,7 +6,8 @@
   "include": [
     ".plasmo/index.d.ts",
     ".plasmo/**/*",
-    "**/*"
+    "**/*",
+    "./types.d.ts"
   ],
   "compilerOptions": {
     "jsx": "react",
@@ -15,6 +16,9 @@
       "~*": [
         "./*"
       ]
-    }
+    },
+    "types": [
+      "./types/index.d.ts"
+    ]
   }
 }

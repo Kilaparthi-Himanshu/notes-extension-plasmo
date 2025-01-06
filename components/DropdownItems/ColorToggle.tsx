@@ -1,17 +1,23 @@
 import React from 'react';
-import styleText from "data-text:./dropdownStyles.module.css"
 import * as style from "./dropdownStyles.module.css"
- 
-export const getStyle = () => {
-    const style = document.createElement("style");
-    style.textContent = styleText;
-    return style;
-}
+import { DropdownContext } from '~components/context';
+import { useContext } from 'react';
 
 const ColorToggle = () => {
+    const {customColor, setTextAreaColor, theme} = useContext(DropdownContext);
+
     return (
-        <div className={style.dropdownCard}>
-            Color:
+        <div className={`${style.dropdownCard} ${style[theme]}`}>
+            <div>Color:</div>
+            <div>
+                <input
+                    title="Choose Note Color"
+                    className={style.colorSelector}
+                    type="color"
+                    value={customColor}
+                    onChange={(e) => setTextAreaColor(e.target.value)}
+                />
+            </div>
         </div>
     );
 }

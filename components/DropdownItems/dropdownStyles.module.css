@@ -89,3 +89,21 @@
     flex-direction: row;
     transition: transform 0.1s ease-in;
 }
+
+.fontSelect {
+    width: 45%;
+    height: 25px;
+    cursor: pointer;
+    outline: none;
+    border-radius: 5px;
+    background: rgb(70, 70, 70);
+    font-weight: bold;
+    padding-left: 2px;
+    padding-bottom: 1px;
+}
+
+.fontSelect option {
+    border: 2px solid rgb(99, 99, 228);
+    border-radius: 8px;
+    padding: 5px;
+}

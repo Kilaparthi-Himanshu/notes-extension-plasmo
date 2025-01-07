@@ -6,9 +6,8 @@ import { X, Save, Check} from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
 import DropDown from './Dropdown';
 import { DropdownContext } from "./context";
-import type { PlasmoGetStyle } from "plasmo";
 
-export const getStyle: PlasmoGetStyle = () => {
+export const getStyle = () => {
     const style = document.createElement("style");
     style.textContent = styleText;
     return style;
@@ -32,7 +31,8 @@ function InjectReact({
         saved: boolean,
         width: number,
         height: number,
-        active: boolean
+        active: boolean,
+        font: string
     }
 }) {
 
@@ -70,6 +70,7 @@ function InjectReact({
     const [width, setWidth] = useState(300);
     const [height, setHeight] = useState(200);
     const [active, setActive] = useState(false);
+    const [font, setFont] = useState('Gill Sans MT');
 
     useEffect(() => {
         if (note) {
@@ -83,6 +84,7 @@ function InjectReact({
             setWidth(note.width);
             setHeight(note.height);
             setActive(note.active);
+            setFont(note.font);
         }
     }, [note]);
 
@@ -185,7 +187,8 @@ function InjectReact({
                 saved: true,
                 width: width,
                 height: height,
-                active: active
+                active: active,
+                font: font
             };
 
             const notes = result.notes || [];
@@ -210,7 +213,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, font]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -321,6 +324,7 @@ function InjectReact({
                         saveNote();
                         setSaved(true);
                     }}
+                    onMouseDown={(e) => e.stopPropagation()}
                     className={style.saveButton}
                     title={saved ? "Note Is Saved" : "Save Note"}
                 >
@@ -344,6 +348,7 @@ function InjectReact({
 
                 <button
                     onClick={handleClose}
+                    onMouseDown={(e) => e.stopPropagation()}
                     className={style.closeButton}
                     title="Close Note"
                 >
@@ -355,7 +360,7 @@ function InjectReact({
                         }}
                     />
                 </button>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive}}>
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont}}>
                     <DropDown />
                 </DropdownContext.Provider>
             </div>
@@ -392,7 +397,8 @@ function InjectReact({
                     }}
                     style={{
                         backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
-                        color: theme === "light" ? "black" : "white"
+                        color: theme === "light" ? "black" : "white",
+                        fontFamily: font
                     }}
                     placeholder="Start Typing..."
                     onFocus={(e) => {

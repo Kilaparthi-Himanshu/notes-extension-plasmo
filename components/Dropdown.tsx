@@ -7,6 +7,7 @@ import ThemeToggle from './DropdownItems/ThemeToggle';
 import ColorToggle from './DropdownItems/ColorToggle';
 import PinToggle from './DropdownItems/PinToggle';
 import PersistToggle from './DropdownItems/PersistToggle';
+import FontToggle from './DropdownItems/FontToggle';
 import { useContext } from 'react';
 import { DropdownContext } from './context';
 
@@ -31,7 +32,7 @@ const Dropdown = () => {
 
     return (
         <div>
-            <div className={style.hamburger} title="Options">
+            <div className={style.hamburger} title="Options" onMouseDown={(e) => e.stopPropagation()}>
                 <Menu 
                     style={{
                         color: isOpen 
@@ -54,6 +55,8 @@ const Dropdown = () => {
                     <PinToggle />
                     <div className={style.borderBottom}></div>
                     <PersistToggle />
+                    <div className={style.borderBottom}></div>
+                    <FontToggle />
                 </div>
             )}
         </div>

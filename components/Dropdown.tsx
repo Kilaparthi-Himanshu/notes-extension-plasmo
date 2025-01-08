@@ -8,7 +8,7 @@ import ColorToggle from './DropdownItems/ColorToggle';
 import PinToggle from './DropdownItems/PinToggle';
 import PersistToggle from './DropdownItems/PersistToggle';
 import FontToggle from './DropdownItems/FontToggle';
-import { useContext } from 'react';
+import { useContext, useRef, useEffect } from 'react';
 import { DropdownContext } from './context';
 
 export const getStyle = () => {
@@ -21,6 +21,7 @@ const Dropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const {theme} = useContext(DropdownContext);
     const [isClosing, setIsClosing] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleClose = () => {
         setIsClosing(true);
@@ -29,6 +30,20 @@ const Dropdown = () => {
             setIsClosing(false);
         }, 200); // Match animation duration
     };
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                handleClose();
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <div>
@@ -43,10 +58,13 @@ const Dropdown = () => {
                 />
             </div>
             {isOpen && (
-                <div className={`${style.dropdown} ${isClosing ? style.dropdownClose : ''}`} onMouseDown={(e) => e.stopPropagation()} 
-                style={{backgroundColor: theme === "light" ? 
+                <div 
+                    className={`${style.dropdown} ${isClosing ? style.dropdownClose : ''}`} 
+                    onMouseDown={(e) => e.stopPropagation()} 
+                    style={{backgroundColor: theme === "light" ? 
                     "rgb(175, 175, 175)" : "rgb(70, 70, 70)", 
                     color: theme === "light" ? "#2e2e2e" : "white"}}
+                    ref={dropdownRef}
                 >
                     <ThemeToggle />
                     <div className={style.borderBottom}></div>

@@ -15,7 +15,9 @@ const ThemeToggle = () => {
 
     return (
         <div className={`${style.dropdownCard} ${style[theme]}`}>
-            <div>Theme:</div>
+            <div>
+                Theme:
+            </div>
             <div>
                 <div className={style.themeToggle}>
                     <button

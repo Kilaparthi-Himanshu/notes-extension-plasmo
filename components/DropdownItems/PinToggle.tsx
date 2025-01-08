@@ -8,8 +8,10 @@ const PinToggle = () => {
     const {pinned, handlePin, theme} = useContext(DropdownContext);
 
     return (
-        <div className={`${style.dropdownCard} ${style[theme]}`}>
-            <div>Pin:</div>
+        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handlePin}>
+            <div>
+                Pin:
+            </div>
             <div>
                 <div title="Pin Note" className={style.pinsContainer}>
                     <Pin

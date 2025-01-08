@@ -8,8 +8,10 @@ const PersistToggle = () => {
 
     const {active, handleActive, theme} = useContext(DropdownContext);
     return (
-        <div className={`${style.dropdownCard} ${style[theme]}`}>
-            <div>Persist:</div>
+        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handleActive}>
+            <div>
+                Persist:
+            </div>
             <div>
                 <div title="Persist" className={style.pinsContainer}>
                     <Repeat

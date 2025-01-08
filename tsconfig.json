@@ -19,8 +19,7 @@
     },
     "types": [
       "./types/index.d.ts",
-      "@types/chrome",
-      "@types/react"
+      "@types/chrome"
     ]
   }
 }

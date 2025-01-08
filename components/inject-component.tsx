@@ -32,7 +32,8 @@ function InjectReact({
         width: number,
         height: number,
         active: boolean,
-        font: string
+        font: string,
+        fontSize: number
     }
 }) {
 
@@ -71,6 +72,7 @@ function InjectReact({
     const [height, setHeight] = useState(200);
     const [active, setActive] = useState(false);
     const [font, setFont] = useState('Gill Sans MT');
+    const [fontSize, setFontSize] = useState(16);
 
     useEffect(() => {
         if (note) {
@@ -85,6 +87,7 @@ function InjectReact({
             setHeight(note.height);
             setActive(note.active);
             setFont(note.font);
+            setFontSize(note.fontSize);
         }
     }, [note]);
 
@@ -188,7 +191,8 @@ function InjectReact({
                 width: width,
                 height: height,
                 active: active,
-                font: font
+                font: font,
+                fontSize: fontSize
             };
 
             const notes = result.notes || [];
@@ -201,9 +205,6 @@ function InjectReact({
             }
 
             await chrome.storage.local.set({ "notes": notes });
-
-            const finalState = await chrome.storage.local.get("notes");
-            // console.log("finalState", finalState);
         } catch (error) {
             console.error("Error saving note:", error);
         }
@@ -213,7 +214,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, font]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -360,7 +361,7 @@ function InjectReact({
                         }}
                     />
                 </button>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont}}>
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize}}>
                     <DropDown />
                 </DropdownContext.Provider>
             </div>
@@ -398,7 +399,8 @@ function InjectReact({
                     style={{
                         backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
                         color: theme === "light" ? "black" : "white",
-                        fontFamily: font
+                        fontFamily: font,
+                        fontSize: `${fontSize}px`
                     }}
                     placeholder="Start Typing..."
                     onFocus={(e) => {

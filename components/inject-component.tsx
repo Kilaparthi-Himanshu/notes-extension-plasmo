@@ -33,7 +33,8 @@ function InjectReact({
         height: number,
         active: boolean,
         font: string,
-        fontSize: number
+        fontSize: number,
+        fontColor: string
     }
 }) {
 
@@ -64,7 +65,20 @@ function InjectReact({
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [theme, setTheme] = useState('light');
-    const [zIndex, setZIndex] = useState(9999);
+    const [zIndex, setZIndex] = useState(() => {
+        const notes = document.querySelectorAll('plasmo-csui');
+        let maxZ = 9999;
+
+        notes.forEach(note => {
+            const element = note.shadowRoot?.querySelector('#react-injected-component');
+                if (element) {
+                    const z = parseInt(getComputedStyle(element).zIndex) || 0;
+                    maxZ = Math.max(maxZ, z);
+                }
+            });
+
+        return maxZ + 1;
+    });
     const [customColor, setCustomColor] = useState("#C0C0C0");
     const [pinned, setPinned] = useState(true);
     const [saved, setSaved] = useState(false);
@@ -73,6 +87,7 @@ function InjectReact({
     const [active, setActive] = useState(false);
     const [font, setFont] = useState('Gill Sans MT');
     const [fontSize, setFontSize] = useState(16);
+    const [fontColor, setFontColor] = useState("#000000");
 
     useEffect(() => {
         if (note) {
@@ -88,6 +103,7 @@ function InjectReact({
             setActive(note.active);
             setFont(note.font);
             setFontSize(note.fontSize);
+            setFontColor(note.fontColor);
         }
     }, [note]);
 
@@ -133,7 +149,7 @@ function InjectReact({
 
     const bringToFront = () => {
         const notes = document.querySelectorAll('plasmo-csui');
-        let maxZ = 0;
+        let maxZ = 9999;
 
         // Find highest z-index
         notes.forEach(note => {
@@ -172,6 +188,7 @@ function InjectReact({
     const handleThemeChange = (newTheme: string) => {
         setTheme(newTheme);
         setCustomColor(newTheme === "light" ? "#C0C0C0" : "#333333"); // Reset custom color when theme changes
+        setFontColor(newTheme === "light" ? "#000000" : "#ffffff"); // Reset font color when theme changes
     };
 
     const saveNote = async () => {
@@ -192,7 +209,8 @@ function InjectReact({
                 height: height,
                 active: active,
                 font: font,
-                fontSize: fontSize
+                fontSize: fontSize,
+                fontColor: fontColor
             };
 
             const notes = result.notes || [];
@@ -214,7 +232,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -361,7 +379,7 @@ function InjectReact({
                         }}
                     />
                 </button>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize}}>
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor}}>
                     <DropDown />
                 </DropdownContext.Provider>
             </div>
@@ -398,9 +416,9 @@ function InjectReact({
                     }}
                     style={{
                         backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
-                        color: theme === "light" ? "black" : "white",
+                        color: fontColor || (theme === "light" ? "black" : "white"),
                         fontFamily: font,
-                        fontSize: `${fontSize}px`
+                        fontSize: `${fontSize}px`,
                     }}
                     placeholder="Start Typing..."
                     onFocus={(e) => {

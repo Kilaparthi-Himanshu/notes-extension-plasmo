@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as style from "../dropdownStyles.module.css";
 import { useContext } from 'react';
 import {DropdownContext} from "./../../context";
 
 const FontMenu = () => {
-    const {font, setFont, theme, fontSize, setFontSize} = useContext(DropdownContext);
+    const {font, setFont, theme, fontSize, setFontSize, fontColor, setFontColor} = useContext(DropdownContext);
 
     return (
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: "5px"}}>
@@ -47,6 +47,20 @@ const FontMenu = () => {
                         "rgb(175, 175, 175)" : "rgb(70, 70, 70)",
                         color: theme === "light" ? "#2e2e2e" : "white",
                         border: theme === "light" ? "2px solid rgb(70, 70, 70)" : "2px solid rgb(175, 175, 175)"}}
+                />
+            </div>
+
+            <div className={style.borderBottom}></div>
+
+            <div className={`${style.fontMenu} ${style[theme]}`}>
+                <div>
+                    Color:
+                </div>
+                <input 
+                    type="color" 
+                    className={style.colorSelector} 
+                    value={fontColor} 
+                    onChange={(e) => setFontColor(e.target.value)} 
                 />
             </div>
         </div>

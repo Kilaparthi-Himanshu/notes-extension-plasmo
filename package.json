@@ -1,7 +1,7 @@
 {
   "name": "note-to-go",
-  "displayName": "NoteToGo",
-  "version": "1.0.0",
+  "displayName": "NoteToGo - Save Notes, Anywhere, Anytime",
+  "version": "1.1.0",
   "description": "Simple and quick way to add small yet effective side notes!",
   "author": "Himanshu",
   "scripts": {

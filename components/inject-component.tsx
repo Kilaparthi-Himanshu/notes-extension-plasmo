@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { X, Save, Check} from "lucide-react";
+import { X, Save, Check, EyeOff} from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
 import DropDown from './Dropdown';
 import { DropdownContext } from "./context";
+import icon from "../assets/icon.png";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -88,6 +89,7 @@ function InjectReact({
     const [font, setFont] = useState('Gill Sans MT');
     const [fontSize, setFontSize] = useState(16);
     const [fontColor, setFontColor] = useState("#000000");
+    const [iconize, setIconize] = useState(false);
 
     useEffect(() => {
         if (note) {
@@ -300,7 +302,39 @@ function InjectReact({
     }, [noteId]); // To stop keyboard events from interacting with the outer DOM
 
     return (
-        <div
+        <>
+        { iconize ? 
+        (<div data-id={noteId}
+            id="react-injected-component"
+            title="Double Click To Expand Note"
+            className={style.iconized}
+            style={{
+                left: `${position.x}px`,
+                top: `${position.y}px`,
+                zIndex: zIndex,
+                overflow: 'auto',    // Required for resize to work
+                position: pinned ? 'fixed' : 'absolute',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none',
+                '--custom-color': customColor,
+            }as React.CSSProperties}
+            onMouseDown={handleMouseDown}
+            onDoubleClick={() => setIconize(false)}
+        >
+            <img 
+                src={icon} 
+                alt="icon" 
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
+                style={{ 
+                    userSelect: 'none',
+                    pointerEvents: 'none'
+                }} 
+            />
+        </div>) : 
+        (<div
             data-id={noteId}
             id="react-injected-component"
             className={style.injectedComponent}
@@ -311,6 +345,9 @@ function InjectReact({
                 top: `${position.y}px`,
                 zIndex: zIndex,
                 userSelect: 'none', // Prevents text selection while dragging
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none',
                 resize: 'both',     // Enable native resizing
                 overflow: 'auto',    // Required for resize to work
                 position: pinned ? 'fixed' : 'absolute',
@@ -337,6 +374,21 @@ function InjectReact({
                     }}
                     placeholder="Enter The Title..."
                 />
+
+                <button
+                    onClick={() => setIconize(true)}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    className={style.iconizeButton}
+                    title="Minimize Note"
+                >
+                    <EyeOff
+                        style={{
+                            position: "relative",
+                            color: theme === "light" ? "black" : "white",
+                            marginTop: "4px"
+                        }}
+                    />
+                </button>
 
                 <button
                     onClick={() => {
@@ -444,7 +496,8 @@ function InjectReact({
                     }}
                 ></textarea>
             </div>
-        </div>
+        </div>)}
+        </>
     );
 }
 

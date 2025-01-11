@@ -14,6 +14,34 @@
     animation: fadeIn 0.3s ease forwards;
 }
 
+.iconized {
+    min-width: 30px;
+    min-height: 30px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background: gray;
+    background-color: transparent;
+    border: none;
+    color: black;
+    overflow: hidden !important;
+    box-shadow: 0px 0px 10px hsla(0, 0%, 0%, 0.527);
+    animation: fadeIn 0.3s ease forwards;
+    cursor: pointer;
+}
+
+.iconized::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 3px;  /* Adjust for spacing from left */
+    right: 3px; /* Adjust for spacing from right */
+    height: 2px;
+    background-color: var(--custom-color);
+}
+
 .topbar {
     display: flex;
     align-items: center;
@@ -226,4 +254,11 @@
 .borderBottom {
     border-bottom: 1px solid #858585;
     width: 95%;
+}
+
+.iconizeButton {
+    all: unset;
+    position: absolute;
+    right: 50px;
+    cursor: pointer;
 }

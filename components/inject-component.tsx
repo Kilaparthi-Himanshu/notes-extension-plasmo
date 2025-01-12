@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
-import { X, Save, Check, EyeOff} from "lucide-react";
+import { X, Save, Check, Minimize} from "lucide-react";
 import { removeNoteIdFromAddedNotesIds } from "../contents/content";
 import DropDown from './Dropdown';
 import { DropdownContext } from "./context";
 import icon from "../assets/icon.png";
+import PasswordForm from "./Password/PasswordForm";
+import NewPasswordForm from "./Password/NewPasswordForm";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -35,7 +37,9 @@ function InjectReact({
         active: boolean,
         font: string,
         fontSize: number,
-        fontColor: string
+        fontColor: string,
+        isPasswordProtected: boolean,
+        password: string
     }
 }) {
 
@@ -90,6 +94,10 @@ function InjectReact({
     const [fontSize, setFontSize] = useState(16);
     const [fontColor, setFontColor] = useState("#000000");
     const [iconize, setIconize] = useState(false);
+    const [isPasswordProtected, setIsPasswordProtected] = useState(false);
+    const [requirePassword, setRequirePassword] = useState(false);
+    const [password, setPassword] = useState('');
+    const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
 
     useEffect(() => {
         if (note) {
@@ -106,6 +114,9 @@ function InjectReact({
             setFont(note.font);
             setFontSize(note.fontSize);
             setFontColor(note.fontColor);
+            setIsPasswordProtected(note.isPasswordProtected);
+            setRequirePassword(note.isPasswordProtected);
+            setPassword(note.password);
         }
     }, [note]);
 
@@ -212,7 +223,9 @@ function InjectReact({
                 active: active,
                 font: font,
                 fontSize: fontSize,
-                fontColor: fontColor
+                fontColor: fontColor,
+                isPasswordProtected: isPasswordProtected,
+                password: password
             };
 
             const notes = result.notes || [];
@@ -234,7 +247,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor, isPasswordProtected, password]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -320,7 +333,10 @@ function InjectReact({
                 msUserSelect: 'none',
                 '--custom-color': customColor,
             }as React.CSSProperties}
-            onMouseDown={handleMouseDown}
+            onMouseDown={(e) => {
+                handleMouseDown(e);
+                bringToFront();
+            }}
             onDoubleClick={() => setIconize(false)}
         >
             <img 
@@ -370,9 +386,11 @@ function InjectReact({
                     className={style.topbarInput}
                     style={{
                         backgroundColor: theme === "light" ? "white" : "rgb(31, 31, 31)",
-                        color: theme === "light" ? "black" : "white"
+                        color: theme === "light" ? "black" : "white",
+                        pointerEvents: requirePassword ? "none" : "auto",
                     }}
                     placeholder="Enter The Title..."
+                    title="Title"
                 />
 
                 <button
@@ -381,7 +399,7 @@ function InjectReact({
                     className={style.iconizeButton}
                     title="Minimize Note"
                 >
-                    <EyeOff
+                    <Minimize
                         style={{
                             position: "relative",
                             color: theme === "light" ? "black" : "white",
@@ -431,71 +449,93 @@ function InjectReact({
                         }}
                     />
                 </button>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor}}>
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm}}>
                     <DropDown />
                 </DropdownContext.Provider>
             </div>
 
-            <div className={style.textAreaContainer}
-                style={{backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)")}}
-            >
-                <textarea
-                    className={style.textArea}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    onKeyDown={(e) => {
-                        // To check if both Shift and Enter keys are pressed
-                        if (e.key === 'Enter' && e.shiftKey) {
-                            e.preventDefault(); // Prevent default behavior
+            {(() => {
+                if (requirePassword) {
+                    return (
+                        <PasswordForm 
+                            theme={theme} 
+                            setRequirePassword={setRequirePassword}
+                            password={password}
+                        />
+                    );
+                } else if (showNewPasswordForm) {
+                    return (
+                        <NewPasswordForm 
+                            theme={theme} 
+                            setShowNewPasswordForm={setShowNewPasswordForm}
+                            setPassword={setPassword}
+                        />
+                    );
+                } else {
+                    return (
+                        <div className={style.textAreaContainer}
+                            style={{backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)")}}
+                        >
+                            <textarea
+                                className={style.textArea}
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                onKeyDown={(e) => {
+                                    // To check if both Shift and Enter keys are pressed
+                                    if (e.key === 'Enter' && e.shiftKey) {
+                                        e.preventDefault(); // Prevent default behavior
 
-                            // Get current cursor position
-                            const start = e.currentTarget.selectionStart;
-                            const end = e.currentTarget.selectionEnd;
+                                        // Get current cursor position
+                                        const start = e.currentTarget.selectionStart;
+                                        const end = e.currentTarget.selectionEnd;
 
-                            // Get current value
-                            const value = e.currentTarget.value;
+                                        // Get current value
+                                        const value = e.currentTarget.value;
 
-                            // Insert new line at cursor position
-                            const newValue = value.substring(0, start) + '\n' + value.substring(end);
+                                        // Insert new line at cursor position
+                                        const newValue = value.substring(0, start) + '\n' + value.substring(end);
 
-                            // Update textarea value
-                            e.currentTarget.value = newValue;
+                                        // Update textarea value
+                                        e.currentTarget.value = newValue;
 
-                            // Move cursor after the new line
-                            e.currentTarget.selectionStart = start + 1;
-                            e.currentTarget.selectionEnd = start + 1;
-                        }
-                    }}
-                    style={{
-                        backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
-                        color: fontColor || (theme === "light" ? "black" : "white"),
-                        fontFamily: font,
-                        fontSize: `${fontSize}px`,
-                    }}
-                    placeholder="Start Typing..."
-                    onFocus={(e) => {
-                        // When textarea is focused, create an invisible overlay just for keyboard events
-                        const overlay = document.createElement('div');
-                        overlay.id = 'keyboard-overlay';
-                        overlay.style.cssText = `
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100vw;
-                            height: 100vh;
-                            z-index: 2147483646;
-                            background: transparent;
-                            pointer-events: none;
-                        `;
-                        document.body.appendChild(overlay);
-                    }}
-                    onBlur={() => {
-                        // Remove overlay when textarea loses focus
-                        const overlay = document.getElementById('keyboard-overlay');
-                        if (overlay) overlay.remove();
-                    }}
-                ></textarea>
-            </div>
+                                        // Move cursor after the new line
+                                        e.currentTarget.selectionStart = start + 1;
+                                        e.currentTarget.selectionEnd = start + 1;
+                                    }
+                                }}
+                                style={{
+                                    backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
+                                    color: fontColor || (theme === "light" ? "black" : "white"),
+                                    fontFamily: font,
+                                    fontSize: `${fontSize}px`,
+                                }}
+                                placeholder="Start Typing..."
+                                onFocus={(e) => {
+                                    // When textarea is focused, create an invisible overlay just for keyboard events
+                                    const overlay = document.createElement('div');
+                                    overlay.id = 'keyboard-overlay';
+                                    overlay.style.cssText = `
+                                        position: fixed;
+                                        top: 0;
+                                        left: 0;
+                                        width: 100vw;
+                                        height: 100vh;
+                                        z-index: 2147483646;
+                                        background: transparent;
+                                        pointer-events: none;
+                                    `;
+                                    document.body.appendChild(overlay);
+                                }}
+                                onBlur={() => {
+                                    // Remove overlay when textarea loses focus
+                                    const overlay = document.getElementById('keyboard-overlay');
+                                    if (overlay) overlay.remove();
+                                }}
+                            ></textarea>
+                        </div>
+                    );
+                }
+            })()}
         </div>)}
         </>
     );

@@ -186,9 +186,10 @@
     background: rgba(0, 0, 0, 0.3) !important;
 }
 
-/* .disabled {
+.disabled {
     cursor: not-allowed !important;
-} */
+    pointer-events: none !important;
+}
 
 .hamburger {
     cursor: pointer;
@@ -200,6 +201,10 @@
     left: 1px;
     top: 0px;
     transform: scale(0.8);
+}
+
+.hamburger:active {
+    transform: scale(0.75);
 }
 
 .dropdown {
@@ -261,4 +266,99 @@
     position: absolute;
     right: 50px;
     cursor: pointer;
+    transform: scale(0.9);
+}
+
+.iconizeButton:active {
+    transform: scale(0.85);
+}
+
+.passwordOverlay {
+    width: 100%;
+    height: 100%;
+    display: flex;  /* This helps the textarea expand */
+    align-items: center;
+    justify-content: center;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    overflow: hidden;
+    position: relative;
+}
+
+.passwordInput {
+    position: relative;
+    border: none;
+    width: 230px;
+    height: 40px;
+    border-radius: 5px;
+    font-size: 18px;
+    margin-bottom: 5px;
+    outline: none;
+    padding-right: 38px;
+}
+
+.passwordInput:focus {
+    outline: 2px solid #007bff;
+    box-shadow: 0px 0px 10px rgba(0, 123, 255, 0.5);
+}   
+
+.passwordLabel {
+    font-size: 22px;
+    font-weight: bold;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.passwordInputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.passwordInputContainer.light {
+    box-shadow: 9.01px 9.01px 15px #9F9F9F, -9.01px -9.01px 15px #BFBFBF;
+}
+
+.passwordInputContainer.dark {
+    box-shadow: 9.91px 9.91px 15px #3D3D3D, -9.91px -9.91px 15px #4F4F4F;
+}
+
+.passwordSubmitButton {
+    width: 150px;
+    height: 40px;
+    background-color: rgb(99, 99, 228);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.passwordSubmitButton:hover {
+    background-color: rgb(130, 130, 228);
+    box-shadow: 0px 0px 10px rgb(99, 99, 228);
+}
+
+.passwordSubmitButton:active {
+    transform: scale(0.95);
+}
+
+.passwordEye {
+    position: absolute;
+    right: 3px;
+    top: 10px;
+    cursor: pointer;
+}
+
+.eye {
+    background-color: gray;
+    border-radius: 5px;
+    cursor: pointer;
+    padding-right: 4px;
+    padding-left: 4px;
 }

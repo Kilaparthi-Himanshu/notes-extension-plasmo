@@ -19,6 +19,9 @@
     },
     "types": [
       "./types/index.d.ts",
+      "@types/react-dom",
+      "@types/react",
+      "@types/css-modules",
       "@types/chrome"
     ]
   }

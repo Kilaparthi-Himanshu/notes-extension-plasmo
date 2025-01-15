@@ -26,4 +26,4 @@ const FontToggle = () => {
     )
 }
 
-export default FontToggle
+export default FontToggle;

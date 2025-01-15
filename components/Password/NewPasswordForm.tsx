@@ -109,7 +109,15 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword}: { theme:
                             />}
                         </div>
                     </div>
-                    <button type="submit" className={style.passwordSubmitButton}>Set Password</button>
+                    <button 
+                        type="submit" 
+                        className={style.passwordSubmitButton}
+                        style={{
+                            color: theme === 'light' ? 'black' : 'white'
+                        }}
+                    >
+                        Set Password
+                    </button>
                 </div>
             </form>
         </div>

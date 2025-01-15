@@ -76,7 +76,15 @@ const PasswordForm = ({ theme, setRequirePassword, password}: { theme: string, s
                             />}
                         </div>
                     </div>
-                    <button type="submit" className={style.passwordSubmitButton}>Unlock</button>
+                    <button 
+                        type="submit" 
+                        className={style.passwordSubmitButton}
+                        style={{
+                            color: theme === 'light' ? 'black' : 'white'
+                        }}
+                    >
+                        Unlock
+                    </button>
                 </div>
             </form>
         </div>

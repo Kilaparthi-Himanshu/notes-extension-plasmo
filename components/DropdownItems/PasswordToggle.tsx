@@ -7,7 +7,7 @@ import { Lock, LockOpen } from 'lucide-react';
 const PasswordToggle = () => {
 
     const {theme, isPasswordProtected, setIsPasswordProtected, showNewPasswordForm, setShowNewPasswordForm} = useContext(DropdownContext);
-    
+
     const passWordFormToggle = () => {
         setIsPasswordProtected(!isPasswordProtected);
         setShowNewPasswordForm(!isPasswordProtected);
@@ -27,4 +27,4 @@ const PasswordToggle = () => {
     )
 }
 
-export default PasswordToggle
+export default PasswordToggle;

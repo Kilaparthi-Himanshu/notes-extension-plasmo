@@ -32,5 +32,3 @@ const PinToggle = () => {
 }
 
 export default PinToggle;
-
-// style={{borderBottom: "1px solid #5e5e5e"}}

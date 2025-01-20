@@ -362,3 +362,15 @@
     padding-right: 4px;
     padding-left: 4px;
 }
+
+.resetPassword {
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: #397eff;
+    text-decoration: underline;
+}
+
+.resetPassword:active {
+    transform: scale(0.95);
+}

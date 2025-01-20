@@ -20,7 +20,7 @@ const FontToggle = () => {
                     className={style.pinsContainer}
                 >
                     <motion.div animate={{rotate: openFontMenu ? 180 : 0}}>
-                        <ChevronUp style={{color: openFontMenu ? "red" : "white", paddingTop: "3px"}}/>
+                        <ChevronUp style={{color: openFontMenu ? "red" : theme === "light" ? "black" : "white", paddingTop: "3px"}}/>
                     </motion.div>
                 </div>
             </div>

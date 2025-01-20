@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import * as style from '../styles.module.css';
 import passwordChecker from './passwordFunctions';
-import {Eye, EyeOff} from 'lucide-react';
-import * as cssText from "data-text:~style.module.css";
-
-export const getStyle = () => {
-    const style = document.createElement("style");
-    style.textContent = cssText;
-    return style;
-}
+import {Check, Eye, EyeOff} from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const PasswordForm = ({ theme, setRequirePassword, password}: { theme: string, setRequirePassword: (value: boolean) => void, password: string}) => {
     const [password1, setPassword1] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isResetPassword, setIsResetPassword] = useState(false);
 
     const handlePasswordSubmit = () => {
         if (passwordChecker(password, password1)) {
@@ -20,6 +15,11 @@ const PasswordForm = ({ theme, setRequirePassword, password}: { theme: string, s
         } else {
             alert('Wrong password');
         }
+    }
+
+    const handleResetPassword = () => {
+        alert('Password reset successfully');
+        setIsResetPassword(true);
     }
 
     return (
@@ -93,7 +93,10 @@ const PasswordForm = ({ theme, setRequirePassword, password}: { theme: string, s
                         Unlock
                     </button>
                     <div>
-                        <div className='text-blue-500 bg-red-500 mt-10'>
+                        <div 
+                            className={style.resetPassword} 
+                            onClick={() => handleResetPassword()}
+                        > 
                             Reset Password
                         </div>
                     </div>

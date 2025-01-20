@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import * as style from '../styles.module.css';
 import passwordChecker from './passwordFunctions';
 import {Eye, EyeOff} from 'lucide-react';
+import * as cssText from "data-text:~style.module.css";
+
+export const getStyle = () => {
+    const style = document.createElement("style");
+    style.textContent = cssText;
+    return style;
+}
 
 const PasswordForm = ({ theme, setRequirePassword, password}: { theme: string, setRequirePassword: (value: boolean) => void, password: string}) => {
     const [password1, setPassword1] = useState('');
@@ -85,6 +92,11 @@ const PasswordForm = ({ theme, setRequirePassword, password}: { theme: string, s
                     >
                         Unlock
                     </button>
+                    <div>
+                        <div className='text-blue-500 bg-red-500 mt-10'>
+                            Reset Password
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

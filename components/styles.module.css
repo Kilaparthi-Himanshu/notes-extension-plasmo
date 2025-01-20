@@ -289,7 +289,7 @@
     position: relative;
     border: none;
     width: 230px;
-    height: 40px;
+    height: 37px;
     border-radius: 5px;
     font-size: 18px;
     margin-bottom: 5px;
@@ -351,7 +351,7 @@
 .passwordEye {
     position: absolute;
     right: 3px;
-    top: 10px;
+    top: 7px;
     cursor: pointer;
 }
 

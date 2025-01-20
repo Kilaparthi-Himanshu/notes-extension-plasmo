@@ -39,7 +39,8 @@ function InjectReact({
         fontSize: number,
         fontColor: string,
         isPasswordProtected: boolean,
-        password: string
+        password: string,
+        email: string
     }
 }) {
 
@@ -98,6 +99,7 @@ function InjectReact({
     const [requirePassword, setRequirePassword] = useState(false);
     const [password, setPassword] = useState('');
     const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
+    const [email, setEmail] = useState('');
 
     useEffect(() => {
         if (note) {
@@ -117,6 +119,7 @@ function InjectReact({
             setIsPasswordProtected(note.isPasswordProtected);
             setRequirePassword(note.isPasswordProtected);
             setPassword(note.password);
+            setEmail(note.email);
         }
     }, [note]);
 
@@ -225,7 +228,8 @@ function InjectReact({
                 fontSize: fontSize,
                 fontColor: fontColor,
                 isPasswordProtected: isPasswordProtected,
-                password: password
+                password: password,
+                email: email
             };
 
             const notes = result.notes || [];
@@ -247,7 +251,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor, isPasswordProtected, password]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor, isPasswordProtected, password, email]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -469,6 +473,8 @@ function InjectReact({
                             theme={theme} 
                             setShowNewPasswordForm={setShowNewPasswordForm}
                             setPassword={setPassword}
+                            email={email}
+                            setEmail={setEmail}
                         />
                     );
                 } else {

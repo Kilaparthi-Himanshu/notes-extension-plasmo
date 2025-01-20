@@ -3,13 +3,13 @@ import * as style from '../styles.module.css';
 import passwordChecker from './passwordFunctions';
 import { Eye, EyeOff } from 'lucide-react';
 
-const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword}: { theme: string, setShowNewPasswordForm: (value: boolean) => void, setPassword: (value: string) => void}) => {
+const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, setEmail}: { theme: string, setShowNewPasswordForm: (value: boolean) => void, setPassword: (value: string) => void, email: string, setEmail: (value: string) => void}) => {
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
     const [isPasswordVisible1, setIsPasswordVisible1] = useState(false);
     const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
 
-    const handlePasswordSubmit = () => {
+    const handleSubmit = () => {
         if (passwordChecker(password1, password2)) {
             setShowNewPasswordForm(false);
             setPassword(password1);
@@ -29,7 +29,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword}: { theme:
             <form 
                 onSubmit={(e) => {
                     e.preventDefault();
-                    handlePasswordSubmit();
+                    handleSubmit();
                 }}
                 style={{
                     display: 'flex',
@@ -108,6 +108,19 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword}: { theme:
                                 onClick={() => setIsPasswordVisible2(!isPasswordVisible2)}
                             />}
                         </div>
+                    </div>
+                    <div style={{position: 'relative'}}>
+                        <input 
+                            required
+                            type="email"
+                            placeholder="Enter recovery email..."
+                            className={style.passwordInput}
+                            style={{
+                                backgroundColor: theme === 'light' ? 'white' : 'darkgray',
+                                color: 'black'
+                            }}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
                     </div>
                     <button 
                         type="submit" 

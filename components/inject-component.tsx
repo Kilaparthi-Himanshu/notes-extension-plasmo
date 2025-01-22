@@ -465,6 +465,8 @@ function InjectReact({
                             theme={theme} 
                             setRequirePassword={setRequirePassword}
                             password={password}
+                            email={email}
+                            setShowNewPasswordForm={setShowNewPasswordForm}
                         />
                     );
                 } else if (showNewPasswordForm) {

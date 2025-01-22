@@ -63,14 +63,14 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                         />
                         <div className={style.passwordEye}>
                             {isPasswordVisible1 ? 
-                            <EyeOff 
+                            <Eye 
                                 className={style.eye}
                                 style={{
                                     color: theme === 'light' ? 'white' : 'black',
                                 }}
                                 onClick={() => setIsPasswordVisible1(!isPasswordVisible1)}
                             /> : 
-                            <Eye 
+                            <EyeOff 
                                 className={style.eye}
                                 style={{
                                     color: theme === 'light' ? 'white' : 'black',
@@ -93,14 +93,14 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                         />
                         <div className={style.passwordEye}>
                             {isPasswordVisible2 ? 
-                            <EyeOff 
+                            <Eye 
                                 className={style.eye}
                                 style={{
                                     color: theme === 'light' ? 'white' : 'black',
                                 }}
                                 onClick={() => setIsPasswordVisible2(!isPasswordVisible2)}
                             /> : 
-                            <Eye 
+                            <EyeOff 
                                 className={style.eye}
                                 style={{
                                     color: theme === 'light' ? 'white' : 'black',

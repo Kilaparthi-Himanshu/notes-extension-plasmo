@@ -374,3 +374,19 @@
 .resetPassword:active {
     transform: scale(0.95);
 }
+
+.verificationInput {
+    width: auto;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid #007bff;
+    outline: none;
+    padding: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    letter-spacing: 1rem;
+    text-align: center;
+}

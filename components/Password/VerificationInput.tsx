@@ -1,19 +1,17 @@
 import React from 'react';
 import * as style from '../styles.module.css';
 
-const VerificationInput = ({ theme }: { theme: string }) => {
+const VerificationInput = ({ theme, setResetCode }: { theme: string, resetCode: string, setResetCode: (code: string) => void }) => {
 
     return (
         <div>
             <input 
+                placeholder=" _____"
                 type="text" 
-                className={style.verificationInput}
+                className={`${style.verificationInput} ${style[theme]}`}
                 required
                 maxLength={5}
-                style={{
-                    backgroundColor: theme === 'light' ? 'white' : 'darkgray',
-                    color: 'black',
-                }}
+                onChange={(e) => setResetCode(e.target.value)}
             />
         </div>
     );

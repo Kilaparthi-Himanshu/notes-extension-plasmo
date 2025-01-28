@@ -1,33 +1,46 @@
 import React, { useState } from 'react';
 import * as style from '../styles.module.css';
-import passwordChecker from './passwordFunctions';
+import equalityChecker from './passwordFunctions';
 import { Eye, EyeOff} from 'lucide-react';
 import VerificationInput from './VerificationInput';
+import { emailSend, verifiyCode } from './ResetCodeVerification';
 
 const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPasswordForm}: { theme: string, setRequirePassword: (value: boolean) => void, password: string, email: string, setShowNewPasswordForm: (value: boolean) => void}) => {
     const [password1, setPassword1] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(false);
+    const [resetCode, setResetCode] = useState('');
+    const [isThrottled, setIsThrottled] = useState(false);
 
     const handlePasswordSubmit = () => {
-        if (passwordChecker(password, password1)) {
+        if (equalityChecker(password, password1)) {
             setRequirePassword(false);
         } else {
             alert('Wrong password');
         }
     }
 
-    const handleSendResetCode = () => {
-        alert(`Reset Code Sent to ${email}`);
+    const handleSendResetCode = async () => {
+        setIsThrottled(true);
+        setTimeout(() => setIsThrottled(false), 15000);
+        const result = await emailSend(email);
+        if (!result) {
+            setIsResetPassword(false);
+            return;
+        }
         setIsResetPassword(true);
     }
 
     const handleResetPassword = () => {
-        alert(`GG`);
-        setIsResetPassword(false);
-        setIsPasswordVisible(false);
-        setRequirePassword(false);
-        setShowNewPasswordForm(true);
+        const result = verifiyCode(resetCode);
+        if (result) {
+            setIsResetPassword(false);
+            setIsPasswordVisible(false);
+            setRequirePassword(false);
+            setShowNewPasswordForm(true);
+        } else {
+            alert('Wrong Code!');
+        }
     }
 
     return (
@@ -35,7 +48,7 @@ const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPa
             className={style.passwordOverlay}
             style={{
                 backgroundColor: theme === "light" ? 
-                    "rgb(175, 175, 175)" : "rgb(70, 70, 70)"
+                    "rgb(202, 202, 202)" : "rgb(34, 48, 73)"
             }}
         >
             <form 
@@ -70,10 +83,9 @@ const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPa
                             disabled={isResetPassword}
                             type={isPasswordVisible ? 'text' : 'password'}
                             placeholder="Enter password..."
-                            className={style.passwordInput}
+                            className={`${style.passwordInput} ${style[theme]}`}
                             style={{
-                                backgroundColor: isResetPassword ? 'lightgray' : theme === 'light' ? 'white' : 'darkgray',
-                                color: 'black',
+                                backgroundColor: isResetPassword && 'lightgray',
                                 cursor: isResetPassword ? 'not-allowed' : 'auto'
                             }}
                             onChange={(e) => setPassword1(e.target.value)}
@@ -119,17 +131,24 @@ const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPa
                             width: '100%'
                         }}
                     >
-                        <div 
+                        <button 
                             className={style.resetPassword} 
                             onClick={() => handleSendResetCode()}
+                            disabled = {isResetPassword || isThrottled}
+                            title={isThrottled ? 'Try Again After Some Time!' : 'Reset Password'}
+                            style={{
+                                cursor: isResetPassword || isThrottled ? 'not-allowed' : 'pointer'
+                            }}
                         > 
                             Reset Password
-                        </div>
+                        </button>
                         {isResetPassword && 
                         <div>
                             <div>
                                 <VerificationInput 
                                     theme={theme}
+                                    resetCode={resetCode}
+                                    setResetCode={setResetCode}
                                 />
                             </div>
                             <div 

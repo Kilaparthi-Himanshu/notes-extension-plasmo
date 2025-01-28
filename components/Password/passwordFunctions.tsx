@@ -1,7 +1,5 @@
-import React from 'react';
-
-export default function passwordChecker(password1: string, password2: string) {
-    if (password1 === password2) {
+export default function equalityChecker(var1: string, var2: string) {
+    if (var1 === var2) {
         return true;
     } else {
         return false;

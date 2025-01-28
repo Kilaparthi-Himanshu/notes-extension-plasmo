@@ -10,7 +10,7 @@ const PersistToggle = () => {
     return (
         <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handleActive}>
             <div>
-                Persist:
+                Persist
             </div>
             <div>
                 <div title="Persist" className={style.pinsContainer}>

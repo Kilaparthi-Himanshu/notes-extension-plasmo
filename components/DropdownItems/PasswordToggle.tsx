@@ -16,7 +16,7 @@ const PasswordToggle = () => {
     return (
         <>
             <div className={`${style.dropdownCard} ${style[theme]}`} onClick={passWordFormToggle}>
-                <div>Password:</div>
+                <div>Password</div>
                 <div onClick={passWordFormToggle} 
                     className={style.pinsContainer}
                 >

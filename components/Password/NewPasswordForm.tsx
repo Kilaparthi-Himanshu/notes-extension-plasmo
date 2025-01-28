@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
 import * as style from '../styles.module.css';
-import passwordChecker from './passwordFunctions';
+import equalityChecker from './passwordFunctions';
 import { Eye, EyeOff } from 'lucide-react';
+import { isValidEmail }from './ResetCodeVerification';
 
 const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, setEmail}: { theme: string, setShowNewPasswordForm: (value: boolean) => void, setPassword: (value: string) => void, email: string, setEmail: (value: string) => void}) => {
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
+    const [email1, setEmail1] = useState('');
+    const [email2, setEmail2] = useState('');
     const [isPasswordVisible1, setIsPasswordVisible1] = useState(false);
     const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
 
     const handleSubmit = () => {
-        if (passwordChecker(password1, password2)) {
+        if (equalityChecker(password1, password2) && isValidEmail(email1) && isValidEmail(email2) && equalityChecker(email1, email2)) {
             setShowNewPasswordForm(false);
+            setEmail(email1);
             setPassword(password1);
         } else {
-            alert('Passwords do not match');
+            alert('Passwords/Emails Do Not Match Or The Email Is Wrong');
         }
     }
 
@@ -23,7 +27,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
             className={style.passwordOverlay}
             style={{
                 backgroundColor: theme === "light" ? 
-                    "rgb(175, 175, 175)" : "rgb(70, 70, 70)"
+                    "rgb(202, 202, 202)" : "rgb(34, 48, 73)"
             }}
         >
             <form 
@@ -54,11 +58,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                             required
                             type={isPasswordVisible1 ? 'text' : 'password'}
                             placeholder="Enter password..."
-                            className={style.passwordInput}
-                            style={{
-                                backgroundColor: theme === 'light' ? 'white' : 'darkgray',
-                                color: 'black'
-                            }}
+                            className={`${style.passwordInput} ${style[theme]}`}
                             onChange={(e) => setPassword1(e.target.value)}
                         />
                         <div className={style.passwordEye}>
@@ -84,11 +84,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                             required
                             type={isPasswordVisible2 ? 'text' : 'password'}
                             placeholder="Confirm password..."
-                            className={style.passwordInput}
-                            style={{
-                                backgroundColor: theme === 'light' ? 'white' : 'darkgray',
-                                color: 'black'
-                            }}
+                            className={`${style.passwordInput} ${style[theme]}`}
                             onChange={(e) => setPassword2(e.target.value)}
                         />
                         <div className={style.passwordEye}>
@@ -114,12 +110,25 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                             required
                             type="email"
                             placeholder="Enter recovery email..."
-                            className={style.passwordInput}
+                            className={`${style.passwordInput} ${style[theme]}`}
                             style={{
-                                backgroundColor: theme === 'light' ? 'white' : 'darkgray',
-                                color: 'black'
+                                paddingRight: '0px',
+                                width: '270px'
                             }}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmail1(e.target.value)}
+                        />
+                    </div>
+                    <div style={{position: 'relative'}}>
+                        <input 
+                            required
+                            type="email"
+                            placeholder="Confirm recovery email..."
+                            className={`${style.passwordInput} ${style[theme]}`}
+                            style={{
+                                paddingRight: '0px',
+                                width: '270px' 
+                            }}
+                            onChange={(e) => setEmail2(e.target.value)}
                         />
                     </div>
                     <button 

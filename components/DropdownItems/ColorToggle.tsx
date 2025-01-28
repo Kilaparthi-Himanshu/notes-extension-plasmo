@@ -9,7 +9,7 @@ const ColorToggle = () => {
     return (
         <div className={`${style.dropdownCard} ${style[theme]}`}>
             <div>
-                Color:
+                Color
             </div>
             <div>
                 <input

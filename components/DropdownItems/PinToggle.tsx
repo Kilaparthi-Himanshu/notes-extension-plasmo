@@ -10,7 +10,7 @@ const PinToggle = () => {
     return (
         <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handlePin}>
             <div>
-                Pin:
+                Pin
             </div>
             <div>
                 <div title="Pin Note" className={style.pinsContainer}>

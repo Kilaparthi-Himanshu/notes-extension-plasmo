@@ -18,7 +18,7 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
             >
                 <div className={`${style.fontMenu} ${style[theme]}`}>
                     <div>
-                        Style:
+                        Style
                     </div>
                     <select value={font} 
                         onChange={(e) => setFont(e.target.value)} 
@@ -44,7 +44,7 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
                 <div className={style.borderBottom}></div>
 
                 <div className={`${style.fontMenu} ${style[theme]}`}>
-                    <div>Size:</div>
+                    <div>Size</div>
                     <input className={style.fontSizeSelect} 
                         type="number" 
                         value={fontSize} 
@@ -62,7 +62,7 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
 
                 <div className={`${style.fontMenu} ${style[theme]}`}>
                     <div>
-                        Color:
+                        Color
                     </div>
                     <input 
                         type="color" 

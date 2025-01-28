@@ -15,7 +15,7 @@ const FontToggle = () => {
         <>
             <div className={`${style.dropdownCard} ${style[theme]}`} 
                 onClick={() => setOpenFontMenu(!openFontMenu)}>
-                <div>Font:</div>
+                <div>Font</div>
                 <div onClick={() => setOpenFontMenu(!openFontMenu)} 
                     className={style.pinsContainer}
                 >

@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@expo/spawn-async": "^1.7.2",
     "@types/css-modules": "^1.0.5",
     "framer-motion": "^12.0.0",

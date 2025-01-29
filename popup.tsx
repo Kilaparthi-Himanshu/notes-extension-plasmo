@@ -5,6 +5,7 @@ import { RefreshCw } from 'lucide-react';
 function IndexPopup () {
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState([]);
+    const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
 
     const handleSearch = () => {
@@ -97,6 +98,7 @@ function IndexPopup () {
     }
 
     const handleResetPos = async (note) => {
+        setResetDisabled(true);
         note.position.x = 100;
         note.position.y = 100;
         note.isPinned = true;
@@ -118,6 +120,9 @@ function IndexPopup () {
                 });
             }
         }
+        setTimeout(() => {
+            setResetDisabled(false);
+        }, 300);
     }
 
     return (
@@ -196,9 +201,13 @@ function IndexPopup () {
                                 </button>
 
                                 <button 
+                                    disabled = {resetDisabled}
                                     className="resetPos-button"
                                     onClick={() => handleResetPos(note)}
                                     title='Reset Position'
+                                    style={{
+                                        cursor: resetDisabled ? 'not-allowed' : 'pointer'
+                                    }}
                                 >
                                     <RefreshCw size={18}/>
                                 </button>

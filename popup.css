@@ -11,7 +11,7 @@ body {
     border-radius: 10px;
     cursor: pointer;
     border: none;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     letter-spacing: 3px;
     font-size: 20px;
     transition: all 0.3s ease;
@@ -117,16 +117,17 @@ body {
 
 .load-button, .delete-button {
     height: 70%;
-    width: 55px;
+    width: 50px;
     cursor: pointer;
     margin-right: 5px;
     color: rgb(255, 255, 255);
     border: none;
     border-radius: 5px;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: bold;
     transition: all 0.3s ease;
     max-height: 32.19px;
+    text-align: center;
 }
 
 .load-button {
@@ -170,5 +171,6 @@ body {
 }
 
 .resetPos-button:hover {
+    background-color: rgb(29, 29, 29);
     box-shadow: 0 0 10px 0 rgb(95, 95, 95);
 }

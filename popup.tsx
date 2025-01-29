@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './popup.css';
+import { RefreshCw } from 'lucide-react';
 
 function IndexPopup () {
     const [search, setSearch] = useState("");
@@ -95,6 +96,30 @@ function IndexPopup () {
         await chrome.storage.local.set({ "notes": newNotes });
     }
 
+    const handleResetPos = async (note) => {
+        note.position.x = 100;
+        note.position.y = 100;
+        note.isPinned = true;
+
+        const result = await chrome.storage.local.get("notes");
+        const notes = result.notes;
+
+        const noteIndex = notes.findIndex(n => n.id === note.id);
+        if (noteIndex !== -1) {
+            notes[noteIndex] = note;
+            await chrome.storage.local.set({ "notes": notes });
+
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab?.id) {
+                await chrome.tabs.sendMessage(tab.id, {
+                    type: 'UPDATE_NOTE_POSITION',
+                    noteId: note.id,
+                    note: note,
+                });
+            }
+        }
+    }
+
     return (
         <div className="popup">
             <button 
@@ -157,6 +182,7 @@ function IndexPopup () {
                                 <button 
                                     className="load-button"
                                     onClick={() => handleLoadNote(note)}
+                                    title='Load'
                                 >
                                     Load
                                 </button>
@@ -164,8 +190,17 @@ function IndexPopup () {
                                 <button 
                                     className="delete-button"
                                     onClick={() => handleDeleteNote(note)}
+                                    title='Delete'
                                 >
                                     Delete
+                                </button>
+
+                                <button 
+                                    className="resetPos-button"
+                                    onClick={() => handleResetPos(note)}
+                                    title='Reset Position'
+                                >
+                                    <RefreshCw size={18}/>
                                 </button>
                             </div>
                         </div>

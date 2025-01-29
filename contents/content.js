@@ -83,6 +83,26 @@ chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
     }
 });
 
+chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
+    if (message.type === "UPDATE_NOTE_POSITION") {
+        const noteElement = document.getElementById(message.noteId);
+        if (noteElement) {
+            const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
+            if (component) {
+                component.classList.add(style.fadeOut);
+                // Remove element after animation
+                setTimeout(() => {
+                    noteElement.remove();
+                    injectComponent({
+                        note: message.note,
+                        fromContextMenu: false,
+                    });
+                }, 300); // Match this with animation duration
+            }
+        }
+    }
+});
+
 chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
     if (request.type === "REMOVE_NOTE") {
         const noteElement = document.getElementById(request.noteId);

@@ -153,3 +153,22 @@ body {
     font-size: 15px;
     font-weight: bold;
 }
+
+.resetPos-button {
+    height: 70%;
+    width: auto;
+    cursor: pointer;
+    margin-right: 5px;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    max-height: 32.19px;
+    background-color: rgb(37, 37, 37);
+}
+
+.resetPos-button:hover {
+    box-shadow: 0 0 10px 0 rgb(95, 95, 95);
+}

@@ -147,18 +147,25 @@ function InjectReact({
     };
 
     const handleClose = () => {
-        setActive(false);
-        const noteElement = document.getElementById(noteId);
-        if (noteElement) {
-            // Add fade-out animation
-            const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
-            if (component) {
-                component.classList.add(style.fadeOut);
-                // Remove element after animation
-                removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
-                setTimeout(() => {
-                    noteElement.remove();
-                }, 300); // Match this with animation duration
+        let shouldClose = true;
+        if (!saved) {
+            shouldClose = window.confirm("The Note Is Unsaved. Do You Want To Close?");
+        }
+
+        if (shouldClose) {
+            setActive(false);
+            const noteElement = document.getElementById(noteId);
+            if (noteElement) {
+                // Add fade-out animation
+                const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
+                if (component) {
+                    component.classList.add(style.fadeOut);
+                    // Remove element after animation
+                    removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
+                    setTimeout(() => {
+                        noteElement.remove();
+                    }, 300); // Match this with animation duration
+                }
             }
         }
     };

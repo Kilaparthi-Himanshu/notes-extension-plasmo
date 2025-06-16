@@ -9,10 +9,11 @@ import { DropdownContext } from "./context";
 import icon from "../assets/icon.png";
 import PasswordForm from "./Password/PasswordForm";
 import NewPasswordForm from "./Password/NewPasswordForm";
+import tailwindStyles from "data-text:../styles/global.css"
 
 export const getStyle = () => {
     const style = document.createElement("style");
-    style.textContent = styleText;
+    style.textContent =  styleText + tailwindStyles;
     return style;
 }
 
@@ -85,7 +86,7 @@ function InjectReact({
 
         return maxZ + 1;
     });
-    const [customColor, setCustomColor] = useState("#C0C0C0");
+    const [customColor, setCustomColor] = useState('#ffffff');
     const [pinned, setPinned] = useState(true);
     const [saved, setSaved] = useState(false);
     const [width, setWidth] = useState(300);
@@ -107,7 +108,7 @@ function InjectReact({
             setContent(note.content);
             setPosition(note.position);
             setTheme(note.theme);
-            setCustomColor(note.color);
+            setCustomColor(note.color); // Add logic so if theme light previous notes get white
             setPinned(note.isPinned);
             setSaved(note.saved);
             setWidth(note.width);
@@ -210,7 +211,7 @@ function InjectReact({
 
     const handleThemeChange = (newTheme: string) => {
         setTheme(newTheme);
-        setCustomColor(newTheme === "light" ? "#C0C0C0" : "#333333"); // Reset custom color when theme changes
+        setCustomColor(newTheme === "light" ? "#ffffff" : "#262626"); // Reset custom color when theme changes
         setFontColor(newTheme === "light" ? "#000000" : "#ffffff"); // Reset font color when theme changes
     };
 
@@ -386,7 +387,7 @@ function InjectReact({
                 className={style.topbar}
                 style={{
                     cursor: isDragging ? 'grabbing' : 'grab',
-                    backgroundColor: theme === "light" ? "white" : "rgb(31, 31, 31)"
+                    backgroundColor: theme === "light" ? "#D9D9D9" : "#454545"
                 }}
                 onMouseDown={handleMouseDown}
             >
@@ -396,7 +397,7 @@ function InjectReact({
                     onKeyDown={(e) => e.stopPropagation()}
                     className={style.topbarInput}
                     style={{
-                        backgroundColor: theme === "light" ? "white" : "rgb(31, 31, 31)",
+                        backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
                         color: theme === "light" ? "black" : "white",
                         pointerEvents: requirePassword ? "none" : "auto",
                     }}
@@ -404,62 +405,83 @@ function InjectReact({
                     title="Title"
                 />
 
-                <button
-                    onClick={() => setIconize(true)}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className={style.iconizeButton}
-                    title="Minimize Note"
-                >
-                    <Minimize
-                        style={{
-                            position: "relative",
-                            color: theme === "light" ? "black" : "white",
-                            marginTop: "4px"
-                        }}
-                    />
-                </button>
+                <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2`} style={{
+                    backgroundColor: customColor,
+                }}>
+                    <svg viewBox="0 0 50 35" width="100%" height="100%" preserveAspectRatio="none">
+                        <path
+                            d="M0,0 L31,0 C3,0 31,35 0,35"
+                            fill={theme === "light" ? "#D9D9D9" : "#454545"}
+                        />
+                    </svg>
 
-                <button
-                    onClick={() => {
-                        saveNote();
-                        setSaved(true);
-                    }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className={style.saveButton}
-                    title={saved ? "Note Is Saved" : "Save Note"}
-                >
-                    {saved ? 
-                        <Check
-                        style={{
-                            position: "relative",
-                            color: "green",
-                            marginTop: "2px",
+                    <button
+                        onClick={() => {
+                            saveNote();
+                            setSaved(true);
                         }}
-                        /> : 
-                        <Save
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className='bg-green-400 group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
+                        title={saved ? "Note Is Saved" : "Save Note"}
+                    >
+                        {saved ? 
+                            <Check
+                                className="hidden group-hover:block transition-[display]"
+                                size={14}
+                                style={{
+                                    position: "relative",
+                                    color: "green",
+                                    marginLeft: '4px',
+                                    marginRight: '4px'
+                                    // marginTop: "2px",
+                                }}
+                            /> :
+                            <Save
+                                className="hidden group-hover:block transition-[display]"
+                                size={14}
+                                style={{
+                                    position: "relative",
+                                    color: "green",
+                                    marginLeft: '4px',
+                                    marginRight: '4px'
+                                    // marginTop: "1px",
+                                }}
+                            />
+                        }
+                    </button>
+
+                    <button
+                        onClick={() => setIconize(true)}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className='bg-[#FFBF48] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
+                        title="Minimize Note"
+                    >
+                        <Minimize
+                            className="hidden group-hover:block transition-[display]"
+                            size={14}
                             style={{
                                 position: "relative",
-                                color: "green",
-                                marginTop: "1px",
+                                color: "rgb(158, 124, 0)",
                             }}
                         />
-                    }
-                </button>
+                    </button>
 
-                <button
-                    onClick={handleClose}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className={style.closeButton}
-                    title="Close Note"
-                >
-                    <X
-                        style={{
-                            position: "relative",
-                            color: "red",
-                            marginTop: "2px"
-                        }}
-                    />
-                </button>
+                    <button
+                        onClick={handleClose}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        className='bg-[#FF4848] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
+                        title="Close Note"
+                    >
+                        <X
+                            className="hidden group-hover:block"
+                            size={14}
+                            style={{
+                                position: "relative",
+                                color: "darkred",
+                            }}
+                        />
+                    </button>
+                </div>
                 <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm}}>
                     <DropDown />
                 </DropdownContext.Provider>
@@ -489,7 +511,7 @@ function InjectReact({
                 } else {
                     return (
                         <div className={style.textAreaContainer}
-                            style={{backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)")}}
+                            style={{backgroundColor: customColor}}
                         >
                             <textarea
                                 className={style.textArea}
@@ -519,7 +541,7 @@ function InjectReact({
                                     }
                                 }}
                                 style={{
-                                    backgroundColor: customColor || (theme === "light" ? "rgb(192, 192, 192)" : "rgb(51, 51, 51)"),
+                                    backgroundColor: customColor,
                                     color: fontColor || (theme === "light" ? "black" : "white"),
                                     fontFamily: font,
                                     fontSize: `${fontSize}px`,

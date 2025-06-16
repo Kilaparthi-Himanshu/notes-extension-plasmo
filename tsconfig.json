@@ -11,6 +11,8 @@
   ],
   "compilerOptions": {
     "jsx": "react",
+    "target": "ESNext",
+    "lib": ["DOM", "ESNext"],
     "esModuleInterop": true,
     "paths": {
       "~*": [

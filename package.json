@@ -1,7 +1,7 @@
 {
   "name": "note-to-go",
   "displayName": "NoteToGo - Save Notes, Password Protected!",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Simple and quick way to add small yet effective side notes!",
   "author": "Himanshu",
   "scripts": {
@@ -15,10 +15,11 @@
     "@types/css-modules": "^1.0.5",
     "framer-motion": "^12.0.0",
     "lucide-react": "^0.468.0",
-    "plasmo": "0.89.4",
+    "plasmo": "^0.90.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-hot-toast": "^2.5.1"
+    "react-hot-toast": "^2.5.1",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",

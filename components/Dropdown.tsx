@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu } from 'lucide-react';
+import { RiMenu2Line } from "react-icons/ri";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
 import { useState } from 'react';
@@ -61,15 +61,18 @@ const Dropdown = () => {
                 }}
                 style={{
                     cursor: requirePassword ? "not-allowed" : "pointer",
+                    width: '38px',
+                    height: '38px'
                 }}
                 title={requirePassword ? "Unlock Note To Open Options" : "Options"}
             >
-                <Menu 
+                <RiMenu2Line
                     style={{
                         color: isOpen 
-                                    ? "red"
-                                    : theme === "light" ? "black" : "white",
-                    }} 
+                            ? "red"
+                            : theme === "light" ? "black" : "white",
+                    }}
+                    className='w-full h-full'
                 />
             </div>
             {isOpen && (
@@ -77,8 +80,8 @@ const Dropdown = () => {
                     className={`${style.dropdown} ${isClosing ? style.dropdownClose : ''}`} 
                     onMouseDown={(e) => e.stopPropagation()} 
                     style={{backgroundColor: theme === "light" ? 
-                    "rgb(175, 175, 175)" : "rgb(70, 70, 70)", 
-                    color: theme === "light" ? "#2e2e2e" : "white"}}
+                        "rgb(175, 175, 175)" : "rgb(70, 70, 70)", 
+                        color: theme === "light" ? "#2e2e2e" : "white"}}
                     ref={dropdownRef}
                 >
                     <ThemeToggle />

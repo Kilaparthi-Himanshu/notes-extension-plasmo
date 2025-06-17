@@ -58,7 +58,7 @@
     color: Black;
     text-align: start;
     height: 30px;
-    font-family: 'Arial';
+    font-family: Arial;
     font-size: 20px;
     transition: border-bottom 0.2s ease;
     width: 50%;
@@ -75,8 +75,8 @@
     display: flex;  /* This helps the textarea expand */
     align-items: center;
     justify-content: center;
-    padding-top: 7px;
-    padding-bottom: 7px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     overflow: hidden;
     position: relative;
 }
@@ -91,7 +91,7 @@
     outline: none;
     border: 1px solid transparent;
     transition: border 0.2s ease;
-    margin: 7px;
+    margin: 10px;
     background-color: rgb(51, 51, 51);
     font-weight: 400;
 }
@@ -209,8 +209,8 @@
 
 .dropdown {
     position: absolute;
-    top: 25px;
-    left: 8px;
+    top: 26px;
+    left: 15px;
     z-index: 99999;
     display: flex;
     flex-direction: column;
@@ -218,11 +218,11 @@
     justify-content: space-between;
     width: 200px;
     height: auto;
-    border-radius: 10px;
-    border: 2px solid rgb(99, 99, 228);
+    border-radius: 15px;
+    box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    padding: 5px;
-    gap: 5px;
+    padding: 10px;
+    gap: 11px;
     animation: dropDown 0.2s ease-out forwards;
     will-change: transform, opacity;
     backface-visibility: hidden;
@@ -288,9 +288,9 @@
 .passwordInput {
     position: relative;
     border: none;
-    width: 230px;
+    width: 241px;
     height: 37px;
-    border-radius: 5px;
+    /* border-radius: 5px; */
     font-size: 18px;
     margin-bottom: 5px;
     outline: none;
@@ -298,7 +298,8 @@
 }
 
 .passwordInput.light {
-    background-color: #cccccc;  /* Darker gray-white background */
+    background-color: #ffffff;  /* Darker gray-white background */
+    border-bottom: 1px solid blue;
     color: #1a1a1a;  /* Almost black text */
 }
 .passwordInput.dark {
@@ -318,13 +319,14 @@
 }
 
 .passwordInputContainer {
+    width: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 15px;
     padding: 15px;
-    border-radius: 12px;
+    border-radius: 15px;
 }
 
 .passwordInputContainer.light {
@@ -333,7 +335,6 @@
     backdrop-filter: blur(12px) saturate(54%);
     -webkit-backdrop-filter: blur(12px) saturate(54%);
     background-color: rgba(255, 255, 255, 0.61);
-    border-radius: 12px;
     border: 1px solid rgba(209, 213, 219, 0.3);
 }
 
@@ -343,7 +344,6 @@
     backdrop-filter: blur(12px) saturate(63%);
     -webkit-backdrop-filter: blur(12px) saturate(63%);
     background-color: rgba(17, 25, 40, 0.61);
-    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.125);
 }
 

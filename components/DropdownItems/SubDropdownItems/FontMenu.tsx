@@ -10,7 +10,7 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
     return (
         <AnimatePresence>
             {isVisible && (
-                <motion.div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: "5px"}}
+                <motion.div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", gap: "8px"}}
                     initial={{opacity: 0, height: "0px"}}
                     animate={{opacity: 1, height: "auto"}}
                     exit={{opacity: 0, height: "0px"}}
@@ -24,9 +24,9 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
                         onChange={(e) => setFont(e.target.value)} 
                         className={style.fontSelect}
                         style={{backgroundColor: theme === "light" ? 
-                            "rgb(175, 175, 175)" : "rgb(70, 70, 70)",
-                            color: theme === "light" ? "#2e2e2e" : "white",
-                            border: theme === "light" ? "2px solid rgb(70, 70, 70)" : "2px solid rgb(175, 175, 175)"}}
+                            "white" : "#262626",
+                            color: theme === "light" ? "black" : "white",
+                            border: theme === "light" ? "2px solid #262626" : "2px solid white"}}
                     >
                         <option value="Gill Sans MT">Gill Sans MT</option>
                         <option value="Roboto">Roboto</option>
@@ -41,8 +41,6 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
                     </select>
                 </div>
 
-                <div className={style.borderBottom}></div>
-
                 <div className={`${style.fontMenu} ${style[theme]}`}>
                     <div>Size</div>
                     <input className={style.fontSizeSelect} 
@@ -52,13 +50,11 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
                         max={80}
                         onChange={(e) => setFontSize(parseInt(e.target.value))}
                         style={{backgroundColor: theme === "light" ? 
-                            "rgb(175, 175, 175)" : "rgb(70, 70, 70)",
-                            color: theme === "light" ? "#2e2e2e" : "white",
-                            border: theme === "light" ? "2px solid rgb(70, 70, 70)" : "2px solid rgb(175, 175, 175)"}}
+                            "white" : "#262626",
+                            color: theme === "light" ? "black" : "white",
+                            border: theme === "light" ? "2px solid #262626" : "2px solid white"}}
                     />
                 </div>
-
-                <div className={style.borderBottom}></div>
 
                 <div className={`${style.fontMenu} ${style[theme]}`}>
                     <div>

@@ -27,7 +27,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
             className={style.passwordOverlay}
             style={{
                 backgroundColor: theme === "light" ? 
-                    "rgb(202, 202, 202)" : "rgb(34, 48, 73)"
+                    "white" : "rgb(34, 48, 73)"
             }}
         >
             <form 
@@ -113,7 +113,6 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                             className={`${style.passwordInput} ${style[theme]}`}
                             style={{
                                 paddingRight: '0px',
-                                width: '270px'
                             }}
                             onChange={(e) => setEmail1(e.target.value)}
                         />
@@ -126,7 +125,6 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                             className={`${style.passwordInput} ${style[theme]}`}
                             style={{
                                 paddingRight: '0px',
-                                width: '270px' 
                             }}
                             onChange={(e) => setEmail2(e.target.value)}
                         />

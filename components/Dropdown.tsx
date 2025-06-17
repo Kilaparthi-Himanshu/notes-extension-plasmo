@@ -80,20 +80,15 @@ const Dropdown = () => {
                     className={`${style.dropdown} ${isClosing ? style.dropdownClose : ''}`} 
                     onMouseDown={(e) => e.stopPropagation()} 
                     style={{backgroundColor: theme === "light" ? 
-                        "rgb(175, 175, 175)" : "rgb(70, 70, 70)", 
-                        color: theme === "light" ? "#2e2e2e" : "white"}}
+                        "white" : "#262626", 
+                        color: theme === "light" ? "black" : "white"}}
                     ref={dropdownRef}
                 >
                     <ThemeToggle />
-                    <div className={style.borderBottom}></div>
                     <ColorToggle />
-                    <div className={style.borderBottom}></div>
                     <PinToggle />
-                    <div className={style.borderBottom}></div>
                     <PersistToggle />
-                    <div className={style.borderBottom}></div>
                     <FontToggle />
-                    <div className={style.borderBottom}></div>
                     <PasswordToggle />
                 </div>
             )}

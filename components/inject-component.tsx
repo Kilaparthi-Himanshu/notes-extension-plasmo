@@ -498,7 +498,7 @@ function InjectReact({
                             setShowNewPasswordForm={setShowNewPasswordForm}
                         />
                     );
-                } else if (showNewPasswordForm) {
+                } else if (true) {
                     return (
                         <NewPasswordForm 
                             theme={theme} 

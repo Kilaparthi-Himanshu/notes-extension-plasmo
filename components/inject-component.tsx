@@ -59,8 +59,8 @@ function InjectReact({
 
         // Calculate random position within viewport
         // Subtract note size to keep within bounds
-        const randomX = Math.random() * (viewportWidth - 300);  // 300px is note width
-        const randomY = Math.random() * (viewportHeight - 200); // 200px is note height
+        const randomX = Math.random() * (viewportWidth - 378);  // 378px is note width
+        const randomY = Math.random() * (viewportHeight - 265); // 265px is note height
 
         return {
             x: Math.max(0, randomX),  // Ensure not less than 0
@@ -89,8 +89,8 @@ function InjectReact({
     const [customColor, setCustomColor] = useState('#ffffff');
     const [pinned, setPinned] = useState(true);
     const [saved, setSaved] = useState(false);
-    const [width, setWidth] = useState(300);
-    const [height, setHeight] = useState(200);
+    const [width, setWidth] = useState(378);
+    const [height, setHeight] = useState(265);
     const [active, setActive] = useState(false);
     const [font, setFont] = useState('Gill Sans MT');
     const [fontSize, setFontSize] = useState(16);
@@ -108,7 +108,7 @@ function InjectReact({
             setContent(note.content);
             setPosition(note.position);
             setTheme(note.theme);
-            setCustomColor(note.color); // Add logic so if theme light previous notes get white
+            setCustomColor(note.color);
             setPinned(note.isPinned);
             setSaved(note.saved);
             setWidth(note.width);
@@ -492,16 +492,18 @@ function InjectReact({
                     return (
                         <PasswordForm 
                             theme={theme} 
+                            customColor={customColor}
                             setRequirePassword={setRequirePassword}
                             password={password}
                             email={email}
                             setShowNewPasswordForm={setShowNewPasswordForm}
                         />
                     );
-                } else if (true) {
+                } else if (showNewPasswordForm) {
                     return (
                         <NewPasswordForm 
                             theme={theme} 
+                            customColor={customColor}
                             setShowNewPasswordForm={setShowNewPasswordForm}
                             setPassword={setPassword}
                             email={email}

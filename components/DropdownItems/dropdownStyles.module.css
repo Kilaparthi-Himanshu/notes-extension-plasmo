@@ -124,7 +124,7 @@
     cursor: pointer;
     font-family: Arial;
     font-size: 18px;
-    border-radius: 5px;
+    border-radius: 8px;
     transition: box-shadow 0.2s ease-in;
 }
 

@@ -4,8 +4,9 @@ import equalityChecker from './passwordFunctions';
 import { Eye, EyeOff} from 'lucide-react';
 import VerificationInput from './VerificationInput';
 import { emailSend, verifiyCode } from './ResetCodeVerification';
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
-const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPasswordForm}: { theme: string, setRequirePassword: (value: boolean) => void, password: string, email: string, setShowNewPasswordForm: (value: boolean) => void}) => {
+const PasswordForm = ({ theme, customColor, setRequirePassword, password, email, setShowNewPasswordForm}: { theme: string, customColor: string, setRequirePassword: (value: boolean) => void, password: string, email: string, setShowNewPasswordForm: (value: boolean) => void}) => {
     const [password1, setPassword1] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(false);
@@ -47,8 +48,7 @@ const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPa
         <div 
             className={style.passwordOverlay}
             style={{
-                backgroundColor: theme === "light" ? 
-                    "rgb(202, 202, 202)" : "rgb(34, 48, 73)"
+                backgroundColor: customColor
             }}
         >
             <form 
@@ -96,25 +96,27 @@ const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPa
                             }}
                         >
                             {isPasswordVisible ? 
-                            <Eye 
+                            <FaRegEye 
                                 className={style.eye}
                                 style={{
-                                    color: theme === 'light' ? 'white' : 'black',
+                                    color: theme === 'light' ? 'gray' : 'white',
                                 }}
                                 onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                                size={28}
                             /> : 
-                            <EyeOff 
+                            <FaRegEyeSlash 
                                 className={style.eye}
                                 style={{
-                                    color: theme === 'light' ? 'white' : 'black',
+                                    color: theme === 'light' ? 'gray' : 'white',
                                 }}
                                 onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                                size={28}
                             />}
                         </div>
                     </div>
                     <button 
                         type="submit" 
-                        className={style.passwordSubmitButton}
+                        className={`${style.passwordSubmitButton} ${style[theme]}`}
                         style={{
                             color: theme === 'light' ? 'black' : 'white'
                         }}
@@ -152,9 +154,9 @@ const PasswordForm = ({ theme, setRequirePassword, password, email, setShowNewPa
                                 />
                             </div>
                             <div 
-                                className={style.resetPassword} 
+                                className={`${style.resetPassword}`} 
                                 onClick={() => setIsResetPassword(false)}
-                            > 
+                            >
                                 Cancel
                             </div>
                         </div>

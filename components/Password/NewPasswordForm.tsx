@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import * as style from '../styles.module.css';
 import equalityChecker from './passwordFunctions';
-import { Eye, EyeOff } from 'lucide-react';
 import { isValidEmail }from './ResetCodeVerification';
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
-const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, setEmail}: { theme: string, setShowNewPasswordForm: (value: boolean) => void, setPassword: (value: string) => void, email: string, setEmail: (value: string) => void}) => {
+const NewPasswordForm = ({ theme, customColor, setShowNewPasswordForm, setPassword, email, setEmail}: { theme: string, customColor: string, setShowNewPasswordForm: (value: boolean) => void, setPassword: (value: string) => void, email: string, setEmail: (value: string) => void}) => {
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
     const [email1, setEmail1] = useState('');
@@ -26,8 +26,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
         <div 
             className={style.passwordOverlay}
             style={{
-                backgroundColor: theme === "light" ? 
-                    "white" : "rgb(34, 48, 73)"
+                backgroundColor: customColor
             }}
         >
             <form 
@@ -63,19 +62,21 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                         />
                         <div className={style.passwordEye}>
                             {isPasswordVisible1 ? 
-                            <Eye 
+                            <FaRegEye 
                                 className={style.eye}
                                 style={{
-                                    color: theme === 'light' ? 'white' : 'black',
+                                    color: theme === 'light' ? 'gray' : 'white',
                                 }}
                                 onClick={() => setIsPasswordVisible1(!isPasswordVisible1)}
+                                size={30}
                             /> : 
-                            <EyeOff 
+                            <FaRegEyeSlash 
                                 className={style.eye}
                                 style={{
-                                    color: theme === 'light' ? 'white' : 'black',
+                                    color: theme === 'light' ? 'gray' : 'white',
                                 }}
                                 onClick={() => setIsPasswordVisible1(!isPasswordVisible1)}
+                                size={30}
                             />}
                         </div>
                     </div>
@@ -89,19 +90,21 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                         />
                         <div className={style.passwordEye}>
                             {isPasswordVisible2 ? 
-                            <Eye 
+                            <FaRegEye 
                                 className={style.eye}
                                 style={{
-                                    color: theme === 'light' ? 'white' : 'black',
+                                    color: theme === 'light' ? 'gray' : 'white',
                                 }}
                                 onClick={() => setIsPasswordVisible2(!isPasswordVisible2)}
+                                size={30}
                             /> : 
-                            <EyeOff 
+                            <FaRegEyeSlash 
                                 className={style.eye}
                                 style={{
-                                    color: theme === 'light' ? 'white' : 'black',
+                                    color: theme === 'light' ? 'gray' : 'white',
                                 }}
                                 onClick={() => setIsPasswordVisible2(!isPasswordVisible2)}
+                                size={30}
                             />}
                         </div>
                     </div>
@@ -131,7 +134,7 @@ const NewPasswordForm = ({ theme, setShowNewPasswordForm, setPassword, email, se
                     </div>
                     <button 
                         type="submit" 
-                        className={style.passwordSubmitButton}
+                        className={`${style.passwordSubmitButton} ${style[theme]}`}
                         style={{
                             color: theme === 'light' ? 'black' : 'white'
                         }}

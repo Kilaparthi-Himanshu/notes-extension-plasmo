@@ -517,6 +517,7 @@ function InjectReact({
                         >
                             <textarea
                                 className={style.textArea}
+                                name="textarea"
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 onKeyDown={(e) => {

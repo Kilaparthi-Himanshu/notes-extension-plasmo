@@ -4,7 +4,7 @@ import { RefreshCw } from 'lucide-react';
 
 function IndexPopup () {
     const [search, setSearch] = useState("");
-    const [notes, setNotes] = useState([]);
+    const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
 
@@ -27,7 +27,9 @@ function IndexPopup () {
     };
 
     // Call the function to get notes
-    getNotes();
+    useEffect(() => {
+        getNotes();
+    }, []);
 
     const handleInject = async () => {
         try {
@@ -92,9 +94,10 @@ function IndexPopup () {
         const notes = result.notes;
 
         const newNotes = notes.filter((n) => n.id != note.id);
-        console.log(newNotes);
 
         await chrome.storage.local.set({ "notes": newNotes });
+
+        getNotes();
     }
 
     const handleResetPos = async (note) => {

@@ -10,7 +10,7 @@ function IndexPopup () {
 
     const handleSearch = () => {
         searchRef.current?.focus();
-    }
+    };
 
     useEffect(() => {
         document.addEventListener("keydown", handleSearch);
@@ -68,10 +68,16 @@ function IndexPopup () {
         } catch (err) {
             console.error("Failed:", err);
         }
-    }
+    };
 
-    const handleDeleteNote = async (note) => {
-        console.log(note.id);
+    const handleDeleteNote = async (note: any) => {
+        let shouldDelete = true;
+
+        shouldDelete = window.confirm('Are You Sure You Want To Delete This Note?');
+
+        if (!shouldDelete) {
+            return;
+        }
 
         try {
             const [tab] = await chrome.tabs.query({ 
@@ -98,7 +104,7 @@ function IndexPopup () {
         await chrome.storage.local.set({ "notes": newNotes });
 
         getNotes();
-    }
+    };
 
     const handleResetPos = async (note) => {
         setResetDisabled(true);
@@ -126,7 +132,7 @@ function IndexPopup () {
         setTimeout(() => {
             setResetDisabled(false);
         }, 300);
-    }
+    };
 
     return (
         <div className="popup">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
@@ -9,11 +9,13 @@ import { DropdownContext } from "./context";
 import icon from "../assets/icon.png";
 import PasswordForm from "./Password/PasswordForm";
 import NewPasswordForm from "./Password/NewPasswordForm";
-import tailwindStyles from "data-text:../styles/global.css"
+import tailwindStyles from "data-text:../styles/global.css";
+import Quill from "quill";
+import snowCss from "data-text:quill/dist/quill.snow.css";
 
 export const getStyle = () => {
     const style = document.createElement("style");
-    style.textContent =  styleText + tailwindStyles;
+    style.textContent =  styleText + tailwindStyles + snowCss;
     return style;
 }
 
@@ -326,9 +328,45 @@ function InjectReact({
         };
     }, [noteId]); // To stop keyboard events from interacting with the outer DOM
 
+    const editorRef = useRef<Quill | null>(null);
+    const editorContainerRef = useRef<HTMLDivElement | null>(null);
+    const toolbarRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (editorContainerRef.current && !editorRef.current) {
+            const quill = new Quill(editorContainerRef.current, {
+                theme: "snow",
+                modules: {
+                    toolbar: false
+                },
+            });
+
+            quill.on("text-change", () => {
+                setContent(quill.root.innerHTML);
+            });
+
+            editorRef.current = quill;
+        }
+    }, [noteId, requirePassword, editorContainerRef.current, iconize]);
+
+    useEffect(() => {
+        if (editorRef.current) {
+            const currentHtml = editorRef.current.root.innerHTML;
+            let safeContent = content || "";
+
+            if (safeContent && !safeContent.trim().startsWith("<")) {
+                safeContent = `<p>${safeContent}</p>`;
+            }
+
+            if (safeContent !== currentHtml) {
+                editorRef.current.root.innerHTML = safeContent;
+            }
+        }
+    }, [content, requirePassword]);
+
     return (
         <>
-        { iconize ? 
+        {iconize ? 
         (<div data-id={noteId}
             id="react-injected-component"
             title="Double Click To Expand Note"
@@ -513,9 +551,30 @@ function InjectReact({
                 } else {
                     return (
                         <div className={style.textAreaContainer}
-                            style={{backgroundColor: customColor}}
+                            style={{backgroundColor: customColor, flexDirection: "column"}}
                         >
-                            <textarea
+                            {/* <div ref={toolbarRef} id={`toolbar-${noteId}`}>
+                                <button className="ql-bold"></button>
+                                <button className="ql-italic"></button>
+                                <button className="ql-underline"></button>
+                                <button className="ql-list" value="ordered"></button>
+                                <button className="ql-list" value="bullet"></button>
+                            </div> */}
+
+                            <div 
+                                ref={editorContainerRef} 
+                                id={`editor-${noteId}`} 
+                                style={{
+                                    backgroundColor: "black",
+                                    color: fontColor || (theme === "light" ? "black" : "white"),
+                                    fontFamily: font,
+                                    fontSize: `${fontSize}px`,
+                                //     // minHeight: "100%",
+                                //     // minWidth: "100%""
+                                }}
+                                className={style.textArea}
+                            />
+                            {/* <textarea
                                 className={style.textArea}
                                 name="textarea"
                                 value={content}
@@ -571,7 +630,7 @@ function InjectReact({
                                     const overlay = document.getElementById('keyboard-overlay');
                                     if (overlay) overlay.remove();
                                 }}
-                            ></textarea>
+                            /> */}
                         </div>
                     );
                 }

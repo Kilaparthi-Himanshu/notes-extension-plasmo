@@ -12,6 +12,13 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@expo/spawn-async": "^1.7.2",
+    "@tiptap/extension-font-size": "^3.0.0-next.3",
+    "@tiptap/extension-strike": "^3.3.0",
+    "@tiptap/extension-text-style": "^3.3.0",
+    "@tiptap/extensions": "^3.3.0",
+    "@tiptap/pm": "^3.3.0",
+    "@tiptap/react": "^3.3.0",
+    "@tiptap/starter-kit": "^3.3.0",
     "@types/css-modules": "^1.0.5",
     "framer-motion": "^12.0.0",
     "lucide-react": "^0.468.0",
@@ -24,6 +31,7 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/chrome": "0.0.258",
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",

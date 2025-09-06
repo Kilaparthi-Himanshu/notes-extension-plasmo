@@ -12,6 +12,7 @@ import NewPasswordForm from "./Password/NewPasswordForm";
 import tailwindStyles from "data-text:../styles/global.css";
 import Quill from "quill";
 import snowCss from "data-text:quill/dist/quill.snow.css";
+import TipTapEditor from "./TipTapEditor";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -332,11 +333,37 @@ function InjectReact({
     const editorContainerRef = useRef<HTMLDivElement | null>(null);
     const toolbarRef = useRef<HTMLDivElement | null>(null);
 
+    // useEffect(() => {
+    //     if (editorContainerRef.current && !editorRef.current) {
+    //         const quill = new Quill(editorContainerRef.current, {
+    //             theme: "snow",
+    //             modules: {
+    //                 toolbar: false
+    //             },
+    //         });
+
+    //         quill.on("text-change", () => {
+    //             setContent(quill.root.innerHTML);
+    //         });
+
+    //         editorRef.current = quill;
+    //     }
+    // }, [noteId, requirePassword, editorContainerRef.current, iconize]);
+
     useEffect(() => {
-        if (editorContainerRef.current && !editorRef.current) {
+        if (!requirePassword && !showNewPasswordForm && editorContainerRef.current) {
+            if (editorRef.current) {
+                editorRef.current.off("text-change");
+                editorRef.current = null;
+            }
+
             const quill = new Quill(editorContainerRef.current, {
                 theme: "snow",
-                modules: {
+                modules: { 
+                    history: {
+                        delay: 2000,
+                        maxStack: 500,
+                    },
                     toolbar: false
                 },
             });
@@ -346,23 +373,15 @@ function InjectReact({
             });
 
             editorRef.current = quill;
-        }
-    }, [noteId, requirePassword, editorContainerRef.current, iconize]);
 
-    useEffect(() => {
-        if (editorRef.current) {
-            const currentHtml = editorRef.current.root.innerHTML;
+            // restore saved content
             let safeContent = content || "";
-
             if (safeContent && !safeContent.trim().startsWith("<")) {
                 safeContent = `<p>${safeContent}</p>`;
             }
-
-            if (safeContent !== currentHtml) {
-                editorRef.current.root.innerHTML = safeContent;
-            }
+            quill.clipboard.dangerouslyPasteHTML(safeContent, "silent");
         }
-    }, [content, requirePassword]);
+    }, [requirePassword, iconize, showNewPasswordForm, editorContainerRef.current]);
 
     return (
         <>
@@ -551,7 +570,7 @@ function InjectReact({
                 } else {
                     return (
                         <div className={style.textAreaContainer}
-                            style={{backgroundColor: customColor, flexDirection: "column"}}
+                            style={{backgroundColor: customColor, flexDirection: "column", flex: 1}}
                         >
                             {/* <div ref={toolbarRef} id={`toolbar-${noteId}`}>
                                 <button className="ql-bold"></button>
@@ -561,18 +580,28 @@ function InjectReact({
                                 <button className="ql-list" value="bullet"></button>
                             </div> */}
 
-                            <div 
+                            {/* <div 
                                 ref={editorContainerRef} 
                                 id={`editor-${noteId}`} 
                                 style={{
-                                    backgroundColor: "black",
+                                    backgroundColor: customColor,
                                     color: fontColor || (theme === "light" ? "black" : "white"),
                                     fontFamily: font,
                                     fontSize: `${fontSize}px`,
+                                    // border: 0
                                 //     // minHeight: "100%",
-                                //     // minWidth: "100%""
+                                //     // minWidth: "100%"
                                 }}
                                 className={style.textArea}
+                            /> */}
+                            <TipTapEditor
+                                content={content}
+                                onChange={setContent}
+                                customColor={customColor}
+                                fontColor={fontColor} 
+                                font={font}
+                                fontSize={fontSize}
+                                theme={theme}
                             />
                             {/* <textarea
                                 className={style.textArea}

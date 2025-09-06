@@ -162,26 +162,27 @@ function IndexPopup () {
                 className="saved-notes-container"
             >
                 {notes.filter((note) =>
-                note.title.toLowerCase().includes(search.toLowerCase()) 
-                || note.content.toLowerCase().includes(search.toLowerCase()))
+                    note.title.toLowerCase().includes(search.toLowerCase()) 
+                    // || note.content.toLowerCase().includes(search.toLowerCase())
+                )
                 .reverse()
                 .map((note, index) => (
                         <div className="saved-note"
-                            // style={{
-                            //     backgroundColor: note.color
-                            // }}
+                            style={{
+                                backgroundColor: note.color
+                            }}
                             onDoubleClick={() => handleLoadNote(note, true)}
                             key={note.id || index}
                         >
                             <div className="saved-note-content">
                                 <h2
-                                    // style={{
-                                    //     color: note.theme === "light" ? "black" : "white"
-                                    // }}
+                                    style={{
+                                        color: note.fontColor
+                                    }}
                                 >
                                     {note.title}
                                 </h2>
-                                <p 
+                                {/* <p 
                                 // style={{
                                 //         color: note.theme === "light" ? "black" : "white"
                                 //     }}
@@ -189,7 +190,7 @@ function IndexPopup () {
                                     {note.content.length > 30
                                     ? note.content.slice(0, 30) + '...' 
                                     : note.content}
-                                </p>
+                                </p> */}
                             </div>
 
                             <div className="saved-note-buttons">

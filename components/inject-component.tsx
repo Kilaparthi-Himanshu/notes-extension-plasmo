@@ -594,6 +594,9 @@ function InjectReact({
                                 }}
                                 className={style.textArea}
                             /> */}
+
+                            {/* TipTapEditor Below */}
+
                             <TipTapEditor
                                 content={content}
                                 onChange={setContent}
@@ -603,6 +606,9 @@ function InjectReact({
                                 fontSize={fontSize}
                                 theme={theme}
                             />
+
+                            {/* Original Below */}
+
                             {/* <textarea
                                 className={style.textArea}
                                 name="textarea"

@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './popup.css';
 import { RefreshCw } from 'lucide-react';
+import { supabase } from "./lib/supabase";
 
 function IndexPopup () {
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
+    const [user, setUser] = useState<any>(null);
+    const [session, setSession] = useState(false);
 
     const handleSearch = () => {
         searchRef.current?.focus();
@@ -134,6 +137,25 @@ function IndexPopup () {
         }, 300);
     };
 
+    useEffect(() => {
+        async function getSession() {
+            console.log("Getting session...");
+            const { data, error } = await supabase
+                .auth
+                .getSession();
+
+            if (data.session == null || error) {
+                setSession(false);
+                console.log(data, error);
+            } else {
+                setSession(true);
+                console.log(data);
+            }
+        }
+
+      getSession();
+    }, []);
+
     return (
         <div className="popup">
             <button 
@@ -145,6 +167,12 @@ function IndexPopup () {
             >
                 Add New Note
             </button>
+
+            <div style={{
+                color: "white"
+            }}>
+                The seession is: {session ? "True" : "False"}
+            </div>
 
             <div>
                 <input 

@@ -12,6 +12,8 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@expo/spawn-async": "^1.7.2",
+    "@plasmohq/storage": "^1.15.0",
+    "@supabase/supabase-js": "^2.57.2",
     "@tiptap/extension-font-size": "^3.0.0-next.3",
     "@tiptap/extension-strike": "^3.3.0",
     "@tiptap/extension-text-style": "^3.3.0",
@@ -46,11 +48,25 @@
     "host_permissions": [
       "<all_urls>"
     ],
+    "key": "$CRX_KEY",
     "permissions": [
       "activeTab",
       "storage",
       "contextMenus",
       "unlimitedStorage"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "options.html"
+        ],
+        "matches": [
+          "<all_urls>"
+        ],
+        "extension_ids": [
+          "$CRX_ID"
+        ]
+      }
     ]
   }
 }

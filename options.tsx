@@ -1,9 +1,10 @@
-import React, { useEffect, type FormEvent } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { supabase } from "~lib/supabase";
 import "./styles/global.css";
 import NoteToGoIcon from "./assets/icon.png";
 import TrafficLights from "./components/TrafficLight";
+import DebugButtons from "./components/DebugButtons";
 
 function Options() {
     const [user, setUser] = useState<any>(null);
@@ -190,63 +191,7 @@ function Options() {
                 className="w-full h-full absolute z-0"
             />
 
-            <div className="absolute bg-red-500 top-2 left-2 p-4 flex flex-col items-center justify-center gap-2">
-                <button className="bg-blue-200 p-4"
-                    onClick={() => {
-                        console.log(user);
-                    }}
-                >
-                    Log User
-                </button>
-
-                <button className="bg-blue-200 p-4"
-                    onClick={async () => {
-                        const { data, error } = await supabase.auth.getSession();
-                        if (error) {
-                            console.log(error);
-                        }
-                        console.log(data);
-                    }}
-                >
-                    Log Session
-                </button>
-
-                <button className="bg-blue-200 p-4"
-                    onClick={async () => {
-                        const { error } = await supabase.auth.signOut();
-                        console.log(error);
-                    }}
-                >
-                    Sign Out
-                </button>
-
-                <button className="bg-blue-200 p-4" onClick={() => {
-                    const redirectUrl =
-                        process.env.NODE_ENV == "development"
-                        ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html"
-                        : "chrome-extension://omniokhaanekilmkofmbfnbchoaifnbh/options.html"
-                        console.log(redirectUrl);
-                }}>
-                    Print Redirect Email
-                </button>
-
-                <button className="bg-blue-200 p-4" onClick={async () => {
-                    const { data: userData, error: userError } = await supabase
-                    .from('users')
-                    .insert({
-                        user_id: user.id,
-                        email: user.email
-                    })
-                    .select();
-
-                    if (!userData || userError) {
-                        console.error(userError);
-                        return;
-                    }
-                }}>
-                    Insert User
-                </button>
-            </div>
+            <DebugButtons user={user} supabase={supabase} />
 
             <div className="w-full flex items-center justify-center h-[200px] gap-[20px] z-10">
                 <span className="text-8xl max-sm:text-6xl text-white underline decoration-purple-200 decoration-[4px] underline-offset-4">NoteToGo</span>

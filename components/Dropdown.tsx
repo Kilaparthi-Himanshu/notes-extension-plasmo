@@ -49,7 +49,7 @@ const Dropdown = () => {
     return (
         <div>
             <div 
-                className={style.hamburger} 
+                className={style.hamburger}
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                     if (requirePassword) {

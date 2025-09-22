@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './popup.css';
 import { RefreshCw } from 'lucide-react';
 import { supabase } from "./lib/supabase";
+import type { Session } from "~node_modules/@supabase/supabase-js/dist/module";
 
 function IndexPopup () {
     const [search, setSearch] = useState("");
@@ -9,7 +10,7 @@ function IndexPopup () {
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
     const [user, setUser] = useState<any>(null);
-    const [session, setSession] = useState(false);
+    const [session, setSession] = useState<Session>(null);
 
     const handleSearch = () => {
         searchRef.current?.focus();
@@ -145,10 +146,10 @@ function IndexPopup () {
                 .getSession();
 
             if (data.session == null || error) {
-                setSession(false);
+                setSession(null);
                 console.log(data, error);
             } else {
-                setSession(true);
+                setSession(data.session);
                 console.log(data);
             }
         }
@@ -171,7 +172,11 @@ function IndexPopup () {
             <div style={{
                 color: "white"
             }}>
-                The seession is: {session ? "True" : "False"}
+                {session ? (
+                    <div>Signed in as: {session.user.email}</div>
+                ) : (
+                    <div>Not signed in</div>
+                )}
             </div>
 
             <div>

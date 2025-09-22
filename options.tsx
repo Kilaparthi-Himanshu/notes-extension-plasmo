@@ -10,6 +10,10 @@ function Options() {
     const [actionType, setActionType] = useState<'signup' | 'signin'>('signup');
 
     useEffect(() => {
+        console.log("THE EXT ENV IS: ", process.env.NODE_ENV);
+    }, []);
+
+    useEffect(() => {
         const init = async () => {
             const { data, error } = await supabase
                 .auth
@@ -20,7 +24,7 @@ function Options() {
                 return;
             }
 
-            if (!!data.session) {
+            if (!!data.session) { // converts data.session to boolean, here true then do
                 setUser(data.session.user);
                 // sendToBackground({
                 //     name: "init-session",
@@ -29,6 +33,31 @@ function Options() {
                 //         access_token: data.session.access_token,
                 //     }
                 // });
+            } else {
+                return;
+            }
+
+            if (data.session.user.email_confirmed_at) {
+                const { data: userData, error: userError} = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq("user_id", data.session.user.id);
+
+                if (userData.length != 0 || userError) {
+                    return;
+                }
+
+                const { error: insertError } = await supabase
+                    .from('users')
+                    .insert({
+                        user_id: data.session.user.id,
+                        email: data.session.user.email
+                    });
+
+                if (insertError) {
+                    console.error(insertError);
+                    return;
+                }
             }
         }
 
@@ -38,14 +67,27 @@ function Options() {
     useEffect(() => {
         const { data: subscription } = supabase.auth.onAuthStateChange(
             async (event, session) => {
-                console.log("Auth event:", event, session);
-
                 if (event === "SIGNED_OUT") {
                     setUser(null);
                 }
 
-                if (event === "SIGNED_IN") {
+                if (event === "SIGNED_IN" && session.user.email_confirmed_at) {
                     setUser(session.user);
+
+                    // Fire and forget to prevent async dead-end block
+                    (async () => {
+                        const { data: userData, error } = await supabase
+                            .from("users")
+                            .select("*")
+                            .eq("user_id", session.user.id);
+
+                        if (!error && (!userData || userData.length === 0)) {
+                            await supabase.from("users").insert({
+                                user_id: session.user.id,
+                                email: session.user.email,
+                            });
+                        }
+                    })();
                 }
             }
         );
@@ -59,6 +101,11 @@ function Options() {
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
         const confirmPassword = formData.get("confirmPassword") as string;
+
+        const redirectUrl =
+            process.env.NODE_ENV == "development"
+            ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html"
+            : "chrome-extension://aacbmfpcgjlmefmhhbafimdaefpifkjk/options.html"
 
         if (!email || !password || !confirmPassword) {
             alert("All Fields Must Be Filled!");
@@ -74,13 +121,19 @@ function Options() {
             .auth
             .signUp({
                 email,
-                password
+                password,
+                options: {
+                    emailRedirectTo: redirectUrl
+                }
             });
 
-        console.log("Signed Up user: ", { data, error });
-        alert("Confirmation Mail Has Been Sent To The Provided Email!")
-        setUser(data.user);
-        console.log(data.user);
+        if (!data || error) {
+            console.error(error);
+            alert("Error Signing up!");
+            return;
+        }
+
+        alert("Confirmation Mail Has Been Sent To The Provided Email!, Open The Mail From This Device Only!");
     }
 
     const signIn = async (formData: FormData) => {
@@ -93,7 +146,14 @@ function Options() {
                 email,
                 password
             });
-        console.log("Login result:", { data, error });
+
+        if (!data.user || error) {
+            alert("Unable to signin, please make sure the credentials are correct or the account exists");
+            return;
+        }
+
+        alert("Signed In Successfully!");
+
         setUser(data.user);
     }
 
@@ -104,6 +164,7 @@ function Options() {
 
         if (error) {
             alert(`Error Signing Out, Please Try Again!, ${error.message}`);
+            return;
         }
     }
 
@@ -118,7 +179,7 @@ function Options() {
         chrome.runtime.sendMessage({ type: "PRINT_SESSION" });
     }
 
-    const inputClasses = "w-full rounded-xl h-[45px] text-violet-300 text-xl px-2 outline-none focus:border-2 focus:border-purple-400 bg-neutral-800 transition-[border] duration-[40ms]";
+    const inputClasses = "w-full rounded-xl h-[45px] text-violet-300 text-xl px-2 outline-none border-2 border-transparent focus:border-2 focus:border-purple-400 bg-neutral-800 transition-[border] duration-[100ms]";
 
     return (
         <div className="w-dvw h-dvh bg-neutral-800 overflow-hidden flex items-center max-lg:flex-col">
@@ -140,7 +201,11 @@ function Options() {
 
                 <button className="bg-blue-200 p-4"
                     onClick={async () => {
-                        console.log(await supabase.auth.getSession());
+                        const { data, error } = await supabase.auth.getSession();
+                        if (error) {
+                            console.log(error);
+                        }
+                        console.log(data);
                     }}
                 >
                     Log Session
@@ -153,6 +218,33 @@ function Options() {
                     }}
                 >
                     Sign Out
+                </button>
+
+                <button className="bg-blue-200 p-4" onClick={() => {
+                    const redirectUrl =
+                        process.env.NODE_ENV == "development"
+                        ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html"
+                        : "chrome-extension://omniokhaanekilmkofmbfnbchoaifnbh/options.html"
+                        console.log(redirectUrl);
+                }}>
+                    Print Redirect Email
+                </button>
+
+                <button className="bg-blue-200 p-4" onClick={async () => {
+                    const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .insert({
+                        user_id: user.id,
+                        email: user.email
+                    })
+                    .select();
+
+                    if (!userData || userError) {
+                        console.error(userError);
+                        return;
+                    }
+                }}>
+                    Insert User
                 </button>
             </div>
 
@@ -175,61 +267,80 @@ function Options() {
                         <TrafficLights />
                     </div>
 
-                    <div className="w-full h-[30px] relative">
-                        <span className="text-4xl absolute -top-3 -left-3">
-                            {actionType === 'signin' ? 'Sign In' : 'Sign Up'}
-                        </span>
-                    </div>
+                    {!user ? (
+                        <>
+                            <div className="w-full h-[30px] relative">
+                                <span className="text-4xl absolute -top-3 -left-3">
+                                    {actionType === 'signin' ? 'Sign In' : 'Sign Up'}
+                                </span>
+                            </div>
 
-                    <div className="w-full h-max flex flex-col gap-3">
-                        <span className="text-2xl underline decoration-purple-300">Email</span>
+                            <div className="w-full h-max flex flex-col gap-3">
+                                <span className="text-2xl underline decoration-purple-300">Email</span>
 
-                        <input className={inputClasses} name="email" />
-                    </div>
+                                <input className={inputClasses} name="email" />
+                            </div>
 
-                    <div className="w-full h-max flex flex-col gap-3">
-                        <span className="text-2xl underline decoration-purple-300">Password</span>
+                            <div className="w-full h-max flex flex-col gap-3">
+                                <span className="text-2xl underline decoration-purple-300">Password</span>
 
-                        <input className={inputClasses} name="password" />
-                    </div>
+                                <input className={inputClasses} type="password" name="password" />
+                            </div>
 
-                    {actionType === 'signup' && 
-                        <div className="w-full h-max flex flex-col gap-3">
-                            <span className="text-2xl underline decoration-purple-300">Confirm Password</span>
+                            {actionType === 'signup' && 
+                                <div className="w-full h-max flex flex-col gap-3">
+                                    <span className="text-2xl underline decoration-purple-300">Confirm Password</span>
 
-                            <input className={inputClasses} name="confirmPassword" />
-                        </div>
-                    }
-
-                    <div className="w-full flex justify-between items-center h-max mt-4">
-                        <button className="border px-10 py-2 text-xl rounded-2xl bg-violet-700 hover:scale-95 transition-[transform]" type="submit">
-                            Submit
-                        </button>
-
-                        <div className="h-full flex items-center">
-                            {actionType === 'signup' ? (
-                                <div className="flex flex-col items-center justify-center text-lg text-center">
-                                    <span className="text-[13px]">
-                                        Already have an account?
-                                    </span>
-
-                                    <button className="underline" type="button" onClick={() => setActionType('signin')}>
-                                        Sign In
-                                    </button>
+                                    <input className={inputClasses} type="password" name="confirmPassword" />
                                 </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center text-lg text-center">
-                                    <span className="text-[13px]">
-                                        Don't have an account?
-                                    </span>
+                            }
 
-                                    <button className="underline" type="button" onClick={() => setActionType('signup')}>
-                                        Sign Up
-                                    </button>
+                            <div className="w-full flex justify-between items-center h-max mt-4">
+                                <button className="border px-10 py-2 text-xl rounded-2xl bg-violet-700 hover:scale-95 transition-[transform]" type="submit">
+                                    Submit
+                                </button>
+
+                                <div className="h-full flex items-center">
+                                    {actionType === 'signup' ? (
+                                        <div className="flex flex-col items-center justify-center text-lg text-center">
+                                            <span className="text-[13px]">
+                                                Already have an account?
+                                            </span>
+
+                                            <button className="underline" type="button" onClick={() => setActionType('signin')}>
+                                                Sign In
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center text-lg text-center">
+                                            <span className="text-[13px]">
+                                                Don't have an account?
+                                            </span>
+
+                                            <button className="underline" type="button" onClick={() => setActionType('signup')}>
+                                                Sign Up
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="w-full text-center">
+                                <span className="text-3xl text-wrap">
+                                    Signed In As <br/>
+                                    <span className="underline text-2xl break-all">
+                                        {user.email}
+                                    </span>
+                                </span>
+                            </div>
+
+                            <button className="border px-10 py-2 text-xl rounded-2xl bg-violet-700 hover:scale-95 transition-[transform] mt-2" type="button" onClick={signOut}>
+                                Sign Out
+                            </button>
+                        </>
+                    )}
                 </form>
             </div>
         </div>

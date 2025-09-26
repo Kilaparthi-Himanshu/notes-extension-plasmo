@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Editor } from "@tiptap/react";
 import { Bold, Italic, Underline, List, ListOrdered, Strikethrough } from "lucide-react";
-import styleText from "data-text:./styles.module.css";
+import styleText from "data-text:../styles.module.css";
 
 export const getStyle = () => {
     const style = document.createElement("style");

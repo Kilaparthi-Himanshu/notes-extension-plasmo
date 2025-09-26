@@ -12,7 +12,7 @@ import NewPasswordForm from "./Password/NewPasswordForm";
 import tailwindStyles from "data-text:../styles/global.css";
 import Quill from "quill";
 import snowCss from "data-text:quill/dist/quill.snow.css";
-import TipTapEditor from "./TipTapEditor";
+import TipTapEditor from './TipTapEditor/TipTapEditor';
 
 export const getStyle = () => {
     const style = document.createElement("style");

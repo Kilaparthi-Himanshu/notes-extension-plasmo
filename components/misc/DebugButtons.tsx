@@ -2,13 +2,15 @@ import React from "react";
 
 export default function DebugButtons ({
     user, 
+    userDetails,
     supabase
 }: {
-    user: any
-    supabase: any
+    user: any;
+    userDetails: any;
+    supabase: any;
 }) {
     return (
-        <div className="absolute bg-red-500 top-2 left-2 p-4 flex flex-col items-center justify-center gap-2">
+        <div className="absolute bg-red-500 top-2 left-2 p-4 grid grid-cols-2 gap-2">
                 <button className="bg-blue-200 p-4"
                     onClick={() => {
                         console.log(user);
@@ -63,6 +65,12 @@ export default function DebugButtons ({
                     }
                 }}>
                     Insert User
+                </button>
+
+                <button className="bg-blue-200 p-4" onClick={() => {
+                    console.log(userDetails);
+                }}>
+                    Log User From DB
                 </button>
             </div>
     );

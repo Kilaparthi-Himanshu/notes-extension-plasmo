@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import styleText from "data-text:./styles.module.css";
+import styleText from "data-text:../styles.module.css";
 import MenuBar from "./MenuBar";
 import BulletList from "@tiptap/extension-bullet-list";
 import OrderedList from "@tiptap/extension-ordered-list";

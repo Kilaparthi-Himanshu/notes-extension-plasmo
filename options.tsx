@@ -3,11 +3,13 @@ import { useState } from "react";
 import { supabase } from "~lib/supabase";
 import "./styles/global.css";
 import NoteToGoIcon from "./assets/icon.png";
-import TrafficLights from "./components/TrafficLight";
-import DebugButtons from "./components/DebugButtons";
+import TrafficLights from "./components//misc/TrafficLight";
+import DebugButtons from "./components/misc/DebugButtons";
+import type { Session } from "~node_modules/@supabase/auth-js/dist/module";
 
 function Options() {
     const [user, setUser] = useState<any>(null);
+    const [userDetails, setUserDetails] = useState<any>(null);
     const [actionType, setActionType] = useState<'signup' | 'signin'>('signup');
 
     useEffect(() => {
@@ -39,26 +41,7 @@ function Options() {
             }
 
             if (data.session.user.email_confirmed_at) {
-                const { data: userData, error: userError} = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq("user_id", data.session.user.id);
-
-                if (userData.length != 0 || userError) {
-                    return;
-                }
-
-                const { error: insertError } = await supabase
-                    .from('users')
-                    .insert({
-                        user_id: data.session.user.id,
-                        email: data.session.user.email
-                    });
-
-                if (insertError) {
-                    console.error(insertError);
-                    return;
-                }
+                selectAndInsert(data.session);
             }
         }
 
@@ -77,17 +60,7 @@ function Options() {
 
                     // Fire and forget to prevent async dead-end block
                     (async () => {
-                        const { data: userData, error } = await supabase
-                            .from("users")
-                            .select("*")
-                            .eq("user_id", session.user.id);
-
-                        if (!error && (!userData || userData.length === 0)) {
-                            await supabase.from("users").insert({
-                                user_id: session.user.id,
-                                email: session.user.email,
-                            });
-                        }
+                        selectAndInsert(session);
                     })();
                 }
             }
@@ -97,6 +70,34 @@ function Options() {
             subscription.subscription.unsubscribe();
         }
     }, []);
+
+    const selectAndInsert = async (session: Session) => {
+        const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .maybeSingle();
+
+        if (!userError && !userData) {
+            const { data: userInsertData, error: userInsertError } = await supabase
+                .from("users")
+                .insert({
+                    user_id: session.user.id,
+                    email: session.user.email,
+                })
+                .select()
+                .maybeSingle();
+
+            if (!userInsertError) {
+                setUserDetails(userInsertData);
+            }
+        } else if (!userError) {
+            setUserDetails(userData);
+        } else {
+            alert("An Error Has Occured, Please Reload The Page...");
+            console.error(userError)
+        }
+    }
 
     const signUp = async (formData: FormData) => {
         const email = formData.get("email") as string;
@@ -191,7 +192,7 @@ function Options() {
                 className="w-full h-full absolute z-0"
             />
 
-            <DebugButtons user={user} supabase={supabase} />
+            <DebugButtons user={user} userDetails={userDetails} supabase={supabase} />
 
             <div className="w-full flex items-center justify-center h-[200px] gap-[20px] z-10">
                 <span className="text-8xl max-sm:text-6xl text-white underline decoration-purple-200 decoration-[4px] underline-offset-4">NoteToGo</span>
@@ -199,7 +200,7 @@ function Options() {
             </div>
 
             <div className="w-full h-full flex items-center justify-center">
-                <form className="bg-neutral-900 w-[400px] h-max flex flex-col items-center justify-center text-white p-8 rounded-3xl gap-6 shadow-[0_0_5px_3px_#c084fc] relative" onSubmit={(e) => {
+                <form className="bg-neutral-900 w-[400px] h-max flex flex-col items-center justify-center text-white p-8 pt-10 rounded-3xl gap-6 shadow-[0_0_5px_3px_#c084fc] relative" onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.currentTarget);
                     if (actionType === 'signin') {
@@ -273,15 +274,24 @@ function Options() {
                     ) : (
                         <>
                             <div className="w-full text-center">
-                                <span className="text-3xl text-wrap">
-                                    Signed In As <br/>
-                                    <span className="underline text-2xl break-all">
-                                        {user.email}
-                                    </span>
-                                </span>
+                                <div className="text-3xl text-wrap flex flex-col gap-6">
+                                    <div>
+                                        <span>Signed In As:<br /></span>
+                                        <span className="underline text-2xl break-all">
+                                            {user.email}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span>Subscription Plan:<br /></span>
+                                        <b className={`text-2xl capitalize ${userDetails?.subscription_status === 'pro' && 'text-yellow-400'}`}>
+                                            {userDetails?.subscription_status}
+                                        </b>
+                                    </div>
+                                </div>
                             </div>
 
-                            <button className="border px-10 py-2 text-xl rounded-2xl bg-violet-700 hover:scale-95 transition-[transform] mt-2" type="button" onClick={signOut}>
+                            <button className="border px-10 py-2 text-xl rounded-2xl bg-violet-700 hover:scale-95 transition-[transform]" type="button" onClick={signOut}>
                                 Sign Out
                             </button>
                         </>

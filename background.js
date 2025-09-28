@@ -46,5 +46,3 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         console.log("THE SESSION IS: ", await supabase.auth.getSession());
     }
 });
-
-console.log("HELLO GRANDPA!");

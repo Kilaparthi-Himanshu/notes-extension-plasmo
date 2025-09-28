@@ -3,14 +3,20 @@ import './popup.css';
 import { RefreshCw } from 'lucide-react';
 import { supabase } from "./lib/supabase";
 import type { Session } from "~node_modules/@supabase/supabase-js/dist/module";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
+import { useUser } from "./hooks/useUser";
 
 function IndexPopup () {
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
-    const [user, setUser] = useState<any>(null);
-    const [session, setSession] = useState<Session>(null);
+    // const [userDetails, setUserDetails] = useState<any>(null);
+    // const [session, setSession] = useState<Session>(null);
+    const { data, isLoading } = useUser();
+    const session = data?.session;
+    const userDetails = data?.userDetails;
 
     const handleSearch = () => {
         searchRef.current?.focus();
@@ -138,33 +144,37 @@ function IndexPopup () {
         }, 300);
     };
 
-    useEffect(() => {
-        async function getSession() {
-            console.log("Getting session...");
-            const { data, error } = await supabase
-                .auth
-                .getSession();
+    // useEffect(() => {
+    //     async function getSession() {
+    //         const { data, error } = await supabase
+    //             .auth
+    //             .getSession();
 
-            if (data.session == null || error) {
-                setSession(null);
-                console.log(data, error);
-            } else {
-                setSession(data.session);
-                console.log(data);
-            }
-        }
+    //         if (data.session == null || error) {
+    //             setSession(null);
+    //         } else {
+    //             setSession(data.session);
 
-      getSession();
-    }, []);
+    //             const { data: userDetails, error: userDetailsError} = await supabase
+    //                 .from('users')
+    //                 .select('*')
+    //                 .eq("user_id", data.session.user.id)
+    //                 .maybeSingle();
+
+    //             if (!userDetailsError && userDetails) {
+    //                 setUserDetails(userDetails);
+    //             }
+    //         }
+    //     }
+
+    //   getSession();
+    // }, []);
 
     return (
-        <div className="popup">
+        <div className="popup p-2">
             <button 
                 onClick={handleInject}
-                className="add-note-button"
-                style={{
-                    width: '100%',
-                }}
+                className="add-note-button w-full"
             >
                 Add New Note
             </button>
@@ -173,18 +183,26 @@ function IndexPopup () {
                 color: "white"
             }}>
                 {session ? (
-                    <div>Signed in as: {session.user.email}</div>
+                    <div className='flex flex-col items-center'>
+                        <div>Signed in as: {session.user.email}</div>
+                        <div>
+                            Subscription Plan: &nbsp;
+                            <span className={`capitalize ${userDetails?.subscription_status === 'pro' && 'text-yellow-400'}`}>
+                                {userDetails?.subscription_status}
+                            </span>
+                        </div>
+                    </div>
                 ) : (
                     <div>Not signed in</div>
                 )}
             </div>
 
-            <div>
+            <div className='w-full'>
                 <input 
                     ref = {searchRef}
                     type="text" 
                     placeholder="Search..."
-                    className="search-input"
+                    className="search-input px-2"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
@@ -228,11 +246,11 @@ function IndexPopup () {
 
                             <div className="saved-note-buttons">
                                 <button 
-                                    className="load-button"
+                                    className="open-button"
                                     onClick={() => handleLoadNote(note)}
                                     title='Load'
                                 >
-                                    Load
+                                    Open
                                 </button>
 
                                 <button 
@@ -267,4 +285,10 @@ function IndexPopup () {
     );
 }
 
-export default IndexPopup;
+export default function PopupRoot () {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <IndexPopup />
+        </QueryClientProvider>
+    );
+}

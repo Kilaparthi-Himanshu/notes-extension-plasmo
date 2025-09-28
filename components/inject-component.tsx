@@ -13,6 +13,7 @@ import tailwindStyles from "data-text:../styles/global.css";
 import Quill from "quill";
 import snowCss from "data-text:quill/dist/quill.snow.css";
 import TipTapEditor from './TipTapEditor/TipTapEditor';
+import { useUser } from "~hooks/useUser";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -45,8 +46,11 @@ function InjectReact({
         isPasswordProtected: boolean,
         password: string,
         email: string
-    }
+    },
 }) {
+    const { data, isLoading } = useUser();
+    const session = data?.session;
+    const userDetails = data?.userDetails;
 
     const [position, setPosition] = useState(() => {
         if (rightClickPos?.x !== undefined && rightClickPos?.y !== undefined) {
@@ -401,7 +405,7 @@ function InjectReact({
                 MozUserSelect: 'none',
                 msUserSelect: 'none',
                 '--custom-color': customColor,
-            }as React.CSSProperties}
+            } as React.CSSProperties}
             onMouseDown={(e) => {
                 handleMouseDown(e);
                 bringToFront();

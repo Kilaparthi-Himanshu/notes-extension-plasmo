@@ -3,6 +3,8 @@ import React from "react";
 import InjectReact, { getStyle } from "~components/inject-component";
 import * as style from "~components/styles.module.css";
 import { getDropdownStyle } from "~components/DropdownItems/ThemeToggle";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "~lib/queryClient";
 
 const loadActiveNotes = async () => {
     try {
@@ -176,10 +178,12 @@ const injectComponent = async (data) => {
 
     const root = createRoot(rootContainer);
     root.render(
-        <InjectReact 
-            noteId={noteId}
-            rightClickPos={position}
-            note={data.note}
-        />
+        <QueryClientProvider client={queryClient}>
+            <InjectReact 
+                noteId={noteId}
+                rightClickPos={position}
+                note={data.note}
+            />
+        </QueryClientProvider>
     ); // Pass ID to component
 };

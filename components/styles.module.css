@@ -15,10 +15,10 @@
 }
 
 .iconized {
-    min-width: 30px;
-    min-height: 30px;
-    width: 30px;
-    height: 30px;
+    min-width: 35px;
+    min-height: 35px;
+    width: 35px;
+    height: 35px;
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -27,7 +27,7 @@
     border: none;
     color: black;
     overflow: hidden !important;
-    box-shadow: 0px 0px 10px hsla(0, 0%, 0%, 0.527);
+    /* box-shadow: 0px 0px 10px hsla(0, 0%, 0%, 0.527); */
     animation: fadeIn 0.3s ease forwards;
     cursor: pointer;
 }
@@ -38,8 +38,10 @@
     top: 0;
     left: 3px;  /* Adjust for spacing from left */
     right: 3px; /* Adjust for spacing from right */
-    height: 2px;
+    height: 4px;
     background-color: var(--custom-color);
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
 }
 
 .topbar {

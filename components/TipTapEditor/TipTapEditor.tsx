@@ -8,6 +8,7 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import FontSize from "@tiptap/extension-font-size";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Strike from "@tiptap/extension-strike";
+import { useFeatureFlags } from "~hooks/useFeatureFlags";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -22,7 +23,7 @@ interface TipTapEditorProps {
     fontColor: string;
     font: string;
     fontSize: number;
-    theme: string
+    theme: string;
 }
 
 export default function TipTapEditor({ 
@@ -32,7 +33,7 @@ export default function TipTapEditor({
     fontColor, 
     font, 
     fontSize, 
-    theme 
+    theme,
 }: TipTapEditorProps) {
     const editor = useEditor({
         extensions: [
@@ -84,6 +85,8 @@ export default function TipTapEditor({
         }
     }, [editor, fontSize]);
 
+    const { canUseAdvancedEditor } = useFeatureFlags();
+
     return (
         <>
             <EditorContent 
@@ -100,9 +103,11 @@ export default function TipTapEditor({
                 }}
             />
 
-            <div className="absolute bottom-4">
-                <MenuBar editor={editor} theme={theme} />
-            </div>
+           {canUseAdvancedEditor && (
+                <div className="absolute bottom-4">
+                    <MenuBar editor={editor} theme={theme} />
+                </div>
+            )}
         </>
     );
 }

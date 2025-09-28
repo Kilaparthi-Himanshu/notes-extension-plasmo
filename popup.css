@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
     background-color: rgb(31, 31, 31);
     width: 350px;
@@ -28,11 +32,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.add-note-button {
-    width: 200px;
-    margin-bottom: 10px;
+    padding-top: 5px;
 }
 
 .saved-notes-container {
@@ -76,12 +76,12 @@ body {
     border-radius: 5px;
     transition: all 0.3s ease;
     height: 50px;
-    width: 95%;
+    width: 100%;
     cursor: pointer;
 }
 
 .search-input {
-    width: 328.5px;
+    width: 100%;
     margin-top: 4px;
     margin-bottom: 10px;
     outline: none;
@@ -116,7 +116,7 @@ body {
     min-height: 35px;
 }
 
-.load-button, .delete-button {
+.open-button, .delete-button {
     height: 70%;
     width: 50px;
     cursor: pointer;
@@ -132,15 +132,15 @@ body {
     border: 1px solid black;
 }
 
-.load-button {
-    background-color: rgb(105, 218, 105);
+.open-button {
+    background-color: rgb(86, 191, 86);
 }
 
 .delete-button {
     background-color: rgb(218, 105, 105);
 }
 
-.load-button:hover {
+.open-button:hover {
     background-color: rgb(79, 163, 79);
     box-shadow: 0 0 10px 0 rgb(79, 163, 79);
 }
@@ -173,6 +173,7 @@ body {
     display: flex;
     justify-contet: center;
     align-items: center;
+    padding: 5px;
 }
 
 .resetPos-button:hover {

@@ -1,29 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import * as style from "./dropdownStyles.module.css"
 import { DropdownContext } from '~components/context';
-import { useContext } from 'react';
-import { Pin } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
-const PinToggle = () => {
-    const {pinned, handlePin, theme} = useContext(DropdownContext);
+const GlassEffectToggle = () => {
+    const { glassEffect, setGlassEffect, theme } = useContext(DropdownContext);
+
+    const handleGlassEffect = () => {
+        setGlassEffect(!glassEffect);
+    }
 
     return (
-        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handlePin}>
+        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handleGlassEffect}>
             <div>
-                Pin
+                Glass
             </div>
             <div>
                 <div title="Pin Note" className={style.pinsContainer}>
-                    <Pin
+                    <Sparkles
                         style={{
-                            color: pinned
-                                ? "#FFB02E"
+                            color: glassEffect
+                                ? "#9B5EFF"
                                 : theme === "light" ? "black" : "white",
                             marginTop: "3.3px",
                         }}
                         size={24}
                         className={style.pinIcon}
-                        onClick={handlePin}
+                        onClick={handleGlassEffect}
                     />
                 </div>
             </div>
@@ -31,4 +34,4 @@ const PinToggle = () => {
     );
 }
 
-export default PinToggle;
+export default GlassEffectToggle

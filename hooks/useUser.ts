@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 
 async function fetchUserDetails() {
+    console.log("[React Query] fetching user details...");
+
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !sessionData.session) {

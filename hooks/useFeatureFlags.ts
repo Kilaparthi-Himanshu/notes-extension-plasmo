@@ -7,5 +7,6 @@ export function useFeatureFlags() {
     return {
         isProUser: userDetails?.subscription_status === 'pro',
         canUseAdvancedEditor: userDetails?.subscription_status === 'pro',
+        canHaveGlassEffect: userDetails?.subscription_status === 'pro'
     }
 }

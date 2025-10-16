@@ -23,7 +23,7 @@ export const queryClient = new QueryClient({
             staleTime: 1000 * 60 * 5,
             gcTime: 1000 * 60 * 30,
             retry: 1,
-            refetchOnMount: 'always'
+            refetchOnMount: false
         }
     }
 });

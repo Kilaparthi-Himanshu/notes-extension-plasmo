@@ -20,7 +20,7 @@ const PasswordToggle = () => {
                 <div onClick={passWordFormToggle} 
                     className={style.pinsContainer}
                 >
-                    {isPasswordProtected ? <Lock style={{color: "red"}}/> : <LockOpen />}
+                    {isPasswordProtected ? <Lock style={{color: "#00C2FF"}}/> : <LockOpen />}
                 </div>
             </div>
         </>

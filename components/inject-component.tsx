@@ -14,6 +14,9 @@ import Quill from "quill";
 import snowCss from "data-text:quill/dist/quill.snow.css";
 import TipTapEditor from './TipTapEditor/TipTapEditor';
 import { useUser } from "~hooks/useUser";
+import { queryClient } from "~lib/queryClient";
+import * as Falcon from '~assets/Falcon.jpeg';
+import { useFeatureFlags } from "~hooks/useFeatureFlags";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -45,12 +48,15 @@ function InjectReact({
         fontColor: string,
         isPasswordProtected: boolean,
         password: string,
-        email: string
+        email: string,
+        glassEffect: boolean
     },
 }) {
-    const { data, isLoading } = useUser();
-    const session = data?.session;
-    const userDetails = data?.userDetails;
+    useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: ['user'] });
+    }, []);
+
+    const { canHaveGlassEffect } = useFeatureFlags();
 
     const [position, setPosition] = useState(() => {
         if (rightClickPos?.x !== undefined && rightClickPos?.y !== undefined) {
@@ -108,6 +114,7 @@ function InjectReact({
     const [password, setPassword] = useState('');
     const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
     const [email, setEmail] = useState('');
+    const [glassEffect, setGlassEffect] = useState(false);
 
     useEffect(() => {
         if (note) {
@@ -128,8 +135,11 @@ function InjectReact({
             setRequirePassword(note.isPasswordProtected);
             setPassword(note.password);
             setEmail(note.email);
+            setGlassEffect(() => {
+                return canHaveGlassEffect ? note.glassEffect : false
+            });
         }
-    }, [note]);
+    }, [note, canHaveGlassEffect]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -244,7 +254,8 @@ function InjectReact({
                 fontColor: fontColor,
                 isPasswordProtected: isPasswordProtected,
                 password: password,
-                email: email
+                email: email,
+                glassEffect: glassEffect
             };
 
             const notes = result.notes || [];
@@ -266,7 +277,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor, isPasswordProtected, password, email]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor, isPasswordProtected, password, email, glassEffect]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -302,7 +313,6 @@ function InjectReact({
 
     const handleActive = () => {
         setActive(!active);
-        console.log("active", !active);
     }
 
     useEffect(() => {
@@ -333,9 +343,9 @@ function InjectReact({
         };
     }, [noteId]); // To stop keyboard events from interacting with the outer DOM
 
-    const editorRef = useRef<Quill | null>(null);
-    const editorContainerRef = useRef<HTMLDivElement | null>(null);
-    const toolbarRef = useRef<HTMLDivElement | null>(null);
+    // const editorRef = useRef<Quill | null>(null);
+    // const editorContainerRef = useRef<HTMLDivElement | null>(null);
+    // const toolbarRef = useRef<HTMLDivElement | null>(null);
 
     // useEffect(() => {
     //     if (editorContainerRef.current && !editorRef.current) {
@@ -354,38 +364,61 @@ function InjectReact({
     //     }
     // }, [noteId, requirePassword, editorContainerRef.current, iconize]);
 
-    useEffect(() => {
-        if (!requirePassword && !showNewPasswordForm && editorContainerRef.current) {
-            if (editorRef.current) {
-                editorRef.current.off("text-change");
-                editorRef.current = null;
-            }
+    // useEffect(() => {
+    //     if (!requirePassword && !showNewPasswordForm && editorContainerRef.current) {
+    //         if (editorRef.current) {
+    //             editorRef.current.off("text-change");
+    //             editorRef.current = null;
+    //         }
 
-            const quill = new Quill(editorContainerRef.current, {
-                theme: "snow",
-                modules: { 
-                    history: {
-                        delay: 2000,
-                        maxStack: 500,
-                    },
-                    toolbar: false
-                },
-            });
+    //         const quill = new Quill(editorContainerRef.current, {
+    //             theme: "snow",
+    //             modules: { 
+    //                 history: {
+    //                     delay: 2000,
+    //                     maxStack: 500,
+    //                 },
+    //                 toolbar: false
+    //             },
+    //         });
 
-            quill.on("text-change", () => {
-                setContent(quill.root.innerHTML);
-            });
+    //         quill.on("text-change", () => {
+    //             setContent(quill.root.innerHTML);
+    //         });
 
-            editorRef.current = quill;
+    //         editorRef.current = quill;
 
-            // restore saved content
-            let safeContent = content || "";
-            if (safeContent && !safeContent.trim().startsWith("<")) {
-                safeContent = `<p>${safeContent}</p>`;
-            }
-            quill.clipboard.dangerouslyPasteHTML(safeContent, "silent");
-        }
-    }, [requirePassword, iconize, showNewPasswordForm, editorContainerRef.current]);
+    //         // restore saved content
+    //         let safeContent = content || "";
+    //         if (safeContent && !safeContent.trim().startsWith("<")) {
+    //             safeContent = `<p>${safeContent}</p>`;
+    //         }
+    //         quill.clipboard.dangerouslyPasteHTML(safeContent, "silent");
+    //     }
+    // }, [requirePassword, iconize, showNewPasswordForm, editorContainerRef.current]);
+
+    function hexToRgba(hex: string, alpha: number) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    const glassBackgroundStyle = glassEffect ? {
+        backgroundColor: hexToRgba(customColor, 0.35),
+        backdropFilter: 'blur(16px) saturate(180%)', // frosted + vibrant 
+        WebkitBackdropFilter: 'blur(16px) saturate(180%)', // Safari support 
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)', // soft shadow glow
+    } : {
+        backgroundColor: customColor,
+    }
+
+    const glassEffectBorderStyle = glassEffect && {
+        border: '1px solid rgba(255, 255, 255, 0.25)',
+        borderBottomLeftRadius: '16px',
+        borderBottomRightRadius: '16px',
+        borderTop: '0px'
+    }
 
     return (
         <>
@@ -428,6 +461,7 @@ function InjectReact({
             id="react-injected-component"
             className={style.injectedComponent}
             style={{
+                ...glassBackgroundStyle,
                 width: `${width}px`,
                 height: `${height}px`,
                 left: `${position.x}px`,
@@ -440,6 +474,10 @@ function InjectReact({
                 resize: 'both',     // Enable native resizing
                 overflow: 'auto',    // Required for resize to work
                 position: pinned ? 'fixed' : 'absolute',
+                // backgroundImage: `url(${Falcon})`,
+                // backgroundSize: "cover",       // Fill the whole div
+                // backgroundRepeat: "no-repeat", // Don’t tile
+                // backgroundPosition: "center",  // Center the image
             }}
             onMouseDown={bringToFront}
             onMouseUp={handleResize}
@@ -448,7 +486,7 @@ function InjectReact({
                 className={style.topbar}
                 style={{
                     cursor: isDragging ? 'grabbing' : 'grab',
-                    backgroundColor: theme === "light" ? "#D9D9D9" : "#454545"
+                    backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
                 }}
                 onMouseDown={handleMouseDown}
             >
@@ -467,7 +505,7 @@ function InjectReact({
                 />
 
                 <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2`} style={{
-                    backgroundColor: customColor,
+                    backgroundColor: glassEffect ? 'transparent' : customColor,
                 }}>
                     <svg viewBox="0 0 50 35" width="100%" height="100%" preserveAspectRatio="none">
                         <path
@@ -543,7 +581,7 @@ function InjectReact({
                         />
                     </button>
                 </div>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm}}>
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect}}>
                     <DropDown />
                 </DropdownContext.Provider>
             </div>
@@ -574,7 +612,12 @@ function InjectReact({
                 } else {
                     return (
                         <div className={style.textAreaContainer}
-                            style={{backgroundColor: customColor, flexDirection: "column", flex: 1}}
+                            style={{
+                                ...glassEffectBorderStyle,
+                                backgroundColor: 'transparent', 
+                                flexDirection: "column", 
+                                flex: 1,
+                            }}
                         >
                             {/* <div ref={toolbarRef} id={`toolbar-${noteId}`}>
                                 <button className="ql-bold"></button>

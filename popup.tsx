@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './popup.css';
 import { RefreshCw } from 'lucide-react';
-import { supabase } from "./lib/supabase";
-import type { Session } from "~node_modules/@supabase/supabase-js/dist/module";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useUser } from "./hooks/useUser";
 
 function IndexPopup () {
+    useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: ['user'] });
+    }, []);
+
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);

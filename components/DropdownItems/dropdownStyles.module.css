@@ -50,10 +50,12 @@
 
 .themeButton {
     background: none;
-    border: 2px solid transparent;
-    border-radius: 50%;
+    border: 1px solid transparent;
+    border-radius: 30%;
     cursor: pointer;
-    padding: 1px;
+    padding: 2px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     transition: all 0.1s ease;
     font-size: 14px;
 }

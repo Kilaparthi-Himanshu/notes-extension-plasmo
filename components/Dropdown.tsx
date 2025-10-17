@@ -13,10 +13,11 @@ import PasswordToggle from './DropdownItems/PasswordToggle';
 import { useContext, useRef, useEffect } from 'react';
 import { DropdownContext } from './context';
 import { useFeatureFlags } from '~hooks/useFeatureFlags';
+import tailwindStyles from "data-text:../styles/global.css";
 
 export const getStyle = () => {
     const style = document.createElement("style");
-    style.textContent = styleText;
+    style.textContent = styleText + tailwindStyles;
     return style;
 }
 

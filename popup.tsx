@@ -146,32 +146,6 @@ function IndexPopup () {
         }, 300);
     };
 
-    // useEffect(() => {
-    //     async function getSession() {
-    //         const { data, error } = await supabase
-    //             .auth
-    //             .getSession();
-
-    //         if (data.session == null || error) {
-    //             setSession(null);
-    //         } else {
-    //             setSession(data.session);
-
-    //             const { data: userDetails, error: userDetailsError} = await supabase
-    //                 .from('users')
-    //                 .select('*')
-    //                 .eq("user_id", data.session.user.id)
-    //                 .maybeSingle();
-
-    //             if (!userDetailsError && userDetails) {
-    //                 setUserDetails(userDetails);
-    //             }
-    //         }
-    //     }
-
-    //   getSession();
-    // }, []);
-
     return (
         <div className="popup p-2">
             <button 

@@ -86,6 +86,7 @@ export default function TipTapEditor({
                 strike: false,
                 bulletList: false,
                 orderedList: false,
+                undoRedo: false
             }),
             TextStyle,
             FontSize.configure({
@@ -98,13 +99,13 @@ export default function TipTapEditor({
             }),
             OrderedList.configure({
                     HTMLAttributes: {
-                    class: `list-decimal ml-4`, // Tailwind: numbered list + margin
+                    class: `list-decimal ml-4 [&>ol]:ml-4`, // Tailwind: numbered list + margin
                 },
             }), 
             // Always render Bold/Italic/Strike marks, but disable shortcuts if not pro
             BoldExtension,
             ItalicExtension,
-            StrikeExtension,
+            StrikeExtension
         ],
         content: content || "<p></p>", // seed empty state
         onUpdate: ({ editor }) => {
@@ -112,7 +113,7 @@ export default function TipTapEditor({
         },
         editorProps: {
             attributes: {
-                class: "flex-1 h-full rounded-xl p-2 focus:outline-none",
+                class: "flex-1 h-max rounded-xl py-4 px-6 focus:outline-none",
                 style: `font-size: ${fontSize}px;`
             },
         },

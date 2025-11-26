@@ -505,7 +505,7 @@ function InjectReact({
                 />
 
                 <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2`} style={{
-                    backgroundColor: glassEffect ? 'transparent' : customColor,
+                    backgroundColor: glassEffect ? theme === "light" ? "#D9D9D9" : "#454545" : customColor,
                 }}>
                     <svg viewBox="0 0 50 35" width="100%" height="100%" preserveAspectRatio="none">
                         <path

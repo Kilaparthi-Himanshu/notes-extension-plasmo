@@ -11,6 +11,7 @@ import Strike from "@tiptap/extension-strike";
 import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import Bold from "@tiptap/extension-bold";
 import Italic from "@tiptap/extension-italic";
+import Image from '@tiptap/extension-image';
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -105,7 +106,13 @@ export default function TipTapEditor({
             // Always render Bold/Italic/Strike marks, but disable shortcuts if not pro
             BoldExtension,
             ItalicExtension,
-            StrikeExtension
+            StrikeExtension,
+            Image.configure({
+                resize: {
+                    enabled: true,
+                    alwaysPreserveAspectRatio: true,
+                },
+            }),
         ],
         content: content || "<p></p>", // seed empty state
         onUpdate: ({ editor }) => {

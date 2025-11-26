@@ -17,6 +17,23 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.contextMenus.create({
+        id: 'summarize-with-ai',
+        title: 'Summarize with NoteToGo',
+        contexts: ["selection"]
+    });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId == "summarize-with-ai" && info.selectionText) {
+        chrome.tabs.sendMessage(tab.id, {
+            type: 'SUMMARIZE',
+            text: info.selectionText
+        });
+    }
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "GET_NOTES") {
         // Retrieve notes from storage
@@ -44,5 +61,15 @@ supabase.auth.onAuthStateChange((event, session) => {
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.type === "PRINT_SESSION") {
         console.log("THE SESSION IS: ", await supabase.auth.getSession());
+    }
+});
+
+chrome.commands.onCommand.addListener((command) => {
+    if (command === "new_note") {
+        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+            if (tab?.id) {
+                chrome.tabs.sendMessage(tab.id, { type: "INJECT_COMPONENT" });
+            }
+        });
     }
 });

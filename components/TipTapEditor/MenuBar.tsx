@@ -2,6 +2,7 @@ import * as React from "react";
 import { Editor } from "@tiptap/react";
 import { Bold, Italic, Underline, List, ListOrdered, Strikethrough } from "lucide-react";
 import styleText from "data-text:../styles.module.css";
+import { FaImages } from "react-icons/fa6";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -13,6 +14,14 @@ const MenuBar = ({ editor, theme }: { editor: Editor | null; theme: string }) =>
     if (!editor) return null
 
     const highlightColor = theme === 'light' ? 'bg-blue-400' : 'bg-blue-500';
+
+    const addImage = React.useCallback(() => {
+        const url = window.prompt('URL')
+
+        if (url) {
+        editor.chain().focus().setImage({ src: url }).run()
+        }
+    }, [editor]);
 
     return (
         <div className={`flex space-x-2 p-1 ${theme === 'light' ? 'bg-neutral-300' : 'bg-[#454545] text-white'} rounded-xl shadow-lg hover:scale-[1.15] transition-transform`}style={{
@@ -65,6 +74,15 @@ const MenuBar = ({ editor, theme }: { editor: Editor | null; theme: string }) =>
             >
                 <ListOrdered size={16} />
             </button>
+
+            {/* <button
+                onClick={addImage}
+                className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                title="Image URL Upload"
+            >
+                <FaImages size={16} />
+            </button> */}
+            {/* Planned for later */}
         </div>
     )
 }

@@ -17,6 +17,7 @@ import { useUser } from "~hooks/useUser";
 import { queryClient } from "~lib/queryClient";
 import * as Falcon from '~assets/Falcon.jpeg';
 import { useFeatureFlags } from "~hooks/useFeatureFlags";
+import { hexToRgba } from '~utils/colorFormatChange';
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -397,13 +398,6 @@ function InjectReact({
     //     }
     // }, [requirePassword, iconize, showNewPasswordForm, editorContainerRef.current]);
 
-    function hexToRgba(hex: string, alpha: number) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
     const glassBackgroundStyle = glassEffect ? {
         backgroundColor: hexToRgba(customColor, 0.35),
         backdropFilter: 'blur(16px) saturate(180%)', // frosted + vibrant 
@@ -649,8 +643,11 @@ function InjectReact({
                                 onChange={setContent}
                                 customColor={customColor}
                                 fontColor={fontColor} 
+                                setFontColor={setFontColor}
                                 font={font}
+                                setFont={setFont}
                                 fontSize={fontSize}
+                                setFontSize={setFontSize}
                                 theme={theme}
                             />
 

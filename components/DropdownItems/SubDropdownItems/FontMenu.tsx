@@ -20,7 +20,7 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
                     <div>
                         Style
                     </div>
-                    <select value={font} 
+                    <select value={font ?? ""}
                         onChange={(e) => setFont(e.target.value)} 
                         className={style.fontSelect}
                         style={{backgroundColor: theme === "light" ? 
@@ -28,6 +28,7 @@ const FontMenu = ({isVisible}: {isVisible: boolean}) => {
                             color: theme === "light" ? "black" : "white",
                             border: theme === "light" ? "2px solid #262626" : "2px solid white"}}
                     >
+                        <option value="" disabled className='hidden'></option>
                         <option value="Gill Sans MT">Gill Sans MT</option>
                         <option value="Roboto">Roboto</option>
                         <option value="Times New Roman">Times New Roman</option>

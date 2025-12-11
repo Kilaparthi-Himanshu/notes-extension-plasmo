@@ -104,12 +104,12 @@ const Dropdown = () => {
                     <ColorToggle />
                     <PinToggle />
                     <PersistToggle />
-                    <FontToggle />
+                    {/* <FontToggle /> */}
                     <PasswordToggle />
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 export default Dropdown;

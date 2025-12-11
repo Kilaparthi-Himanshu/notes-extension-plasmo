@@ -17,6 +17,9 @@ import { FontFamily } from "@tiptap/extension-text-style";
 import { rgbToHex } from '~utils/colorFormatChange';
 import { detectCollapsedCursorFontColor, detectCollapsedCursorFontFamily, detectCollapsedCursorFontSize, detectMixedFontFamily, detectMixedFontSize } from '~utils/detectMixedFunctions';
 import ListItem from '@tiptap/extension-list-item';
+import Highlight from '@tiptap/extension-highlight';
+import { UndoRedo } from '@tiptap/extensions';
+import { EditorState } from "~node_modules/prosemirror-state/dist";
 
 const ListItemWithStyle = ListItem.extend({
     addAttributes() {
@@ -31,9 +34,13 @@ const ListItemWithStyle = ListItem.extend({
 
             fontSize: {
                 default: null,
-                parseHTML: element => element.style.fontSize || null,
+                parseHTML: element => {
+                    const size = element.style.fontSize;
+                    return size ? parseInt(size) : null;
+                },
                 renderHTML: attrs => {
-                    return attrs.fontSize ? { style: `font-size: ${attrs.fontSize}` } : {};
+                    return attrs.fontSize
+                        ? { style: `font-size: ${attrs.fontSize}px` } : {};
                 },
             },
         };
@@ -157,7 +164,9 @@ export default function TipTapEditor({
             FontFamily,
             Color.configure({
                 types: ['textStyle'],
-            })
+            }),
+            Highlight,
+            UndoRedo
         ],
         content: content || "<p></p>", // seed empty state
         onUpdate: ({ editor }) => {
@@ -184,9 +193,15 @@ export default function TipTapEditor({
             const attrs = ctx.editor.getAttributes("textStyle");
 
             return {
-                fontSize: attrs.fontSize ? parseInt(attrs.fontSize.replace("px","")) : null,
+                fontSize: typeof attrs.fontSize === "string"
+                            ? parseInt(attrs.fontSize)
+                            : typeof attrs.fontSize === "number"
+                            ? attrs.fontSize
+                            : null,
                 fontFamily: attrs.fontFamily ?? null,
                 color: attrs.color ? rgbToHex(attrs.color) : null,
+                canUndo: ctx.editor.can().chain().focus().undo().run(),
+                canRedo: ctx.editor.can().chain().focus().redo().run(),
             }
         }
     });
@@ -241,10 +256,22 @@ export default function TipTapEditor({
 
     // Set Content
     useEffect(() => {
-        if (editor && content && editor.getHTML() !== content) {
-            editor.commands.setContent(content);
-        }
-    }, [content, editor]);
+        if (!editor) return;
+        if (!content) return;
+
+        const current = editor.getHTML();
+        if (current === content) return; // block unnecessary resets
+
+        editor.commands.setContent(content);
+
+        const newState = EditorState.create({
+            doc: editor.state.doc,
+            plugins: editor.state.plugins,
+            schema: editor.state.schema,
+        });
+
+        editor.view.updateState(newState);
+    }, [editor, content]);
 
     // Full Text Size change
     // useEffect(() => {

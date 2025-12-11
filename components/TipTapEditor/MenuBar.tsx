@@ -7,6 +7,9 @@ import { FiAlignLeft } from "react-icons/fi";
 import { FiAlignCenter } from "react-icons/fi";
 import { FiAlignRight } from "react-icons/fi";
 import { FiAlignJustify } from "react-icons/fi";
+import { FaHighlighter } from "react-icons/fa";
+import { IoMdUndo } from "react-icons/io";
+import { IoMdRedo } from "react-icons/io";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -20,6 +23,8 @@ const MenuBar = ({ editor, editorState, theme }: {
         fontSize: number;
         fontFamily: any;
         color: string;
+        canUndo: boolean;
+        canRedo: boolean;
     };
     theme: string;
 }) => {
@@ -32,15 +37,15 @@ const MenuBar = ({ editor, editorState, theme }: {
         const url = window.prompt('URL')
 
         if (url) {
-        editor.chain().focus().setImage({ src: url }).run()
+            editor.chain().focus().setImage({ src: url }).run()
         }
     }, [editor]);
 
     return (
-        <div className={`flex flex-col space-y-1 items-center p-1 ${theme === 'light' ? 'bg-neutral-300' : 'bg-[#454545] text-white'} rounded-xl shadow-lg hover:scale-[1.15] transition-transform`}style={{
+        <div className={`flex flex-col space-y-1 items-center p-1 ${theme === 'light' ? 'bg-neutral-300' : 'bg-[#454545] text-white'} rounded-xl shadow-lg hover:scale-[1.05] transition-transform`}style={{
             border: '1px solid rgba(255, 255, 255, 0.25)'
         }}>
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 items-center">
                 <button
                     onClick={() => editor.chain().focus().toggleBold().run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bold") ? highlightColor : ""}`}
@@ -73,33 +78,6 @@ const MenuBar = ({ editor, editorState, theme }: {
                     <Strikethrough size={16} />
                 </button>
 
-                <select value={editorState.fontFamily ?? ""}
-                    onChange={(event) => {
-                        editor
-                            .chain()
-                            .focus()
-                            .setFontFamily(event.target.value)
-                            .run()
-                        }}
-                    // className={style.fontSelect}
-                    style={{backgroundColor: theme === "light" ? 
-                        "white" : "#262626",
-                        color: theme === "light" ? "black" : "white",
-                        border: theme === "light" ? "2px solid #262626" : "2px solid white"}}
-                >
-                    <option value="" disabled className='hidden'></option>
-                    <option value="Gill Sans MT">Gill Sans MT</option>
-                    <option value="Roboto">Roboto</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Courier New">Courier New</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Lucida Console">Lucida Console</option>
-                    <option value="Lucida Handwriting">Lucida Handwriting</option>
-                    <option value="Comic Sans MS">Comic Sans MS</option>
-                </select>
-
                 <div
                     className="relative hover:bg-neutral-400 p-1 rounded-lg flex items-center justify-center"
                 >
@@ -126,9 +104,91 @@ const MenuBar = ({ editor, editorState, theme }: {
                         style={{ backgroundColor: editorState.color || "#000000" }}
                     />
                 </div>
+
+                <select value={editorState.fontFamily ?? ""}
+                    onChange={(event) => {
+                        editor
+                            .chain()
+                            .focus()
+                            .setFontFamily(event.target.value)
+                            .run()
+                        }
+                    }
+                    // className={style.fontSelect}
+                    style={{
+                        backgroundColor: theme === "light" ? 
+                        "white" : "#262626",
+                        color: theme === "light" ? "black" : "white",
+                        border: theme === "light" ? "1px solid #262626" : "2px solid white"
+                    }}
+                    className="rounded-lg max-w-[64px] text-sm h-[20px]"
+                >
+                    <option value="" disabled className='hidden'></option>
+                    <option value="Gill Sans MT">Gill Sans MT</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Lucida Console">Lucida Console</option>
+                    <option value="Lucida Handwriting">Lucida Handwriting</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                </select>
+
+                <input
+                    className="rounded-lg max-w-[48px] text-sm h-[20px] p-1"
+                    type="number" 
+                    value={editorState.fontSize ?? ""} 
+                    min={8}
+                    max={80}
+                    onChange={(event) => {
+                        const fontSize = event.currentTarget.value;
+
+                        editor
+                            .chain()
+                            .setFontSize(`${parseInt(event.target.value)}px`)
+                            .updateAttributes("listItem", {     // update the parent <li>
+                                fontSize: fontSize
+                            })
+                            .run()
+                        }
+                    }
+                    style={{backgroundColor: theme === "light" ? 
+                        "white" : "#262626",
+                        color: theme === "light" ? "black" : "white",
+                        border: theme === "light" ? "1px solid #262626" : "2px solid white"}}
+                    onBlur={() => editor?.chain().focus().run()}
+                />
             </div>
 
             <div className="flex space-x-2">
+                <button
+                    onClick={() => editor.chain().focus().undo().run()}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                    title="Undo"
+                    disabled={!editorState.canUndo}
+                >
+                    <IoMdUndo size={16} className={`${!editorState.canUndo && 'text-neutral-500'}`} />
+                </button>
+
+                <button
+                    onClick={() => editor.chain().focus().redo().run()}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                    title="Redo"
+                    disabled={!editorState.canRedo}
+                >
+                    <IoMdRedo size={16} className={`${!editorState.canRedo && 'text-neutral-500'}`} />
+                </button>
+
+                <button
+                    onClick={() => editor.chain().focus().toggleHighlight().run()}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("highlight") ? highlightColor : ""} cursor-pointer`}
+                    title="Highlight"
+                >
+                    <FaHighlighter size={16} />
+                </button>
+
                 <button
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bulletList") ? highlightColor : ""} cursor-pointer`}
@@ -157,6 +217,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'left' }) ? highlightColor : ''}`}
+                    title="Align Left"
                 >
                     <FiAlignLeft />
                 </button>
@@ -164,6 +225,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'center' }) ? highlightColor : ''}`}
+                    title="Align Center"
                 >
                     <FiAlignCenter />
                 </button>
@@ -171,6 +233,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'right' }) ? highlightColor : ''}`}
+                    title="Align Right"
                 >
                     <FiAlignRight />
                 </button>
@@ -178,6 +241,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('justify').run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'justify' }) ? highlightColor : ''}`}
+                    title="Align Justify"
                 >
                     <FiAlignJustify />
                 </button>

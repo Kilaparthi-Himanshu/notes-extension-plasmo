@@ -73,6 +73,33 @@ const MenuBar = ({ editor, editorState, theme }: {
                     <Strikethrough size={16} />
                 </button>
 
+                <select value={editorState.fontFamily ?? ""}
+                    onChange={(event) => {
+                        editor
+                            .chain()
+                            .focus()
+                            .setFontFamily(event.target.value)
+                            .run()
+                        }}
+                    // className={style.fontSelect}
+                    style={{backgroundColor: theme === "light" ? 
+                        "white" : "#262626",
+                        color: theme === "light" ? "black" : "white",
+                        border: theme === "light" ? "2px solid #262626" : "2px solid white"}}
+                >
+                    <option value="" disabled className='hidden'></option>
+                    <option value="Gill Sans MT">Gill Sans MT</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Lucida Console">Lucida Console</option>
+                    <option value="Lucida Handwriting">Lucida Handwriting</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                </select>
+
                 <div
                     className="relative hover:bg-neutral-400 p-1 rounded-lg flex items-center justify-center"
                 >

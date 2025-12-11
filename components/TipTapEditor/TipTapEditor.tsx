@@ -16,9 +16,9 @@ import TextAlign from '@tiptap/extension-text-align';
 import { FontFamily } from "@tiptap/extension-text-style";
 import { rgbToHex } from '~utils/colorFormatChange';
 import { detectCollapsedCursorFontColor, detectCollapsedCursorFontFamily, detectCollapsedCursorFontSize, detectMixedFontFamily, detectMixedFontSize } from '~utils/detectMixedFunctions';
-import ListItem from '@tiptap/extension-list-item'
+import ListItem from '@tiptap/extension-list-item';
 
-export const ListItemWithStyle = ListItem.extend({
+const ListItemWithStyle = ListItem.extend({
     addAttributes() {
         return {
             color: {

@@ -44,13 +44,11 @@ function InjectReact({
         width: number,
         height: number,
         active: boolean,
-        font: string,
-        fontSize: number,
-        fontColor: string,
         isPasswordProtected: boolean,
         password: string,
         email: string,
-        glassEffect: boolean
+        glassEffect: boolean,
+        showToolbar: boolean,
     },
 }) {
     useEffect(() => {
@@ -106,9 +104,6 @@ function InjectReact({
     const [width, setWidth] = useState(378);
     const [height, setHeight] = useState(265);
     const [active, setActive] = useState(false);
-    const [font, setFont] = useState('Gill Sans MT');
-    const [fontSize, setFontSize] = useState(16);
-    const [fontColor, setFontColor] = useState("#000000");
     const [iconize, setIconize] = useState(false);
     const [isPasswordProtected, setIsPasswordProtected] = useState(false);
     const [requirePassword, setRequirePassword] = useState(false);
@@ -116,6 +111,7 @@ function InjectReact({
     const [showNewPasswordForm, setShowNewPasswordForm] = useState(false);
     const [email, setEmail] = useState('');
     const [glassEffect, setGlassEffect] = useState(false);
+    const [showToolbar, setShowToolbar] = useState(true);
 
     useEffect(() => {
         if (note) {
@@ -129,9 +125,6 @@ function InjectReact({
             setWidth(note.width);
             setHeight(note.height);
             setActive(note.active);
-            setFont(note.font);
-            setFontSize(note.fontSize);
-            setFontColor(note.fontColor);
             setIsPasswordProtected(note.isPasswordProtected);
             setRequirePassword(note.isPasswordProtected);
             setPassword(note.password);
@@ -139,6 +132,7 @@ function InjectReact({
             setGlassEffect(() => {
                 return canHaveGlassEffect ? note.glassEffect : false
             });
+            setShowToolbar(note.showToolbar);
         }
     }, [note, canHaveGlassEffect]);
 
@@ -230,7 +224,6 @@ function InjectReact({
     const handleThemeChange = (newTheme: string) => {
         setTheme(newTheme);
         setCustomColor(newTheme === "light" ? "#ffffff" : "#262626"); // Reset custom color when theme changes
-        setFontColor(newTheme === "light" ? "#000000" : "#ffffff"); // Reset font color when theme changes
     };
 
     const saveNote = async () => {
@@ -250,13 +243,11 @@ function InjectReact({
                 width: width,
                 height: height,
                 active: active,
-                font: font,
-                fontSize: fontSize,
-                fontColor: fontColor,
                 isPasswordProtected: isPasswordProtected,
                 password: password,
                 email: email,
-                glassEffect: glassEffect
+                glassEffect: glassEffect,
+                showToolbar: showToolbar,
             };
 
             const notes = result.notes || [];
@@ -278,7 +269,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, font, fontSize, fontColor, setFontColor, isPasswordProtected, password, email, glassEffect]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -575,7 +566,7 @@ function InjectReact({
                         />
                     </button>
                 </div>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, font, setFont, fontSize, setFontSize, fontColor, setFontColor, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect}}>
+                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar}}>
                     <DropDown />
                 </DropdownContext.Provider>
             </div>
@@ -642,13 +633,8 @@ function InjectReact({
                                 content={content}
                                 onChange={setContent}
                                 customColor={customColor}
-                                fontColor={fontColor} 
-                                setFontColor={setFontColor}
-                                font={font}
-                                setFont={setFont}
-                                fontSize={fontSize}
-                                setFontSize={setFontSize}
                                 theme={theme}
+                                showToolbar={showToolbar}
                             />
 
                             {/* Original Below */}

@@ -1,32 +1,34 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import * as style from "./dropdownStyles.module.css"
+import { useContext } from 'react';
 import { DropdownContext } from '~components/context';
-import { Sparkles } from 'lucide-react';
+import { CgToolbarBottom } from "react-icons/cg";
 
-const GlassEffectToggle = () => {
-    const { glassEffect, setGlassEffect, theme } = useContext(DropdownContext);
+const ToolbarToggle = () => {
 
-    const handleGlassEffect = () => {
-        setGlassEffect(!glassEffect);
+    const { showToolbar, setShowToolbar, theme } = useContext(DropdownContext);
+
+    const handleToolbarToggle = () => {
+        setShowToolbar(!showToolbar);
     }
 
     return (
-        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handleGlassEffect}>
+        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handleToolbarToggle}>
             <div>
-                Glass
+                Toolbar
             </div>
             <div>
                 <div title="Pin Note" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
-                    <Sparkles
+                    <CgToolbarBottom
                         style={{
-                            color: glassEffect
-                                ? "#9B5EFF"
+                            color: showToolbar
+                                ? "#c45533"
                                 : theme === "light" ? "black" : "white",
                             marginTop: "3.3px",
                         }}
                         size={24}
                         className={style.pinIcon}
-                        onClick={handleGlassEffect}
+                        onClick={handleToolbarToggle}
                     />
                 </div>
             </div>
@@ -34,4 +36,4 @@ const GlassEffectToggle = () => {
     );
 }
 
-export default GlassEffectToggle
+export default ToolbarToggle;

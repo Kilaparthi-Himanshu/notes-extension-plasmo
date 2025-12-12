@@ -57,26 +57,16 @@ interface TipTapEditorProps {
     content: string;
     onChange: (html: string) => void;
     customColor: string;
-    fontColor: string;
-    setFontColor: React.Dispatch<React.SetStateAction<string>>;
-    font: string;
-    setFont: React.Dispatch<React.SetStateAction<string>>;
-    fontSize: number;
-    setFontSize: React.Dispatch<React.SetStateAction<number>>;
     theme: string;
+    showToolbar: boolean;
 }
 
 export default function TipTapEditor({ 
     content, 
     onChange, 
     customColor, 
-    fontColor, 
-    setFontColor,
-    font,
-    setFont, 
-    fontSize, 
-    setFontSize,
     theme,
+    showToolbar
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
 
@@ -415,7 +405,7 @@ export default function TipTapEditor({
                 }}
             />
 
-            {canUseAdvancedEditor && (
+            {canUseAdvancedEditor && showToolbar && (
                 <div className="absolute bottom-4">
                     <MenuBar editor={editor} editorState={editorState} theme={theme} />
                 </div>

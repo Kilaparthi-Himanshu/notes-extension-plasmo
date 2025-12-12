@@ -99,6 +99,14 @@
     transition: transform 0.1s ease-in;
 }
 
+/* .proPinsContainer.light {
+    box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.4);
+}
+
+.proPinsContainer.dark {
+    box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.4);
+} */
+
 .fontSelect {
     width: 45%;
     height: 25px;

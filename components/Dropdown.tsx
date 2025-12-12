@@ -10,6 +10,7 @@ import PinToggle from './DropdownItems/PinToggle';
 import PersistToggle from './DropdownItems/PersistToggle';
 import FontToggle from './DropdownItems/FontToggle';
 import PasswordToggle from './DropdownItems/PasswordToggle';
+import ToolbarToggle from './DropdownItems/ToolbarToggle';
 import { useContext, useRef, useEffect } from 'react';
 import { DropdownContext } from './context';
 import { useFeatureFlags } from '~hooks/useFeatureFlags';
@@ -50,6 +51,7 @@ const Dropdown = () => {
     }, []);
 
     const { canHaveGlassEffect } = useFeatureFlags();
+    const { canUseAdvancedEditor } = useFeatureFlags();
 
     return (
         <div>
@@ -100,12 +102,13 @@ const Dropdown = () => {
                     ref={dropdownRef}
                 >
                     <ThemeToggle />
-                    {canHaveGlassEffect && <GlassEffectToggle />}
                     <ColorToggle />
                     <PinToggle />
                     <PersistToggle />
                     {/* <FontToggle /> */}
                     <PasswordToggle />
+                    {canHaveGlassEffect && <GlassEffectToggle />}
+                    {canUseAdvancedEditor && <ToolbarToggle />}
                 </div>
             )}
         </div>

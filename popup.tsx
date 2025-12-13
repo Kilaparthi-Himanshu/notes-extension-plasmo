@@ -204,7 +204,10 @@ function IndexPopup () {
                             <div className="saved-note-content">
                                 <h2
                                     style={{
-                                        color: note.fontColor
+                                        color: "white",
+                                        WebkitTextStroke: "1px #000",
+                                        fontWeight: "bold",
+                                        fontSize: "18px"
                                     }}
                                 >
                                     {note.title}

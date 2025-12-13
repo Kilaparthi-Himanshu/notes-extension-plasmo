@@ -119,7 +119,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                         backgroundColor: theme === "light" ? 
                         "white" : "#262626",
                         color: theme === "light" ? "black" : "white",
-                        border: theme === "light" ? "1px solid #262626" : "2px solid white"
+                        border: theme === "light" ? "1px solid #262626" : "1px solid white"
                     }}
                     className="rounded-lg max-w-[64px] text-sm h-[20px]"
                 >
@@ -157,7 +157,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                     style={{backgroundColor: theme === "light" ? 
                         "white" : "#262626",
                         color: theme === "light" ? "black" : "white",
-                        border: theme === "light" ? "1px solid #262626" : "2px solid white"}}
+                        border: theme === "light" ? "1px solid #262626" : "1px solid white"}}
                     onBlur={() => editor?.chain().focus().run()}
                 />
             </div>

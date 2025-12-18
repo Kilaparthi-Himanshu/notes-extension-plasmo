@@ -17,7 +17,7 @@ const PersistToggle = () => {
                     <Repeat
                         style={{
                             color: active 
-                                ? "#32D74B"
+                                ? "red"
                                 : theme === "light" ? "black" : "white",
                             marginTop: "2px"
                         }}

@@ -18,6 +18,8 @@ import { queryClient } from "~lib/queryClient";
 import * as Falcon from '~assets/Falcon.jpeg';
 import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import { hexToRgba } from '~utils/colorFormatChange';
+import { SyncConfirmationModal } from './SyncConfirmationModal';
+import type { NoteType } from '../types/noteTypes';
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -32,30 +34,13 @@ function InjectReact({
 }: {
     noteId: string,
     rightClickPos?: { x: number, y: number },
-    note?: {
-        id: string,
-        title: string,
-        content: string,
-        position: { x: number, y: number },
-        theme: string,
-        color: string,
-        isPinned: boolean,
-        saved: boolean,
-        width: number,
-        height: number,
-        active: boolean,
-        isPasswordProtected: boolean,
-        password: string,
-        email: string,
-        glassEffect: boolean,
-        showToolbar: boolean,
-    },
+    note?: NoteType,
 }) {
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: ['user'] });
     }, []);
 
-    const { canHaveGlassEffect } = useFeatureFlags();
+    const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
 
     const [position, setPosition] = useState(() => {
         if (rightClickPos?.x !== undefined && rightClickPos?.y !== undefined) {
@@ -112,6 +97,13 @@ function InjectReact({
     const [email, setEmail] = useState('');
     const [glassEffect, setGlassEffect] = useState(false);
     const [showToolbar, setShowToolbar] = useState(true);
+    const [sync, setSync] = useState(false);
+    const [showSyncConfirmationModal, setShowSyncConfirmationModal] = useState(false);
+
+    // Sync toggle only enabled when note is saved AND sync is not enabled
+    const syncToggleEnable = isProUser && note.saved && !note.sync;
+    // Note can only be edited if note is not synced OR if it is synced then they must be a pro user AND must be online
+    const canEditSyncedNote = !note.sync || (isProUser && navigator.onLine);
 
     useEffect(() => {
         if (note) {
@@ -129,12 +121,11 @@ function InjectReact({
             setRequirePassword(note.isPasswordProtected);
             setPassword(note.password);
             setEmail(note.email);
-            setGlassEffect(() => {
-                return canHaveGlassEffect ? note.glassEffect : false
-            });
-            setShowToolbar(note.showToolbar);
+            setGlassEffect(canHaveGlassEffect && (note.glassEffect ?? false));
+            setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
+            setSync(note.sync ?? false);
         }
-    }, [note, canHaveGlassEffect]);
+    }, [note, canHaveGlassEffect, canUseAdvancedEditor, canUseSync]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -248,6 +239,7 @@ function InjectReact({
                 email: email,
                 glassEffect: glassEffect,
                 showToolbar: showToolbar,
+                sync: sync,
             };
 
             const notes = result.notes || [];
@@ -269,7 +261,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -335,60 +327,6 @@ function InjectReact({
         };
     }, [noteId]); // To stop keyboard events from interacting with the outer DOM
 
-    // const editorRef = useRef<Quill | null>(null);
-    // const editorContainerRef = useRef<HTMLDivElement | null>(null);
-    // const toolbarRef = useRef<HTMLDivElement | null>(null);
-
-    // useEffect(() => {
-    //     if (editorContainerRef.current && !editorRef.current) {
-    //         const quill = new Quill(editorContainerRef.current, {
-    //             theme: "snow",
-    //             modules: {
-    //                 toolbar: false
-    //             },
-    //         });
-
-    //         quill.on("text-change", () => {
-    //             setContent(quill.root.innerHTML);
-    //         });
-
-    //         editorRef.current = quill;
-    //     }
-    // }, [noteId, requirePassword, editorContainerRef.current, iconize]);
-
-    // useEffect(() => {
-    //     if (!requirePassword && !showNewPasswordForm && editorContainerRef.current) {
-    //         if (editorRef.current) {
-    //             editorRef.current.off("text-change");
-    //             editorRef.current = null;
-    //         }
-
-    //         const quill = new Quill(editorContainerRef.current, {
-    //             theme: "snow",
-    //             modules: { 
-    //                 history: {
-    //                     delay: 2000,
-    //                     maxStack: 500,
-    //                 },
-    //                 toolbar: false
-    //             },
-    //         });
-
-    //         quill.on("text-change", () => {
-    //             setContent(quill.root.innerHTML);
-    //         });
-
-    //         editorRef.current = quill;
-
-    //         // restore saved content
-    //         let safeContent = content || "";
-    //         if (safeContent && !safeContent.trim().startsWith("<")) {
-    //             safeContent = `<p>${safeContent}</p>`;
-    //         }
-    //         quill.clipboard.dangerouslyPasteHTML(safeContent, "silent");
-    //     }
-    // }, [requirePassword, iconize, showNewPasswordForm, editorContainerRef.current]);
-
     const glassBackgroundStyle = glassEffect ? {
         backgroundColor: hexToRgba(customColor, 0.35),
         backdropFilter: 'blur(16px) saturate(180%)', // frosted + vibrant 
@@ -407,300 +345,223 @@ function InjectReact({
 
     return (
         <>
-        {iconize ? 
-        (<div data-id={noteId}
-            id="react-injected-component"
-            title="Double Click To Expand Note"
-            className={style.iconized}
-            style={{
-                left: `${position.x}px`,
-                top: `${position.y}px`,
-                zIndex: zIndex,
-                overflow: 'auto',    // Required for resize to work
-                position: pinned ? 'fixed' : 'absolute',
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                MozUserSelect: 'none',
-                msUserSelect: 'none',
-                '--custom-color': customColor,
-            } as React.CSSProperties}
-            onMouseDown={(e) => {
-                handleMouseDown(e);
-                bringToFront();
-            }}
-            onDoubleClick={() => setIconize(false)}
-        >
-            <img 
-                src={icon} 
-                alt="icon" 
-                draggable={false}
-                onDragStart={(e) => e.preventDefault()}
-                style={{ 
-                    userSelect: 'none',
-                    pointerEvents: 'none'
-                }} 
-            />
-        </div>) : 
-        (<div
-            data-id={noteId}
-            id="react-injected-component"
-            className={style.injectedComponent}
-            style={{
-                ...glassBackgroundStyle,
-                width: `${width}px`,
-                height: `${height}px`,
-                left: `${position.x}px`,
-                top: `${position.y}px`,
-                zIndex: zIndex,
-                userSelect: 'none', // Prevents text selection while dragging
-                WebkitUserSelect: 'none',
-                MozUserSelect: 'none',
-                msUserSelect: 'none',
-                resize: 'both',     // Enable native resizing
-                overflow: 'auto',    // Required for resize to work
-                position: pinned ? 'fixed' : 'absolute',
-                // backgroundImage: `url(${Falcon})`,
-                // backgroundSize: "cover",       // Fill the whole div
-                // backgroundRepeat: "no-repeat", // Don’t tile
-                // backgroundPosition: "center",  // Center the image
-            }}
-            onMouseDown={bringToFront}
-            onMouseUp={handleResize}
-        >
-            <div 
-                className={style.topbar}
+            {iconize ? 
+            (<div data-id={noteId}
+                id="react-injected-component"
+                title="Double Click To Expand Note"
+                className={style.iconized}
                 style={{
-                    cursor: isDragging ? 'grabbing' : 'grab',
-                    backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
+                    left: `${position.x}px`,
+                    top: `${position.y}px`,
+                    zIndex: zIndex,
+                    overflow: 'auto',    // Required for resize to work
+                    position: pinned ? 'fixed' : 'absolute',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    '--custom-color': customColor,
+                } as React.CSSProperties}
+                onMouseDown={(e) => {
+                    handleMouseDown(e);
+                    bringToFront();
                 }}
-                onMouseDown={handleMouseDown}
+                onDoubleClick={() => setIconize(false)}
             >
-                <input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    className={style.topbarInput}
-                    style={{
-                        backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
-                        color: theme === "light" ? "black" : "white",
-                        pointerEvents: requirePassword ? "none" : "auto",
-                    }}
-                    placeholder="Enter The Title..."
-                    title="Title"
+                <img 
+                    src={icon} 
+                    alt="icon" 
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    style={{ 
+                        userSelect: 'none',
+                        pointerEvents: 'none'
+                    }} 
                 />
-
-                <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2`} style={{
-                    backgroundColor: glassEffect ? theme === "light" ? "#D9D9D9" : "#454545" : customColor,
-                }}>
-                    <svg viewBox="0 0 50 35" width="100%" height="100%" preserveAspectRatio="none">
-                        <path
-                            d="M0,0 L31,0 C3,0 31,35 0,35"
-                            fill={theme === "light" ? "#D9D9D9" : "#454545"}
-                        />
-                    </svg>
-
-                    <button
-                        onClick={() => {
-                            saveNote();
-                            setSaved(true);
+            </div>) : 
+            (<div
+                data-id={noteId}
+                id="react-injected-component"
+                className={style.injectedComponent}
+                style={{
+                    ...glassBackgroundStyle,
+                    width: `${width}px`,
+                    height: `${height}px`,
+                    left: `${position.x}px`,
+                    top: `${position.y}px`,
+                    zIndex: zIndex,
+                    userSelect: 'none', // Prevents text selection while dragging
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    resize: 'both',     // Enable native resizing
+                    overflow: 'auto',    // Required for resize to work
+                    position: pinned ? 'fixed' : 'absolute',
+                    // backgroundImage: `url(${Falcon})`,
+                    // backgroundSize: "cover",       // Fill the whole div
+                    // backgroundRepeat: "no-repeat", // Don’t tile
+                    // backgroundPosition: "center",  // Center the image
+                }}
+                onMouseDown={bringToFront}
+                onMouseUp={handleResize}
+            >
+                <div 
+                    className={style.topbar}
+                    style={{
+                        cursor: isDragging ? 'grabbing' : 'grab',
+                        backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
+                    }}
+                    onMouseDown={handleMouseDown}
+                >
+                    <input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        className={style.topbarInput}
+                        style={{
+                            backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
+                            color: theme === "light" ? "black" : "white",
+                            pointerEvents: requirePassword ? "none" : "auto",
                         }}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        className='bg-green-400 group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
-                        title={saved ? "Note Is Saved" : "Save Note"}
-                    >
-                        {saved ? 
-                            <Check
-                                className="hidden group-hover:block transition-[display]"
-                                size={14}
-                                style={{
-                                    position: "relative",
-                                    color: "green",
-                                    marginLeft: '4px',
-                                    marginRight: '4px'
-                                    // marginTop: "2px",
-                                }}
-                            /> :
-                            <Save
-                                className="hidden group-hover:block transition-[display]"
-                                size={14}
-                                style={{
-                                    position: "relative",
-                                    color: "green",
-                                    marginLeft: '4px',
-                                    marginRight: '4px'
-                                    // marginTop: "1px",
-                                }}
+                        placeholder="Enter The Title..."
+                        title="Title"
+                    />
+
+                    <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2`} style={{
+                        backgroundColor: glassEffect ? theme === "light" ? "#D9D9D9" : "#454545" : customColor,
+                    }}>
+                        <svg viewBox="0 0 50 35" width="100%" height="100%" preserveAspectRatio="none">
+                            <path
+                                d="M0,0 L31,0 C3,0 31,35 0,35"
+                                fill={theme === "light" ? "#D9D9D9" : "#454545"}
                             />
-                        }
-                    </button>
+                        </svg>
 
-                    <button
-                        onClick={() => setIconize(true)}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        className='bg-[#FFBF48] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
-                        title="Minimize Note"
-                    >
-                        <Minimize
-                            className="hidden group-hover:block transition-[display]"
-                            size={14}
-                            style={{
-                                position: "relative",
-                                color: "rgb(158, 124, 0)",
+                        <button
+                            onClick={() => {
+                                saveNote();
+                                setSaved(true);
                             }}
-                        />
-                    </button>
-
-                    <button
-                        onClick={handleClose}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        className='bg-[#FF4848] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
-                        title="Close Note"
-                    >
-                        <X
-                            className="hidden group-hover:block"
-                            size={14}
-                            style={{
-                                position: "relative",
-                                color: "darkred",
-                            }}
-                        />
-                    </button>
-                </div>
-                <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar}}>
-                    <DropDown />
-                </DropdownContext.Provider>
-            </div>
-
-            {(() => {
-                if (requirePassword) {
-                    return (
-                        <PasswordForm 
-                            theme={theme} 
-                            customColor={customColor}
-                            setRequirePassword={setRequirePassword}
-                            password={password}
-                            email={email}
-                            setShowNewPasswordForm={setShowNewPasswordForm}
-                        />
-                    );
-                } else if (showNewPasswordForm) {
-                    return (
-                        <NewPasswordForm 
-                            theme={theme} 
-                            customColor={customColor}
-                            setShowNewPasswordForm={setShowNewPasswordForm}
-                            setPassword={setPassword}
-                            email={email}
-                            setEmail={setEmail}
-                        />
-                    );
-                } else {
-                    return (
-                        <div className={style.textAreaContainer}
-                            style={{
-                                ...glassEffectBorderStyle,
-                                backgroundColor: 'transparent', 
-                                flexDirection: "column", 
-                                flex: 1,
-                            }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            className='bg-green-400 group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
+                            title={saved ? "Note Is Saved" : "Save Note"}
                         >
-                            {/* <div ref={toolbarRef} id={`toolbar-${noteId}`}>
-                                <button className="ql-bold"></button>
-                                <button className="ql-italic"></button>
-                                <button className="ql-underline"></button>
-                                <button className="ql-list" value="ordered"></button>
-                                <button className="ql-list" value="bullet"></button>
-                            </div> */}
+                            {saved ? 
+                                <Check
+                                    className="hidden group-hover:block transition-[display]"
+                                    size={14}
+                                    style={{
+                                        position: "relative",
+                                        color: "green",
+                                        marginLeft: '4px',
+                                        marginRight: '4px'
+                                        // marginTop: "2px",
+                                    }}
+                                /> :
+                                <Save
+                                    className="hidden group-hover:block transition-[display]"
+                                    size={14}
+                                    style={{
+                                        position: "relative",
+                                        color: "green",
+                                        marginLeft: '4px',
+                                        marginRight: '4px'
+                                        // marginTop: "1px",
+                                    }}
+                                />
+                            }
+                        </button>
 
-                            {/* <div 
-                                ref={editorContainerRef} 
-                                id={`editor-${noteId}`} 
+                        <button
+                            onClick={() => setIconize(true)}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            className='bg-[#FFBF48] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
+                            title="Minimize Note"
+                        >
+                            <Minimize
+                                className="hidden group-hover:block transition-[display]"
+                                size={14}
                                 style={{
-                                    backgroundColor: customColor,
-                                    color: fontColor || (theme === "light" ? "black" : "white"),
-                                    fontFamily: font,
-                                    fontSize: `${fontSize}px`,
-                                    // border: 0
-                                //     // minHeight: "100%",
-                                //     // minWidth: "100%"
+                                    position: "relative",
+                                    color: "rgb(158, 124, 0)",
                                 }}
-                                className={style.textArea}
-                            /> */}
-
-                            {/* TipTapEditor Below */}
-
-                            <TipTapEditor
-                                content={content}
-                                onChange={setContent}
-                                customColor={customColor}
-                                theme={theme}
-                                showToolbar={showToolbar}
                             />
+                        </button>
 
-                            {/* Original Below */}
-
-                            {/* <textarea
-                                className={style.textArea}
-                                name="textarea"
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                onKeyDown={(e) => {
-                                    // To check if both Shift and Enter keys are pressed
-                                    if (e.key === 'Enter' && e.shiftKey) {
-                                        e.preventDefault(); // Prevent default behavior
-
-                                        // Get current cursor position
-                                        const start = e.currentTarget.selectionStart;
-                                        const end = e.currentTarget.selectionEnd;
-
-                                        // Get current value
-                                        const value = e.currentTarget.value;
-
-                                        // Insert new line at cursor position
-                                        const newValue = value.substring(0, start) + '\n' + value.substring(end);
-
-                                        // Update textarea value
-                                        e.currentTarget.value = newValue;
-
-                                        // Move cursor after the new line
-                                        e.currentTarget.selectionStart = start + 1;
-                                        e.currentTarget.selectionEnd = start + 1;
-                                    }
-                                }}
+                        <button
+                            onClick={handleClose}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            className='bg-[#FF4848] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'
+                            title="Close Note"
+                        >
+                            <X
+                                className="hidden group-hover:block"
+                                size={14}
                                 style={{
-                                    backgroundColor: customColor,
-                                    color: fontColor || (theme === "light" ? "black" : "white"),
-                                    fontFamily: font,
-                                    fontSize: `${fontSize}px`,
+                                    position: "relative",
+                                    color: "darkred",
                                 }}
-                                placeholder="Start Typing..."
-                                onFocus={(e) => {
-                                    // When textarea is focused, create an invisible overlay just for keyboard events
-                                    const overlay = document.createElement('div');
-                                    overlay.id = 'keyboard-overlay';
-                                    overlay.style.cssText = `
-                                        position: fixed;
-                                        top: 0;
-                                        left: 0;
-                                        width: 100vw;
-                                        height: 100vh;
-                                        z-index: 2147483646;
-                                        background: transparent;
-                                        pointer-events: none;
-                                    `;
-                                    document.body.appendChild(overlay);
+                            />
+                        </button>
+                    </div>
+                    <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal}}>
+                        <DropDown />
+                    </DropdownContext.Provider>
+                </div>
+
+                {(() => {
+                    if (requirePassword) {
+                        return (
+                            <PasswordForm 
+                                theme={theme} 
+                                customColor={customColor}
+                                setRequirePassword={setRequirePassword}
+                                password={password}
+                                email={email}
+                                setShowNewPasswordForm={setShowNewPasswordForm}
+                            />
+                        );
+                    } else if (showNewPasswordForm) {
+                        return (
+                            <NewPasswordForm 
+                                theme={theme} 
+                                customColor={customColor}
+                                setShowNewPasswordForm={setShowNewPasswordForm}
+                                setPassword={setPassword}
+                                email={email}
+                                setEmail={setEmail}
+                            />
+                        );
+                    } else if (showSyncConfirmationModal) {
+                        return (
+                            <SyncConfirmationModal
+                                customColor={customColor} 
+                                setSync={setSync}
+                                setShowSyncConfirmationModal={setShowSyncConfirmationModal}
+                            />
+                        );
+                    } else {
+                        return (
+                            <div className={style.textAreaContainer}
+                                style={{
+                                    ...glassEffectBorderStyle,
+                                    backgroundColor: 'transparent', 
+                                    flexDirection: "column", 
+                                    flex: 1,
                                 }}
-                                onBlur={() => {
-                                    // Remove overlay when textarea loses focus
-                                    const overlay = document.getElementById('keyboard-overlay');
-                                    if (overlay) overlay.remove();
-                                }}
-                            /> */}
-                        </div>
-                    );
-                }
-            })()}
-        </div>)}
+                            >
+                                <TipTapEditor
+                                    content={content}
+                                    onChange={setContent}
+                                    customColor={customColor}
+                                    theme={theme}
+                                    showToolbar={showToolbar}
+                                />
+                            </div>
+                        );
+                    }
+                })()}
+            </div>)}
         </>
     );
 }

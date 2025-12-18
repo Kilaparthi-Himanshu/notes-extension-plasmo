@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-react';
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useUser } from "./hooks/useUser";
+import type { NoteType } from './types/noteTypes';
 
 function IndexPopup () {
     useEffect(() => {
@@ -61,7 +62,7 @@ function IndexPopup () {
         }
     };
 
-    const handleLoadNote = async (note, doubleClick = false) => {
+    const handleLoadNote = async (note: NoteType, doubleClick = false) => {
         try {
             const [tab] = await chrome.tabs.query({
                 active: true,
@@ -111,14 +112,14 @@ function IndexPopup () {
         const result = await chrome.storage.local.get("notes");
         const notes = result.notes;
 
-        const newNotes = notes.filter((n) => n.id != note.id);
+        const newNotes = notes.filter((n: any) => n.id != note.id);
 
         await chrome.storage.local.set({ "notes": newNotes });
 
         getNotes();
     };
 
-    const handleResetPos = async (note) => {
+    const handleResetPos = async (note: NoteType) => {
         setResetDisabled(true);
         note.position.x = 100;
         note.position.y = 100;
@@ -127,7 +128,7 @@ function IndexPopup () {
         const result = await chrome.storage.local.get("notes");
         const notes = result.notes;
 
-        const noteIndex = notes.findIndex(n => n.id === note.id);
+        const noteIndex = notes.findIndex((n: any) => n.id === note.id);
         if (noteIndex !== -1) {
             notes[noteIndex] = note;
             await chrome.storage.local.set({ "notes": notes });
@@ -145,6 +146,29 @@ function IndexPopup () {
             setResetDisabled(false);
         }, 300);
     };
+
+    function getReadableTextColor(bgColor: string) {
+        if (!bgColor) return "#111";
+
+        let r = 0, g = 0, b = 0;
+
+        if (bgColor.startsWith("#")) {
+            const hex = bgColor.replace("#", "");
+            r = parseInt(hex.substring(0, 2), 16);
+            g = parseInt(hex.substring(2, 4), 16);
+            b = parseInt(hex.substring(4, 6), 16);
+        } else if (bgColor.startsWith("rgb")) {
+            const matches = bgColor.match(/\d+/g);
+            if (matches) {
+                [r, g, b] = matches.map(Number);
+            }
+        }
+
+        // Perceived luminance formula
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+
+        return luminance > 160 ? "#111" : "#fff";
+    }
 
     return (
         <div className="popup p-2">
@@ -188,12 +212,15 @@ function IndexPopup () {
             <div
                 className="saved-notes-container"
             >
-                {notes.filter((note) =>
+                {notes.filter((note: NoteType) =>
                     note.title.toLowerCase().includes(search.toLowerCase()) 
                     // || note.content.toLowerCase().includes(search.toLowerCase())
                 )
                 .reverse()
-                .map((note, index) => (
+                .map((note: NoteType, index: any) => {
+                    const textColor = getReadableTextColor(note.color);
+
+                    return (
                         <div className="saved-note"
                             style={{
                                 backgroundColor: note.color
@@ -204,23 +231,17 @@ function IndexPopup () {
                             <div className="saved-note-content">
                                 <h2
                                     style={{
-                                        color: "white",
-                                        WebkitTextStroke: "1px #000",
-                                        fontWeight: "bold",
-                                        fontSize: "18px"
+                                        color: textColor,
+                                        fontWeight: 600,
+                                        fontSize: "16px",
+                                        textShadow:
+                                        textColor === "#fff"
+                                            ? "0 1px 2px rgba(0,0,0,0.4)"
+                                            : "0 1px 1px rgba(255,255,255,0.25)"
                                     }}
                                 >
                                     {note.title}
                                 </h2>
-                                {/* <p 
-                                // style={{
-                                //         color: note.theme === "light" ? "black" : "white"
-                                //     }}
-                                >
-                                    {note.content.length > 30
-                                    ? note.content.slice(0, 30) + '...' 
-                                    : note.content}
-                                </p> */}
                             </div>
 
                             <div className="saved-note-buttons">
@@ -253,7 +274,7 @@ function IndexPopup () {
                                 </button>
                             </div>
                         </div>
-                    ))}
+                    )})}
             </div>
             ) : (
                 <div className="no-notes-container">
@@ -269,5 +290,5 @@ export default function PopupRoot () {
         <QueryClientProvider client={queryClient}>
             <IndexPopup />
         </QueryClientProvider>
-    );
+    ); 
 }

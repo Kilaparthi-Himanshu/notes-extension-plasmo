@@ -15,6 +15,7 @@ import { useContext, useRef, useEffect } from 'react';
 import { DropdownContext } from './context';
 import { useFeatureFlags } from '~hooks/useFeatureFlags';
 import tailwindStyles from "data-text:../styles/global.css";
+import SyncToggle from './DropdownItems/SyncToggle';
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -109,6 +110,7 @@ const Dropdown = () => {
                     <PasswordToggle />
                     {canHaveGlassEffect && <GlassEffectToggle />}
                     {canUseAdvancedEditor && <ToolbarToggle />}
+                    <SyncToggle handleClose={handleClose} />
                 </div>
             )}
         </div>

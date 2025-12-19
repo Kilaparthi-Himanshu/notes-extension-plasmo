@@ -533,12 +533,13 @@ function InjectReact({
                                 setEmail={setEmail}
                             />
                         );
-                    } else if (/*showSyncConfirmationModa*/ true) {
+                    } else if (showSyncConfirmationModal) {
                         return (
                             <SyncConfirmationModal
                                 customColor={customColor} 
                                 setSync={setSync}
                                 setShowSyncConfirmationModal={setShowSyncConfirmationModal}
+                                theme={theme}
                             />
                         );
                     } else {

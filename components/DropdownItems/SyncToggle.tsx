@@ -3,6 +3,7 @@ import * as style from "./dropdownStyles.module.css"
 import { useContext } from 'react';
 import { DropdownContext } from '~components/context';
 import { MdSyncLock } from "react-icons/md";
+import { IoMdCloudOutline } from "react-icons/io";
 
 const SyncToggle = ({
     handleClose
@@ -26,17 +27,17 @@ const SyncToggle = ({
             className={`${style.dropdownCard} ${style[theme]}`} onClick={() => syncToggleEnable && handleToolbarToggle()} 
             title={titleForSync()}
         >
-            <div className={`${!syncToggleEnable && 'text-neutral-500'}`} >
+            <div className={`${!syncToggleEnable && 'text-neutral-400'}`} >
                 Sync
             </div>
             <div>
                 <div title="Sync Note" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
-                    <MdSyncLock
+                    <IoMdCloudOutline
                         style={{
-                            color: !syncToggleEnable 
-                                ? "#737373"
-                                : sync 
+                            color: sync 
                                 ? "#32D74B"
+                                : !syncToggleEnable 
+                                ? "#737373"
                                 : theme === "light" 
                                 ? "black" 
                                 : "white",

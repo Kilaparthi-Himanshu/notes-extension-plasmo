@@ -16,7 +16,7 @@ const GlassEffectToggle = () => {
                 Glass
             </div>
             <div>
-                <div title="Pin Note" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
+                <div title="Glass Effect" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
                     <Sparkles
                         style={{
                             color: glassEffect

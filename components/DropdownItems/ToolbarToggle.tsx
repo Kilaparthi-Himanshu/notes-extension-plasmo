@@ -18,7 +18,7 @@ const ToolbarToggle = () => {
                 Toolbar
             </div>
             <div>
-                <div title="Pin Note" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
+                <div title="Toolbar" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
                     <CgToolbarBottom
                         style={{
                             color: showToolbar

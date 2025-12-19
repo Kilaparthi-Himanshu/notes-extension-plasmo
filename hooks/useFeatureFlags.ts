@@ -7,7 +7,7 @@ export function useFeatureFlags() {
     const isProUser = userDetails?.subscription_status === 'pro';
 
     return {
-        isProUser: isProUser,
+        isProUser,
         canUseAdvancedEditor: isProUser,
         canHaveGlassEffect: isProUser,
         canUseSync: isProUser,

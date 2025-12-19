@@ -10,30 +10,40 @@ const SyncToggle = ({
     handleClose: () => void;
 }) => {
 
-    const { sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal, theme } = useContext(DropdownContext);
+    const { sync, setShowSyncConfirmationModal, syncToggleEnable, theme, saved } = useContext(DropdownContext);
 
     const handleToolbarToggle = () => {
         setShowSyncConfirmationModal(true);
         handleClose();
     }
 
+    const titleForSync = () => {
+        return sync ? 'You Cannot Turn Off Sync' : !saved ? 'Save The Note To Enable Sync' : !syncToggleEnable ? 'Pro Subscription Required' : 'Turn On Sync';
+    }
+
     return (
-        <div className={`${style.dropdownCard} ${style[theme]}`} onClick={handleToolbarToggle}>
-            <div>
+        <div 
+            className={`${style.dropdownCard} ${style[theme]}`} onClick={() => syncToggleEnable && handleToolbarToggle()} 
+            title={titleForSync()}
+        >
+            <div className={`${!syncToggleEnable && 'text-neutral-500'}`} >
                 Sync
             </div>
             <div>
-                <div title="Pin Note" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
+                <div title="Sync Note" className={`${style.pinsContainer} ${style.proPinsContainer} ${style[theme]}`}>
                     <MdSyncLock
                         style={{
-                            color: sync
+                            color: !syncToggleEnable 
+                                ? "#737373"
+                                : sync 
                                 ? "#32D74B"
-                                : theme === "light" ? "black" : "white",
+                                : theme === "light" 
+                                ? "black" 
+                                : "white",
                             marginTop: "3.3px",
                         }}
                         size={24}
                         className={style.pinIcon}
-                        onClick={handleToolbarToggle}
                     />
                 </div>
             </div>

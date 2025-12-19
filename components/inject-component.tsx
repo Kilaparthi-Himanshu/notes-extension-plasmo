@@ -10,8 +10,6 @@ import icon from "../assets/icon.png";
 import PasswordForm from "./Password/PasswordForm";
 import NewPasswordForm from "./Password/NewPasswordForm";
 import tailwindStyles from "data-text:../styles/global.css";
-import Quill from "quill";
-import snowCss from "data-text:quill/dist/quill.snow.css";
 import TipTapEditor from './TipTapEditor/TipTapEditor';
 import { useUser } from "~hooks/useUser";
 import { queryClient } from "~lib/queryClient";
@@ -23,7 +21,7 @@ import type { NoteType } from '../types/noteTypes';
 
 export const getStyle = () => {
     const style = document.createElement("style");
-    style.textContent =  styleText + tailwindStyles + snowCss;
+    style.textContent =  styleText + tailwindStyles;
     return style;
 }
 
@@ -101,9 +99,9 @@ function InjectReact({
     const [showSyncConfirmationModal, setShowSyncConfirmationModal] = useState(false);
 
     // Sync toggle only enabled when note is saved AND sync is not enabled
-    const syncToggleEnable = isProUser && note.saved && !note.sync;
+    const syncToggleEnable = canUseSync && saved && !sync; // canUseSync = isProUser
     // Note can only be edited if note is not synced OR if it is synced then they must be a pro user AND must be online
-    const canEditSyncedNote = !note.sync || (isProUser && navigator.onLine);
+    const canEditSyncedNote = !sync || (canUseSync && navigator.onLine); // canUseSync = isProUser
 
     useEffect(() => {
         if (note) {
@@ -113,7 +111,7 @@ function InjectReact({
             setTheme(note.theme);
             setCustomColor(note.color);
             setPinned(note.isPinned);
-            setSaved(note.saved);
+            setSaved(note.saved ?? false);
             setWidth(note.width);
             setHeight(note.height);
             setActive(note.active);
@@ -125,7 +123,7 @@ function InjectReact({
             setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
             setSync(note.sync ?? false);
         }
-    }, [note, canHaveGlassEffect, canUseAdvancedEditor, canUseSync]);
+    }, [note, canHaveGlassEffect, canUseAdvancedEditor]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -176,7 +174,7 @@ function InjectReact({
 
     const bringToFront = () => {
         const notes = document.querySelectorAll('plasmo-csui');
-        let maxZ = 9999;
+        let maxZ = 999999;
 
         // Find highest z-index
         notes.forEach(note => {
@@ -504,7 +502,10 @@ function InjectReact({
                             />
                         </button>
                     </div>
-                    <DropdownContext.Provider value={{theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal}}>
+                    <DropdownContext.Provider value={{
+                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, canEditSyncedNote
+                        }}
+                    >
                         <DropDown />
                     </DropdownContext.Provider>
                 </div>
@@ -532,7 +533,7 @@ function InjectReact({
                                 setEmail={setEmail}
                             />
                         );
-                    } else if (showSyncConfirmationModal) {
+                    } else if (/*showSyncConfirmationModa*/ true) {
                         return (
                             <SyncConfirmationModal
                                 customColor={customColor} 

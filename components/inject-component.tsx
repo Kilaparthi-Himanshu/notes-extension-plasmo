@@ -563,8 +563,8 @@ function InjectReact({
                                 />
 
                                 {!canEditSyncedNote && 
-                                    <div className="absolute bottom-0 left-0 right-0 z-10 h-max py-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">
-                                        <p>Need Pro Subcription To Edit a Synced Note.</p>
+                                    <div className="absolute bottom-0 left-0 right-0 z-10 h-max p-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">
+                                        <p>Need a Pro Subcription and an Internet Connection to Edit a Synced Note.</p>
                                     </div>
                                 }
                             </div>

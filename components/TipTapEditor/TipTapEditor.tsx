@@ -59,6 +59,7 @@ interface TipTapEditorProps {
     customColor: string;
     theme: string;
     showToolbar: boolean;
+    canEditSyncedNote: boolean;
 }
 
 export default function TipTapEditor({ 
@@ -66,7 +67,8 @@ export default function TipTapEditor({
     onChange, 
     customColor, 
     theme,
-    showToolbar
+    showToolbar,
+    canEditSyncedNote
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
 
@@ -160,6 +162,7 @@ export default function TipTapEditor({
         ],
         content: content || "<p></p>", // seed empty state
         onUpdate: ({ editor }) => {
+            if (!canEditSyncedNote) return;
             onChange(editor.getHTML());
         },
         editorProps: {
@@ -196,54 +199,6 @@ export default function TipTapEditor({
         }
     });
 
-    // useEffect(() => {
-    //     if (!editorState) return;
-
-    //     setFontSize(editorState.fontSize);
-    //     setFont(editorState.fontFamily);
-    //     setFontColor(editorState.color);
-
-    // }, [editorState]);
-
-    // function handleSelectionChange(editor: Editor) {
-    // // FONT SIZE
-    //     const size = detectCollapsedCursorFontSize(editor);
-    //     setFontSize(size ? parseInt(size.replace("px","")) : null);
-
-    //     // FONT FAMILY
-    //     const family = detectCollapsedCursorFontFamily(editor);
-    //     setFont(family ?? null);
-
-    //     // FONT COLOR
-    //     const color = detectCollapsedCursorFontColor(editor);
-    //     setFontColor(color ?? null);
-    // }
-
-    // Font Size Change
-    // useEffect(() => {
-    //     if (!editor) return;
-    //     if (fontSize === null) return; // mixed → do nothing
-
-    //     editor.chain().focus().setFontSize(`${fontSize}px`).run();
-    // }, [fontSize]);
-
-    // // Font Family Change
-    // useEffect(() => {
-    //     if (!editor) return;
-    //     if (!font) return;
-
-    //     editor.chain().focus().setFontFamily(font).run();
-    // }, [font]);
-
-    // // Font Color Change
-    // useEffect(() => {
-    //     if (!editor) return;
-    //     if (fontColor === null) return; // mixed → don't apply
-
-    //     // Always update stored marks
-    //     editor.chain().focus().setMark("textStyle", { color: fontColor }).run();
-    // }, [fontColor]);
-
     // Set Content
     useEffect(() => {
         if (!editor) return;
@@ -263,142 +218,21 @@ export default function TipTapEditor({
         editor.view.updateState(newState);
     }, [editor, content]);
 
-    // Full Text Size change
-    // useEffect(() => {
-    //     if (editor && fontSize) {
-    //         // save current selection
-    //         const { from, to } = editor.state.selection;
-    //         // Apply to whole doc
-    //         editor.chain().focus().selectAll().setFontSize(`${fontSize}px`).run();
-    //         // restore user selection
-    //         editor.commands.setTextSelection({ from, to });
-    //         // Also set active mark so new text continues at same size
-    //         editor.chain().focus().setFontSize(`${fontSize}px`).run();
-    //     }
-    // }, [editor, fontSize]);
+    // Can Edit note depends on canEditSyncedNote
+    useEffect(() => {
+        if (!editor) return;
 
-    // Selected Text Size Change
-    // useEffect(() => {
-    //     if (!editor) return;
-
-    //     const { from, to } = editor.state.selection;
-
-    //     // Apply font size only to selected text
-    //     if (from !== to) {
-    //         editor.chain().focus().setFontSize(`${fontSize}px`).run();
-    //     } else {
-    //         // If no text selected, set active mark so new text typed will use this size
-    //         editor.chain().focus().setFontSize(`${fontSize}px`).run();
-    //     }
-    // }, [editor, fontSize]);
-
-    // // Update Font Size With Cursor
-    // useEffect(() => {
-    //     if (!editor) return;
-
-    //     // Runs on every cursor movement / selection change
-    //     const handleUpdate = () => {
-    //         const attrs = editor.getAttributes("textStyle");
-    //         const size = attrs.fontSize;
-
-    //         if (size && size.endsWith("px")) {
-    //             const px = parseInt(size.replace("px", ""));
-    //             if (!isNaN(px)) {
-    //                 setFontSize(px);  // 👈 Update your global FontMenu state
-    //             }
-    //         }
-    //     };
-
-    //     editor.on("selectionUpdate", handleUpdate);
-    //     editor.on("transaction", handleUpdate);
-
-    //     return () => {
-    //         editor.off("selectionUpdate", handleUpdate);
-    //         editor.off("transaction", handleUpdate);
-    //     };
-    // }, [editor]);
-
-    // Selected Text Font Change
-    // useEffect(() => {
-    // if (!editor) return;
-
-    //     const { from, to } = editor.state.selection;
-
-    //     if (from !== to) {
-    //         editor.chain().focus().setFontFamily(font).run();
-    //     } else {
-    //         editor.chain().focus().setFontFamily(font).run();
-    //     }
-    // }, [editor, font]);
-
-    // // Update Font Family With Cursor
-    // useEffect(() => {
-    //     if (!editor) return;
-
-    //     const handleUpdate = () => {
-    //         const attrs = editor.getAttributes("textStyle");
-    //         const family = attrs.fontFamily;
-
-    //         if (family) {
-    //             setFont(family); // 👈 update your DropdownContext state
-    //         }
-    //     };
-
-    //     editor.on("selectionUpdate", handleUpdate);
-    //     editor.on("transaction", handleUpdate);
-
-    //     return () => {
-    //         editor.off("selectionUpdate", handleUpdate);
-    //         editor.off("transaction", handleUpdate);
-    //     };
-    // }, [editor]);
-
-    // Selected Text Color Change
-    // useEffect(() => {
-    //     if (!editor) return;
-
-    //     const { from, to } = editor.state.selection;
-
-    //     if (from !== to) {
-    //         editor.chain().focus().setColor(fontColor).run();
-    //     } else {
-    //         editor.chain().focus().setColor(fontColor).run();
-    //     }
-    // }, [editor, fontColor]);
-
-    // Update Font Color With Cursor
-    // useEffect(() => {
-    //     if (!editor) return;
-
-    //     const handleUpdate = () => {
-    //         const attrs = editor.getAttributes("textStyle");
-    //         let color = attrs.color;
-
-    //         if (color) {
-    //             color = rgbToHex(color);
-    //             setFontColor(color); // sync your color picker
-    //         }
-    //     };
-
-    //     editor.on("selectionUpdate", handleUpdate);
-    //     editor.on("transaction", handleUpdate);
-
-    //     return () => {
-    //         editor.off("selectionUpdate", handleUpdate);
-    //         editor.off("transaction", handleUpdate);
-    //     };
-    // }, [editor]);
+        editor.setEditable(canEditSyncedNote);
+    }, [editor, canEditSyncedNote]);
 
     return (
         <>
             <EditorContent 
                 editor={editor}
-                className={`${styleText.textArea} size-full`} 
+                className={`${styleText.textArea} size-full ${!canEditSyncedNote &&
+                    "cursor-not-allowed"}`
+                }
                 style={{
-                    // backgroundColor: customColor,
-                    // color: editorState.color || (theme === "light" ? "black" : "white"),
-                    // fontFamily: editorState.fontFamily,
-                    // fontSize: `${editorState.fontSize}px`,
                     minHeight: "100%",
                     minWidth: "100%",
                     overflowY: "auto",

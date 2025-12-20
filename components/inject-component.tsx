@@ -503,7 +503,7 @@ function InjectReact({
                         </button>
                     </div>
                     <DropdownContext.Provider value={{
-                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, canEditSyncedNote
+                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable
                         }}
                     >
                         <DropDown />
@@ -544,9 +544,10 @@ function InjectReact({
                         );
                     } else {
                         return (
-                            <div className={style.textAreaContainer}
+                            <div className={`${style.textAreaContainer} relative`}
                                 style={{
                                     ...glassEffectBorderStyle,
+                                    paddingBottom: !canEditSyncedNote ? "20px" : undefined,
                                     backgroundColor: 'transparent', 
                                     flexDirection: "column", 
                                     flex: 1,
@@ -558,7 +559,14 @@ function InjectReact({
                                     customColor={customColor}
                                     theme={theme}
                                     showToolbar={showToolbar}
+                                    canEditSyncedNote={canEditSyncedNote}
                                 />
+
+                                {!canEditSyncedNote && 
+                                    <div className="absolute bottom-0 left-0 right-0 z-10 h-max py-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">
+                                        <p>Need Pro Subcription To Edit a Synced Note.</p>
+                                    </div>
+                                }
                             </div>
                         );
                     }

@@ -97,6 +97,8 @@ function InjectReact({
     const [showToolbar, setShowToolbar] = useState(true);
     const [sync, setSync] = useState(false);
     const [showSyncConfirmationModal, setShowSyncConfirmationModal] = useState(false);
+    const [baseVersion, setBaseVersion] = useState(0);
+    const [dirty, setDirty] = useState(false);
 
     // Sync toggle only enabled when note is saved AND sync is not enabled
     const syncToggleEnable = canUseSync && saved && !sync; // canUseSync = isProUser
@@ -122,6 +124,8 @@ function InjectReact({
             setGlassEffect(canHaveGlassEffect && (note.glassEffect ?? false));
             setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
             setSync(note.sync ?? false);
+            setBaseVersion(note.baseVersion ?? 0);
+            setDirty(note.dirty ?? false);
         }
     }, [note, canHaveGlassEffect, canUseAdvancedEditor]);
 
@@ -238,6 +242,8 @@ function InjectReact({
                 glassEffect: glassEffect,
                 showToolbar: showToolbar,
                 sync: sync,
+                baseVersion: baseVersion,
+                dirty: dirty,
             };
 
             const notes = result.notes || [];
@@ -250,6 +256,7 @@ function InjectReact({
             }
 
             await chrome.storage.local.set({ "notes": notes });
+            console.log(note);
         } catch (error) {
             console.error("Error saving note:", error);
         }
@@ -259,7 +266,7 @@ function InjectReact({
         if (saved) {
             saveNote();
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);

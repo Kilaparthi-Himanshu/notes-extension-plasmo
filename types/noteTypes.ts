@@ -19,4 +19,6 @@ export type NoteType = {
     glassEffect: boolean,
     showToolbar: boolean,
     sync: boolean,
+    baseVersion: number,
+    dirty: boolean,
 }

@@ -9,6 +9,7 @@ export type NoteType = {
     theme: string,
     color: string,
     isPinned: boolean,
+    timestamp: number,
     saved: boolean,
     width: number,
     height: number,

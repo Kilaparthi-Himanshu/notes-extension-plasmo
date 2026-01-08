@@ -18,6 +18,8 @@ import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import { hexToRgba } from '~utils/colorFormatChange';
 import { SyncConfirmationModal } from './SyncConfirmationModal';
 import type { NoteType } from '../types/noteTypes';
+import { writeFullNote } from '../lib/sync-engine/storage';
+import { NoteSyncEngine } from '../lib/sync-engine';
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -219,44 +221,32 @@ function InjectReact({
         setCustomColor(newTheme === "light" ? "#ffffff" : "#262626"); // Reset custom color when theme changes
     };
 
+    const assembleNote = (): NoteType => ({
+        id: noteId,
+        title: title,
+        content: content,
+        position: position,
+        theme: theme,
+        color: customColor,
+        isPinned: pinned,
+        timestamp: Date.now(),
+        saved: true,
+        width: width,
+        height: height,
+        active: active,
+        isPasswordProtected: isPasswordProtected,
+        password: password,
+        email: email,
+        glassEffect: glassEffect,
+        showToolbar: showToolbar,
+        sync: sync,
+        baseVersion: baseVersion,
+        dirty: dirty,
+    });
+
     const saveNote = async () => {
         try {
-            const result = await chrome.storage.local.get("notes");
-
-            const note = {
-                id: noteId,
-                title: title,
-                content: content,
-                position: position,
-                theme: theme,
-                color: customColor,
-                isPinned: pinned,
-                timestamp: Date.now(),
-                saved: true,
-                width: width,
-                height: height,
-                active: active,
-                isPasswordProtected: isPasswordProtected,
-                password: password,
-                email: email,
-                glassEffect: glassEffect,
-                showToolbar: showToolbar,
-                sync: sync,
-                baseVersion: baseVersion,
-                dirty: dirty,
-            };
-
-            const notes = result.notes || [];
-            const noteIndex = notes.findIndex(n => n.id === noteId);
-
-            if (noteIndex !== -1) {
-                notes[noteIndex] = note;
-            } else {
-                notes.push(note);
-            }
-
-            await chrome.storage.local.set({ "notes": notes });
-            console.log(note);
+            writeFullNote(assembleNote());
         } catch (error) {
             console.error("Error saving note:", error);
         }
@@ -267,6 +257,28 @@ function InjectReact({
             saveNote();
         }
     }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty]);
+
+    const syncEngineRef = useRef<NoteSyncEngine | null>(null);
+
+    // Subscribe to sync engine
+    useEffect(() => {
+        if (!note) return;
+
+        syncEngineRef.current = new NoteSyncEngine({
+            noteId,
+            content: note.content,
+            baseVersion: note.baseVersion ?? 0,
+            dirty: note.dirty ?? false,
+            canSync: isProUser && sync,
+            canEditSyncedNote
+        });
+
+        return syncEngineRef.current.subscribe((patch) => {
+            if (patch.content !== undefined) setContent(patch.content);
+            if (patch.baseVersion !== undefined) setBaseVersion(patch.baseVersion);
+            if (patch.dirty !== undefined) setDirty(patch.dirty);
+        });
+    }, [noteId]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -562,7 +574,9 @@ function InjectReact({
                             >
                                 <TipTapEditor
                                     content={content}
-                                    onChange={setContent}
+                                    onChange={(html) => {
+                                        syncEngineRef.current?.onLocalEdit(html);
+                                    }}
                                     customColor={customColor}
                                     theme={theme}
                                     showToolbar={showToolbar}

@@ -18,8 +18,8 @@ import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import { hexToRgba } from '~utils/colorFormatChange';
 import { SyncConfirmationModal } from './SyncConfirmationModal';
 import type { NoteType } from '../types/noteTypes';
-import { writeFullNote } from '../lib/sync-engine/storage';
 import { NoteSyncEngine } from '../lib/sync-engine';
+import { persistLocal } from "~lib/sync-engine/storage";
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -108,7 +108,9 @@ function InjectReact({
     const canEditSyncedNote = !sync || (canUseSync && navigator.onLine); // canUseSync = isProUser
 
     useEffect(() => {
+        console.log("NEIN");
         if (note) {
+            console.log(note.sync);
             setTitle(note.title);
             setContent(note.content);
             setPosition(note.position);
@@ -129,7 +131,7 @@ function InjectReact({
             setBaseVersion(note.baseVersion ?? 0);
             setDirty(note.dirty ?? false);
         }
-    }, [note, canHaveGlassEffect, canUseAdvancedEditor]);
+    }, [note]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -244,41 +246,33 @@ function InjectReact({
         dirty: dirty,
     });
 
-    const saveNote = async () => {
-        try {
-            writeFullNote(assembleNote());
-        } catch (error) {
-            console.error("Error saving note:", error);
-        }
-    }
-
-    useEffect(() => {
-        if (saved) {
-            saveNote();
-        }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty]);
-
     const syncEngineRef = useRef<NoteSyncEngine | null>(null);
 
     // Subscribe to sync engine
     useEffect(() => {
-        if (!note) return;
-
         syncEngineRef.current = new NoteSyncEngine({
-            noteId,
-            content: note.content,
-            baseVersion: note.baseVersion ?? 0,
-            dirty: note.dirty ?? false,
+            note,
             canSync: isProUser && sync,
             canEditSyncedNote
         });
 
-        return syncEngineRef.current.subscribe((patch) => {
-            if (patch.content !== undefined) setContent(patch.content);
-            if (patch.baseVersion !== undefined) setBaseVersion(patch.baseVersion);
-            if (patch.dirty !== undefined) setDirty(patch.dirty);
-        });
+        return () => {
+            syncEngineRef.current = null;
+        };
     }, [noteId]);
+
+    useEffect(() => {
+        syncEngineRef.current?.setCapabilities({
+            canSync: isProUser && sync,
+            canEditSyncedNote
+        });
+    }, [isProUser, sync, canEditSyncedNote]);
+
+    useEffect(() => {
+        if (saved) {
+            syncEngineRef.current?.updateNote(assembleNote());
+        }
+    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -456,7 +450,7 @@ function InjectReact({
 
                         <button
                             onClick={() => {
-                                saveNote();
+                                syncEngineRef.current?.firstLocalSave(assembleNote());
                                 setSaved(true);
                             }}
                             onMouseDown={(e) => e.stopPropagation()}
@@ -522,7 +516,7 @@ function InjectReact({
                         </button>
                     </div>
                     <DropdownContext.Provider value={{
-                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, setSync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable
+                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable
                         }}
                     >
                         <DropDown />
@@ -574,9 +568,7 @@ function InjectReact({
                             >
                                 <TipTapEditor
                                     content={content}
-                                    onChange={(html) => {
-                                        syncEngineRef.current?.onLocalEdit(html);
-                                    }}
+                                    onChange={setContent}
                                     customColor={customColor}
                                     theme={theme}
                                     showToolbar={showToolbar}

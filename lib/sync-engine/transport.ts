@@ -1,26 +1,33 @@
+import type { NoteType } from '~types/noteTypes';
 import { supabase } from '../supabase';
-import type { RemoteNote } from './types';
 
 export const fetchRemote = async (noteId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
         .from('notes')
-        .select("content, version")
+        .select("note, version")
         .eq("id", noteId)
         .single()
+
+    if (error) {
+        console.error("Supabase error:", error);
+    }
 
     return data;
 }
 
-export async function pushToDB(
+export async function updateDB(
+    title: string,
     noteId: string,
-    content: string,
+    note: NoteType,
     baseVersion: number
 ) {
     const { data, error } = await supabase
         .from("notes")
         .update({
-            content,
-            version: baseVersion + 1
+            title,
+            note,
+            version: baseVersion + 1,
+            updatedAt: new Date().toISOString()
         })
         .eq("id", noteId)
         .eq("version", baseVersion)
@@ -30,4 +37,27 @@ export async function pushToDB(
     if (error) return { success: false }
 
     return { success: true, version: data.version }
+}
+
+export async function insertDB(
+    title: string,
+    noteId: string,
+    note: NoteType,
+    baseVersion: number
+) {
+    const { data, error } = await supabase
+        .from("notes")
+        .insert({
+            id: noteId,
+            title,
+            note,
+            version: baseVersion + 1,
+            updatedAt: new Date().toISOString()
+        })
+        .select("version")
+        .single()
+
+    if (error) return { success: false };
+
+    return { success: true, version: data.version };
 }

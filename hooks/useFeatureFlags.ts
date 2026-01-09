@@ -1,4 +1,3 @@
-import type { NoteType } from '~types/noteTypes';
 import { useUser } from './useUser';
 
 export function useFeatureFlags() {

@@ -22,4 +22,5 @@ export type NoteType = {
     sync: boolean,
     baseVersion: number,
     dirty: boolean,
+    remoteId: string,
 }

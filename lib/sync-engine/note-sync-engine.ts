@@ -175,8 +175,8 @@ export class NoteSyncEngine {
     async firstRemotePublish() {
         // First-time publish
         const res = await insertDB(
+            this.note.remoteId,
             this.note.title,
-            this.note.id,
             this.note,
             this.note.baseVersion // 0
         );
@@ -186,15 +186,17 @@ export class NoteSyncEngine {
             this.note.dirty = false;
             persistLocal(this.note);
             console.log("First Time: ",this.note);
+        } else {
+            console.log(res.error);
         }
     }
 
     async sync(contentChanged: boolean) {
         if (this.syncing) return;
-        if (contentChanged && !this.note.dirty) return; // prevents sync attempt when waiting from replying from db to make
         this.syncing = true;
 
-        const remote = await fetchRemote(this.note.id);
+        const remote = await fetchRemote(this.note.remoteId);
+        console.log("REMOTE: ", remote);
 
         if (!remote) {
             await this.firstRemotePublish();
@@ -207,7 +209,7 @@ export class NoteSyncEngine {
         if (contentChanged && remote.version !== this.note.baseVersion) {
             this.syncing = false;
 
-            emitConflict(this.note.id, {
+            emitConflict(this.note.remoteId, {
                 local: this.note.content,
                 remote: remote.note.content
             });
@@ -216,6 +218,7 @@ export class NoteSyncEngine {
         }
 
         const res = await updateDB(
+            this.note.remoteId,
             this.note.title,
             this.note.id,
             this.note,
@@ -229,9 +232,36 @@ export class NoteSyncEngine {
                 persistLocal(this.note);
                 console.log("Non-First Time: ",this.note);
             }
+        } else {
+            console.log(res.error);
         }
         console.log("Sync Phase");
 
         this.syncing = false;
+    }
+
+    async hydrateFromRemote() {
+        if (!this.sync) return;
+
+        const remote = await fetchRemote(this.note.remoteId);
+        if (!remote) return;
+
+        // if (this.note.dirty) {
+        //     if (remote.note.content !== this.note.content || remote.note.title !== this.note.title) {
+
+        //     }
+        // }
+
+        if (remote.note.version !== this.note.baseVersion) {
+            this.note = {
+                ...this.note,
+                ...remote.note,
+                baseVersion: remote.version,
+                dirty: false
+            }
+
+            persistLocal(this.note);
+            console.log("Hydrated From Remote: ", this.note);
+        }
     }
 }

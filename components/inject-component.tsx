@@ -101,6 +101,7 @@ function InjectReact({
     const [showSyncConfirmationModal, setShowSyncConfirmationModal] = useState(false);
     const [baseVersion, setBaseVersion] = useState(0);
     const [dirty, setDirty] = useState(false);
+    const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
     // Sync toggle only enabled when note is saved AND sync is not enabled
     const syncToggleEnable = canUseSync && saved && !sync; // canUseSync = isProUser
@@ -108,9 +109,7 @@ function InjectReact({
     const canEditSyncedNote = !sync || (canUseSync && navigator.onLine); // canUseSync = isProUser
 
     useEffect(() => {
-        console.log("NEIN");
         if (note) {
-            console.log(note.sync);
             setTitle(note.title);
             setContent(note.content);
             setPosition(note.position);
@@ -130,6 +129,7 @@ function InjectReact({
             setSync(note.sync ?? false);
             setBaseVersion(note.baseVersion ?? 0);
             setDirty(note.dirty ?? false);
+            // setRemoteId(note.remoteId ?? crypto.randomUUID());
         }
     }, [note]);
 
@@ -244,6 +244,7 @@ function InjectReact({
         sync: sync,
         baseVersion: baseVersion,
         dirty: dirty,
+        remoteId: remoteId,
     });
 
     const syncEngineRef = useRef<NoteSyncEngine | null>(null);
@@ -270,9 +271,10 @@ function InjectReact({
 
     useEffect(() => {
         if (saved) {
+            console.log(remoteId);
             syncEngineRef.current?.updateNote(assembleNote());
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty, remoteId]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);

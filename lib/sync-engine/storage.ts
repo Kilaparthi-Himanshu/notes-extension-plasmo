@@ -7,11 +7,11 @@ export const persistLocal = async (note: NoteType) => {
 
     const index = notes.findIndex((n: any) => n.id === note.id);
 
-     if (index !== -1) {
+    if (index !== -1) {
         notes[index] = note;
     } else {
         notes.push(note);
     }
 
-     await chrome.storage.local.set({ notes });
+    await chrome.storage.local.set({ notes });
 }

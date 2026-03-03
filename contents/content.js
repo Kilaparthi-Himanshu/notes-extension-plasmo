@@ -182,7 +182,7 @@ const injectComponent = async (data) => {
             <InjectReact 
                 noteId={noteId}
                 rightClickPos={position}
-                note={data.note}
+                initialNote={data.note}
             />
         </QueryClientProvider>
     ); // Pass ID to component

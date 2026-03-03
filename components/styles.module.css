@@ -170,25 +170,25 @@
     animation: fadeOut 0.3s ease forwards;
 }
 
-/* styles.module.css */
-.textArea::-webkit-scrollbar {
-    width: 8px !important;  /* Width of vertical scrollbar */
-}
+    /* styles.module.css */
+    .textArea::-webkit-scrollbar {
+        width: 8px !important;  /* Width of vertical scrollbar */
+    }
 
-.textArea::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1) !important;  /* Scrollbar track */
-    border-radius: 4px !important;
-}
-
-.textArea::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2) !important;  /* Scrollbar handle */
+    .textArea::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1) !important;  /* Scrollbar track */
         border-radius: 4px !important;
-}
+    }
 
-/* Hover effects */
-.textArea::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.3) !important;
-}
+    .textArea::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2) !important;  /* Scrollbar handle */
+            border-radius: 4px !important;
+    }
+
+    /* Hover effects */
+    .textArea::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3) !important;
+    }
 
 .disabled {
     cursor: not-allowed !important;

@@ -1,7 +1,7 @@
 import type { NoteType } from "~types/noteTypes"
 import { emitConflict } from "./conflict"
 import { debounce } from "./debounce"
-import { fetchRemote, insertDB, updateDB } from "./transport"
+import { fetchRemote, insertDB, updateDB, updateMetada } from "./transport"
 import type { Listener, RemoteNote, SyncPatch } from "./types"
 import { persistLocal } from "./storage"
 
@@ -160,7 +160,11 @@ export class NoteSyncEngine {
             prev.content !== next.content ||
             prev.title !== next.title;
 
-        this.note = note;
+        this.note = {
+            ...note,
+            baseVersion: this.note.baseVersion,
+        };
+
         if (contentChanged) {
             this.note.dirty = true;
         }
@@ -206,6 +210,8 @@ export class NoteSyncEngine {
         }
 
         // Only check version if content/title changed
+        console.log("Remote Ver: ", remote.version);
+        console.log("Base Ver: ", this.note.baseVersion);
         if (contentChanged && remote.version !== this.note.baseVersion) {
             this.syncing = false;
 
@@ -217,24 +223,30 @@ export class NoteSyncEngine {
             return;
         }
 
-        const res = await updateDB(
-            this.note.remoteId,
-            this.note.title,
-            this.note.id,
-            this.note,
-            this.note.baseVersion
-        );
+        if (contentChanged) {
+            const res = await updateDB(
+                this.note.remoteId,
+                this.note.title,
+                this.note.id,
+                this.note,
+                this.note.baseVersion
+            );
 
-        if (res.success) {
-            if (contentChanged) {
+            if (res.success) {
                 this.note.baseVersion = res.version;
+                console.log("SUCCESS RES: ", this.note.baseVersion);
                 this.note.dirty = false;
                 persistLocal(this.note);
-                console.log("Non-First Time: ",this.note);
+            } else {
+                console.log(res.error);
             }
         } else {
-            console.log(res.error);
+            await updateMetada(
+                this.note.remoteId,
+                this.note
+            );
         }
+
         console.log("Sync Phase");
 
         this.syncing = false;
@@ -262,6 +274,9 @@ export class NoteSyncEngine {
 
             persistLocal(this.note);
             console.log("Hydrated From Remote: ", this.note);
+            return this.note;
         }
+
+        return;
     }
 }

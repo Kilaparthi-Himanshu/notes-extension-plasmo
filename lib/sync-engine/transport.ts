@@ -33,11 +33,29 @@ export async function updateDB(
         .eq("id", remoteId)
         .eq("version", baseVersion)
         .select("version")
-        .single()
+        .single();
+
+    console.log("DATA: ", data, error);
 
     if (error) return { success: false, error }
 
     return { success: true, version: data.version }
+}
+
+export async function updateMetada(
+    remoteId: string,
+    note: NoteType
+) {
+    const { error } = await supabase
+        .from("notes")
+        .update({
+            note,
+            updated_at: new Date().toISOString()
+        })
+        .eq("id", remoteId)
+
+    if (error) return { success: false, error };
+    return { success: true };
 }
 
 export async function insertDB(

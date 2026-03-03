@@ -34,7 +34,6 @@ function IndexPopup () {
         chrome.runtime.sendMessage({ type: "GET_NOTES" }, (response) => {
             if (response && response.notes) {
                 setNotes(response.notes);
-                // Handle the received notes here
             }
         });
     };

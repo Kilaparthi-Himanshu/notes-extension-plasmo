@@ -30,17 +30,20 @@ export const getStyle = () => {
 function InjectReact({
     noteId,
     rightClickPos,
-    note
+    initialNote
 }: {
     noteId: string,
     rightClickPos?: { x: number, y: number },
-    note?: NoteType,
+    initialNote?: NoteType,
 }) {
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: ['user'] });
+        console.log("Note: ", initialNote);
     }, []);
 
     const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
+
+    const [note, setNote] = useState<NoteType>(initialNote);
 
     const [position, setPosition] = useState(() => {
         if (rightClickPos?.x !== undefined && rightClickPos?.y !== undefined) {
@@ -132,6 +135,31 @@ function InjectReact({
             // setRemoteId(note.remoteId ?? crypto.randomUUID());
         }
     }, [note]);
+
+    // const setVariables = (note: NoteType) => {
+    //     if (note) {
+    //         setTitle(note.title);
+    //         setContent(note.content);
+    //         setPosition(note.position);
+    //         setTheme(note.theme);
+    //         setCustomColor(note.color);
+    //         setPinned(note.isPinned);
+    //         setSaved(note.saved ?? false);
+    //         setWidth(note.width);
+    //         setHeight(note.height);
+    //         setActive(note.active);
+    //         setIsPasswordProtected(note.isPasswordProtected);
+    //         setRequirePassword(note.isPasswordProtected);
+    //         setPassword(note.password);
+    //         setEmail(note.email);
+    //         setGlassEffect(canHaveGlassEffect && (note.glassEffect ?? false));
+    //         setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
+    //         setSync(note.sync ?? false);
+    //         setBaseVersion(note.baseVersion ?? 0);
+    //         setDirty(note.dirty ?? false);
+    //         // setRemoteId(note.remoteId ?? crypto.randomUUID());
+    //     }
+    // }
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);

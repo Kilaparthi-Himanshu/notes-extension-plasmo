@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useUser } from "./hooks/useUser";
 import type { NoteType } from './types/noteTypes';
+import { sync } from '~node_modules/motion-dom/dist';
 
 function IndexPopup () {
     useEffect(() => {
@@ -169,34 +170,37 @@ function IndexPopup () {
         return luminance > 160 ? "#111" : "#fff";
     }
 
+    const syncedNotes = notes.filter((n: any) => n.sync);
+    const localNotes = notes.filter((n: any) => !n.sync);
+
     return (
-        <div className="popup p-2">
-            <button 
-                onClick={handleInject}
-                className="add-note-button w-full"
-            >
-                Add New Note
-            </button>
+        <div className="popup p-1">
+            <div className='w-full h-max flex flex-col gap-2 p-2'>
+                <button 
+                    onClick={handleInject}
+                    className="add-note-button w-full"
+                >
+                    Add New Note
+                </button>
 
-            <div style={{
-                color: "white"
-            }}>
-                {session ? (
-                    <div className='flex flex-col items-center'>
-                        <div>Signed in as: {session.user.email}</div>
-                        <div>
-                            Subscription Plan: &nbsp;
-                            <span className={`capitalize ${userDetails?.subscription_status === 'pro' && 'text-yellow-400'}`}>
-                                {userDetails?.subscription_status}
-                            </span>
+                <div
+                    className='border border-purple-400 rounded-lg text-white w-full'
+                >
+                    {session ? (
+                        <div className='flex flex-col items-center py-1'>
+                            <div>Signed in as: <span className='bg-green-700 px-1 rounded-md'>{session.user.email}</span></div>
+                            <div>
+                                Subscription Plan: &nbsp;
+                                <span className={`capitalize ${userDetails?.subscription_status === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.subscription_status === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
+                                    {userDetails?.subscription_status}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div>Not signed in</div>
-                )}
-            </div>
+                    ) : (
+                        <div>Not signed in</div>
+                    )}
+                </div>
 
-            <div className='w-full'>
                 <input 
                     ref = {searchRef}
                     type="text" 
@@ -207,74 +211,156 @@ function IndexPopup () {
                 />
             </div>
 
-            {notes.length > 0 ? (
-            <div
-                className="saved-notes-container"
-            >
-                {notes.filter((note: NoteType) =>
-                    note.title.toLowerCase().includes(search.toLowerCase()) 
-                    // || note.content.toLowerCase().includes(search.toLowerCase())
-                )
-                .reverse()
-                .map((note: NoteType, index: any) => {
-                    const textColor = getReadableTextColor(note.color);
-
-                    return (
-                        <div className="saved-note"
-                            style={{
-                                backgroundColor: note.color
-                            }}
-                            onDoubleClick={() => handleLoadNote(note, true)}
-                            key={note.id || index}
-                        >
-                            <div className="saved-note-content">
-                                <h2
-                                    style={{
-                                        color: textColor,
-                                        fontWeight: 600,
-                                        fontSize: "16px",
-                                        textShadow:
-                                        textColor === "#fff"
-                                            ? "0 1px 2px rgba(0,0,0,0.4)"
-                                            : "0 1px 1px rgba(255,255,255,0.25)"
-                                    }}
-                                >
-                                    {note.title}
-                                </h2>
-                            </div>
-
-                            <div className="saved-note-buttons">
-                                <button 
-                                    className="open-button"
-                                    onClick={() => handleLoadNote(note)}
-                                    title='Load'
-                                >
-                                    Open
-                                </button>
-
-                                <button 
-                                    className="delete-button"
-                                    onClick={() => handleDeleteNote(note)}
-                                    title='Delete'
-                                >
-                                    Delete
-                                </button>
-
-                                <button 
-                                    disabled = {resetDisabled}
-                                    className="resetPos-button"
-                                    onClick={() => handleResetPos(note)}
-                                    title='Reset Position'
-                                    style={{
-                                        cursor: resetDisabled ? 'not-allowed' : 'pointer'
-                                    }}
-                                >
-                                    <RefreshCw size={18}/>
-                                </button>
-                            </div>
-                        </div>
-                    )})}
+            <div className='w-full p-2 text-white text-xl flex'>
+                <span className='px-2 pl-0 min-w-0 w-full flex-1 border-b'>Synced Notes</span>
             </div>
+
+            {syncedNotes.length > 0 ? (
+                <div
+                    className="saved-notes-container"
+                >
+                    {syncedNotes.filter((note: NoteType) =>
+                        note.title.toLowerCase().includes(search.toLowerCase()) 
+                        // || note.content.toLowerCase().includes(search.toLowerCase())
+                    )
+                    .reverse()
+                    .map((note: NoteType, index: any) => {
+                        const textColor = getReadableTextColor(note.color);
+
+                        return (
+                            <div className="saved-note border-2 border-green-600"
+                                style={{
+                                    backgroundColor: note.color
+                                }}
+                                onDoubleClick={() => handleLoadNote(note, true)}
+                                key={note.id || index}
+                            >
+                                <div className="saved-note-content">
+                                    <h2
+                                        style={{
+                                            color: textColor,
+                                            fontWeight: 600,
+                                            fontSize: "16px",
+                                            textShadow:
+                                            textColor === "#fff"
+                                                ? "0 1px 2px rgba(0,0,0,0.4)"
+                                                : "0 1px 1px rgba(255,255,255,0.25)"
+                                        }}
+                                    >
+                                        {note.title}
+                                    </h2>
+                                </div>
+
+                                <div className="saved-note-buttons">
+                                    <button 
+                                        className="open-button"
+                                        onClick={() => handleLoadNote(note)}
+                                        title='Load'
+                                    >
+                                        Open
+                                    </button>
+
+                                    <button 
+                                        className="delete-button"
+                                        onClick={() => handleDeleteNote(note)}
+                                        title='Delete'
+                                    >
+                                        Delete
+                                    </button>
+
+                                    <button 
+                                        disabled = {resetDisabled}
+                                        className="resetPos-button"
+                                        onClick={() => handleResetPos(note)}
+                                        title='Reset Position'
+                                        style={{
+                                            cursor: resetDisabled ? 'not-allowed' : 'pointer'
+                                        }}
+                                    >
+                                        <RefreshCw size={18}/>
+                                    </button>
+                                </div>
+                            </div>
+                        )})}
+                </div>
+            ) : (
+                <div className="no-notes-container">
+                    <p>No Notes To Load 😞.</p>
+                </div>
+            )}
+
+            <div className='w-full p-2 text-white text-xl flex'>
+                <span className='min-w-0 w-full flex-1 border-b'>Local Notes</span>
+            </div>
+
+            {localNotes.length > 0 ? (
+                <div
+                    className="saved-notes-container"
+                >
+                    {localNotes.filter((note: NoteType) =>
+                        note.title.toLowerCase().includes(search.toLowerCase()) 
+                        // || note.content.toLowerCase().includes(search.toLowerCase())
+                    )
+                    .reverse()
+                    .map((note: NoteType, index: any) => {
+                        const textColor = getReadableTextColor(note.color);
+
+                        return (
+                            <div className="saved-note border-2 border-blue-600"
+                                style={{
+                                    backgroundColor: note.color
+                                }}
+                                onDoubleClick={() => handleLoadNote(note, true)}
+                                key={note.id || index}
+                            >
+                                <div className="saved-note-content">
+                                    <h2
+                                        style={{
+                                            color: textColor,
+                                            fontWeight: 600,
+                                            fontSize: "16px",
+                                            textShadow:
+                                            textColor === "#fff"
+                                                ? "0 1px 2px rgba(0,0,0,0.4)"
+                                                : "0 1px 1px rgba(255,255,255,0.25)"
+                                        }}
+                                    >
+                                        {note.title}
+                                    </h2>
+                                </div>
+
+                                <div className="saved-note-buttons">
+                                    <button 
+                                        className="open-button"
+                                        onClick={() => handleLoadNote(note)}
+                                        title='Load'
+                                    >
+                                        Open
+                                    </button>
+
+                                    <button 
+                                        className="delete-button"
+                                        onClick={() => handleDeleteNote(note)}
+                                        title='Delete'
+                                    >
+                                        Delete
+                                    </button>
+
+                                    <button 
+                                        disabled = {resetDisabled}
+                                        className="resetPos-button"
+                                        onClick={() => handleResetPos(note)}
+                                        title='Reset Position'
+                                        style={{
+                                            cursor: resetDisabled ? 'not-allowed' : 'pointer'
+                                        }}
+                                    >
+                                        <RefreshCw size={18}/>
+                                    </button>
+                                </div>
+                            </div>
+                        )})}
+                </div>
             ) : (
                 <div className="no-notes-container">
                     <p>No Notes To Load 😞.</p>

@@ -258,25 +258,30 @@ export class NoteSyncEngine {
         const remote = await fetchRemote(this.note.remoteId);
         if (!remote) return;
 
-        // if (this.note.dirty) {
-        //     if (remote.note.content !== this.note.content || remote.note.title !== this.note.title) {
+        // If remote newer
+        if (remote.note.version > this.note.baseVersion) {
 
-        //     }
-        // }
+            // If local has unsynced changes -> conflict
+            if (this.note.dirty) {
+                emitConflict(this.note.remoteId, {
+                    local: this.note.content,
+                    remote: remote.note.content
+                });
+                return;
+            }
 
-        if (remote.note.version !== this.note.baseVersion) {
+            // Otherwise safe to overwrite
             this.note = {
                 ...this.note,
                 ...remote.note,
                 baseVersion: remote.version,
                 dirty: false
-            }
+            };
 
             persistLocal(this.note);
-            console.log("Hydrated From Remote: ", this.note);
+            console.log("Hydarated from remote: ", this.note);
+
             return this.note;
         }
-
-        return;
     }
 }

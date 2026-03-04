@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useUser } from "./hooks/useUser";
 import type { NoteType } from './types/noteTypes';
-import { sync } from '~node_modules/motion-dom/dist';
+import { supabase } from '~lib/supabase';
 
 function IndexPopup () {
     useEffect(() => {
@@ -31,18 +31,15 @@ function IndexPopup () {
         return () => document.removeEventListener("keydown", handleSearch);
     }, []);
 
-    const getNotes = () => {
-        chrome.runtime.sendMessage({ type: "GET_NOTES" }, (response) => {
-            if (response && response.notes) {
-                setNotes(response.notes);
-            }
-        });
+    const getNotes = async () => {
+        const response = await chrome.runtime.sendMessage({ type: "GET_NOTES" });
+        return response?.notes ?? [];
     };
 
-    // Call the function to get notes
-    useEffect(() => {
-        getNotes();
-    }, []);
+    // // Call the function to get notes
+    // useEffect(() => {
+    //     getNotes();
+    // }, []);
 
     const handleInject = async () => {
         try {
@@ -170,6 +167,65 @@ function IndexPopup () {
         return luminance > 160 ? "#111" : "#fff";
     }
 
+    async function fetchAllRemoteNotes() {
+        const { data, error } = await supabase
+            .from("notes")
+            .select("note, version")
+            .eq("user_id", session.user.id);
+
+        if (error) {
+            console.error(error);
+            return [];
+        }
+
+        return data.map((row: any) => ({
+            ...row.note,
+            baseVersion: row.version
+        }));
+    }
+
+    async function mergeSyncedNotes() {
+        const localNotes: NoteType[] = await getNotes();
+
+        // If user is not signed in -> only show local notes
+        if (!session) {
+            setNotes(localNotes);
+            return;
+        }
+
+        const remoteNotes = await fetchAllRemoteNotes();
+
+        const localSynced = localNotes.filter(n => n.sync);
+        const localMap = new Map(localSynced.map(n => [n.remoteId, n]));
+
+        const merged = [...localNotes.filter(n => !n.sync)];
+
+        for (const remote of remoteNotes) {
+            const local = localMap.get(remote.remoteId);
+
+            if (!local) {
+                // new note from another PC
+                merged.push(remote);
+                continue;
+            }
+
+            if (remote.baseVersion > local.baseVersion) {
+                // remote newer
+                merged.push(remote);
+            } else {
+                merged.push(local);
+            }
+        }
+
+        await chrome.storage.local.set({ notes: merged });
+
+        setNotes(merged);
+    }
+
+    useEffect(() => {
+        mergeSyncedNotes();
+    }, [session]);
+
     const syncedNotes = notes.filter((n: any) => n.sync);
     const localNotes = notes.filter((n: any) => !n.sync);
 
@@ -186,19 +242,24 @@ function IndexPopup () {
                 <div
                     className='border border-purple-400 rounded-lg text-white w-full'
                 >
-                    {session ? (
-                        <div className='flex flex-col items-center py-1'>
-                            <div>Signed in as: <span className='bg-green-700 px-1 rounded-md'>{session.user.email}</span></div>
+                    <div className='flex flex-col items-center py-1'>
+                        {session ? (
                             <div>
-                                Subscription Plan: &nbsp;
-                                <span className={`capitalize ${userDetails?.subscription_status === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.subscription_status === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
-                                    {userDetails?.subscription_status}
-                                </span>
+                                <div>Signed in as: &nbsp;
+                                    <span className='bg-green-700 px-1 rounded-md'>{session.user.email}
+                                        </span>
+                                    </div>
+                                <div>
+                                    Subscription Plan: &nbsp;
+                                    <span className={`capitalize ${userDetails?.subscription_status === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.subscription_status === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
+                                        {userDetails?.subscription_status}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div>Not signed in</div>
-                    )}
+                        ) : (
+                            <div>Not signed in</div>
+                        )}
+                    </div>
                 </div>
 
                 <input 

@@ -184,6 +184,16 @@ function IndexPopup () {
         }));
     }
 
+    function generateLocalId(userIds: Set<String>) {
+        let i = 0;
+        while (userIds.has(`note-${i}`)) {
+            i++;
+        }
+        const id = `note-${i}`;
+        userIds.add(id);
+        return id;
+    }
+
     async function mergeSyncedNotes() {
         const localNotes: NoteType[] = await getNotes();
 
@@ -200,18 +210,28 @@ function IndexPopup () {
 
         const merged = [...localNotes.filter(n => !n.sync)];
 
+        const userIds = new Set(localNotes.map(n => n.id));
+
         for (const remote of remoteNotes) {
             const local = localMap.get(remote.remoteId);
 
             if (!local) {
+                const newId = generateLocalId(userIds);
+
                 // new note from another PC
-                merged.push(remote);
+                merged.push({
+                    ...remote,
+                    id: newId
+                });
                 continue;
             }
 
             if (remote.baseVersion > local.baseVersion) {
                 // remote newer
-                merged.push(remote);
+                merged.push({
+                    ...remote,
+                    id: local.id
+                });
             } else {
                 merged.push(local);
             }

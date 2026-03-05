@@ -228,14 +228,17 @@ function IndexPopup () {
         }
 
         // Handle remote deletions
+        /// General rule of thumb is that a synced note must always exist in the DB.
+        /// If a synced note exists locally but not in the DB, it probably means the note has been deleted, so we remove
+        /// the note locally as well.
         const remoteIds = new Set(remoteNotes.map(n => n.remoteId));
 
         const filterLocal = localNotes.filter(n => {
-            if (!n.sync) return true;
-            return remoteIds.has(n.remoteId);
+            if (!n.sync) return true; // if it is non synced note let it pass through
+            return remoteIds.has(n.remoteId); // if it is synced and exists both locally and remotely let is pass through
         });
 
-        // merge synced new, synced existing and local notes
+        // Merge synced new, synced existing and local notes
         const localSynced = filterLocal.filter(n => n.sync);
         // creating a map of local synced notes for easy lookup of remote synced notes within them
         const localMap = new Map(localSynced.map(n => [n.remoteId, n]));
@@ -250,7 +253,8 @@ function IndexPopup () {
         for (const remote of remoteNotes) {
             const local = localMap.get(remote.remoteId);
 
-            // synced note dosen't exist in local which means a clash of note-{id} occurs so we fix it
+            // synced note dosen't exist in local which means a clash of note-{id} might occur so we fix it
+            // a synced note existing in DB but not locally means its a new synced note
             if (!local) {
                 const newId = generateLocalId(localIds);
 

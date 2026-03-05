@@ -293,6 +293,13 @@ function IndexPopup () {
     const syncedNotes = notes.filter((n: any) => n.sync);
     const localNotes = notes.filter((n: any) => !n.sync);
 
+    const syncedNotesCount = syncedNotes.length;
+    const localNotesCount = localNotes.length;
+
+    useEffect(() => {
+        console.log(syncedNotesCount, localNotesCount);
+    }, [syncedNotesCount, localNotesCount]);
+
     return (
         <div className="popup p-1">
             <div className='w-full h-max flex flex-col gap-2 p-2'>

@@ -1,7 +1,7 @@
 import type { NoteType } from "~types/noteTypes"
 import { emitConflict } from "./conflict"
 import { debounce } from "./debounce"
-import { fetchRemote, insertDB, updateDB, updateMetada } from "./transport"
+import { fetchRemote, insertRemote, updateMetada, updateRemote } from "./transport"
 import type { Listener, RemoteNote, SyncPatch } from "./types"
 import { persistLocal } from "./storage"
 
@@ -178,7 +178,7 @@ export class NoteSyncEngine {
 
     async firstRemotePublish() {
         // First-time publish
-        const res = await insertDB(
+        const res = await insertRemote(
             this.note.remoteId,
             this.note.title,
             this.note,
@@ -224,7 +224,7 @@ export class NoteSyncEngine {
         }
 
         if (contentChanged) {
-            const res = await updateDB(
+            const res = await updateRemote(
                 this.note.remoteId,
                 this.note.title,
                 this.note.id,

@@ -19,7 +19,7 @@ const SyncToggle = ({
     }
 
     const titleForSync = () => {
-        return sync ? 'You Cannot Turn Off Sync' : !saved ? 'Save The Note To Enable Sync' : !syncToggleEnable ? 'Pro Subscription Required' : 'Turn On Sync';
+        return sync ? 'You Cannot Turn Off Sync' : !saved ? 'Save The Note To Enable Sync' : !syncToggleEnable ? 'Pro Subscription And An Internet Connection Required' : 'Turn On Sync';
     }
 
     return (

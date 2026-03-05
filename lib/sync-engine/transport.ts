@@ -15,7 +15,7 @@ export const fetchRemote = async (remoteId: string) => {
     return data;
 }
 
-export async function updateDB(
+export async function updateRemote(
     remoteId: string,
     title: string,
     noteId: string,
@@ -58,7 +58,7 @@ export async function updateMetada(
     return { success: true };
 }
 
-export async function insertDB(
+export async function insertRemote(
     remoteId: string,
     title: string,
     note: NoteType,
@@ -79,4 +79,17 @@ export async function insertDB(
     if (error) return { success: false, error };
 
     return { success: true, version: data.version };
+}
+
+export async function deleteRemote(remoteId: string) {
+    const { error } = await supabase
+        .from("notes")
+        .delete()
+        .eq("id", remoteId);
+
+    if (error) {
+        return { success: false, error };
+    }
+
+    return { success: true };
 }

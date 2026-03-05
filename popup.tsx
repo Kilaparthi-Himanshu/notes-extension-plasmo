@@ -6,6 +6,7 @@ import { queryClient } from "./lib/queryClient";
 import { useUser } from "./hooks/useUser";
 import type { NoteType } from './types/noteTypes';
 import { supabase } from '~lib/supabase';
+import { deleteRemote } from '~lib/sync-engine/transport';
 
 function IndexPopup () {
     useEffect(() => {
@@ -33,6 +34,7 @@ function IndexPopup () {
 
     const getNotes = async () => {
         const response = await chrome.runtime.sendMessage({ type: "GET_NOTES" });
+        console.log(response?.notes);
         return response?.notes ?? [];
     };
 
@@ -90,6 +92,16 @@ function IndexPopup () {
         }
 
         try {
+            // remove from DB if synced
+            if (note.sync && note.remoteId && navigator.onLine) {
+                const response = await deleteRemote(note.remoteId);
+
+                if (response.error) {
+                    throw response.error;
+                }
+            }
+
+            // remove from current tab UI
             const [tab] = await chrome.tabs.query({ 
                 active: true, 
                 currentWindow: true 
@@ -102,18 +114,18 @@ function IndexPopup () {
                 noteId: note.id
             });
 
+            // remove from local storage
+            const result = await chrome.storage.local.get("notes");
+            const notes = result.notes || [];
+
+            const newNotes = notes.filter((n: any) => n.id !== note.id);
+
+            await chrome.storage.local.set({ "notes": newNotes });
+
+            await mergeSyncedNotes();
         } catch (err) {
             console.error("Failed To Remove Note:", err);
         }
-
-        const result = await chrome.storage.local.get("notes");
-        const notes = result.notes;
-
-        const newNotes = notes.filter((n: any) => n.id != note.id);
-
-        await chrome.storage.local.set({ "notes": newNotes });
-
-        getNotes();
     };
 
     const handleResetPos = async (note: NoteType) => {
@@ -184,17 +196,18 @@ function IndexPopup () {
         }));
     }
 
-    function generateLocalId(userIds: Set<String>) {
+    function generateLocalId(localIds: Set<String>) {
         let i = 0;
-        while (userIds.has(`note-${i}`)) {
+        while (localIds.has(`note-${i}`)) {
             i++;
         }
         const id = `note-${i}`;
-        userIds.add(id);
+        localIds.add(id);
         return id;
     }
 
     async function mergeSyncedNotes() {
+        // local notes = local synced + local unsynced
         const localNotes: NoteType[] = await getNotes();
 
         // If user is not signed in -> only show local notes
@@ -203,22 +216,45 @@ function IndexPopup () {
             return;
         }
 
-        const remoteNotes = await fetchAllRemoteNotes();
+        // remote notes = remote synced (might or might not exist locally)
+        let remoteNotes: NoteType[] = [];
 
-        const localSynced = localNotes.filter(n => n.sync);
+        try {
+            remoteNotes = await fetchAllRemoteNotes();
+        } catch (err) {
+            console.warn("Remote fetch failed, using local notes only.");
+            setNotes(localNotes);
+            return;
+        }
+
+        // Handle remote deletions
+        const remoteIds = new Set(remoteNotes.map(n => n.remoteId));
+
+        const filterLocal = localNotes.filter(n => {
+            if (!n.sync) return true;
+            return remoteIds.has(n.remoteId);
+        });
+
+        // merge synced new, synced existing and local notes
+        const localSynced = filterLocal.filter(n => n.sync);
+        // creating a map of local synced notes for easy lookup of remote synced notes within them
         const localMap = new Map(localSynced.map(n => [n.remoteId, n]));
 
-        const merged = [...localNotes.filter(n => !n.sync)];
+        // first we write all local non synced notes
+        const merged = [...filterLocal.filter(n => !n.sync)];
 
-        const userIds = new Set(localNotes.map(n => n.id));
+        // set of local existing (synced + non synced) ids
+        const localIds = new Set(filterLocal.map(n => n.id));
 
+        // checking for existance of remote synced notes locally and merging accordingly
         for (const remote of remoteNotes) {
             const local = localMap.get(remote.remoteId);
 
+            // synced note dosen't exist in local which means a clash of note-{id} occurs so we fix it
             if (!local) {
-                const newId = generateLocalId(userIds);
+                const newId = generateLocalId(localIds);
 
-                // new note from another PC
+                // new note from another PC being assigned a unique note-{id}
                 merged.push({
                     ...remote,
                     id: newId
@@ -226,13 +262,17 @@ function IndexPopup () {
                 continue;
             }
 
+            // synced note already exists locally means we just push it based on greatest baseVersion (logic might change)
             if (remote.baseVersion > local.baseVersion) {
-                // remote newer
+                // remote synced note newer than local synced note
                 merged.push({
                     ...remote,
                     id: local.id
                 });
             } else {
+                // local synced note newer than remote synced note (for now)
+                /// with current restrictions on offline editing of synced notes and them being editable only when user is online,
+                /// this else part is expected never to be reached.
                 merged.push(local);
             }
         }

@@ -107,7 +107,7 @@ function InjectReact({
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
     // Sync toggle only enabled when note is saved AND sync is not enabled
-    const syncToggleEnable = canUseSync && saved && !sync; // canUseSync = isProUser
+    const syncToggleEnable = canUseSync && saved && !sync && navigator.onLine; // canUseSync = isProUser
     // Note can only be edited if note is not synced OR if it is synced then they must be a pro user AND must be online
     const canEditSyncedNote = !sync || (canUseSync && navigator.onLine); // canUseSync = isProUser
 

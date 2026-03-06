@@ -7,6 +7,7 @@ import { useUser } from "./hooks/useUser";
 import type { NoteType } from './types/noteTypes';
 import { supabase } from '~lib/supabase';
 import { deleteRemote } from '~lib/sync-engine/transport';
+import { FREE_MAX_SYNCED_NOTES_COUNT, PRO_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
 
 function IndexPopup () {
     useEffect(() => {
@@ -187,7 +188,7 @@ function IndexPopup () {
 
         if (error) {
             console.error(error);
-            return [];
+            return null;
         }
 
         return data.map((row: any) => ({
@@ -196,7 +197,7 @@ function IndexPopup () {
         }));
     }
 
-    function generateLocalId(localIds: Set<String>) {
+    function generateLocalId(localIds: Set<string>) {
         let i = 0;
         while (localIds.has(`note-${i}`)) {
             i++;
@@ -221,6 +222,11 @@ function IndexPopup () {
 
         try {
             remoteNotes = await fetchAllRemoteNotes();
+
+            if (!remoteNotes) {
+                setNotes(localNotes);
+                return;
+            }
         } catch (err) {
             console.warn("Remote fetch failed, using local notes only.");
             setNotes(localNotes);
@@ -288,6 +294,7 @@ function IndexPopup () {
 
     useEffect(() => {
         mergeSyncedNotes();
+        console.log(userDetails);
     }, [session]);
 
     const syncedNotes = notes.filter((n: any) => n.sync);
@@ -343,8 +350,18 @@ function IndexPopup () {
                 />
             </div>
 
-            <div className='w-full p-2 text-white text-xl flex'>
-                <span className='px-2 pl-0 min-w-0 w-full flex-1 border-b'>Synced Notes</span>
+            <div className='w-full p-2 text-white text-xl'>
+                <div className='w-full flex justify-between items-center border-b'>
+                    <span className='px-2 pl-0 min-w-0 w-full flex-1 '>Synced Notes</span>
+
+                    <span className='text-sm'>
+                        {syncedNotesCount}/
+                        {userDetails?.subscription_status === "pro" 
+                            ? PRO_MAX_SYNCED_NOTES_COUNT 
+                            : FREE_MAX_SYNCED_NOTES_COUNT
+                        }
+                    </span>
+                </div>
             </div>
 
             {syncedNotes.length > 0 ? (
@@ -421,8 +438,14 @@ function IndexPopup () {
                 </div>
             )}
 
-            <div className='w-full p-2 text-white text-xl flex'>
-                <span className='min-w-0 w-full flex-1 border-b'>Local Notes</span>
+            <div className='w-full p-2 text-white text-xl'>
+                <div className='w-full flex justify-between items-center border-b'>
+                    <span className='px-2 pl-0 min-w-0 w-full flex-1 '>Local Notes</span>
+
+                    <span className='text-sm'>
+                        {localNotesCount}
+                    </span>
+                </div>
             </div>
 
             {localNotes.length > 0 ? (

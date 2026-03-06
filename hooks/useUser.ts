@@ -1,6 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 
+type UserDetailsType = {
+    created_at: string;
+    email: string;
+    subscription_status: string;
+    user_id: string;
+}
+
 async function fetchUserDetails() {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
@@ -14,7 +21,7 @@ async function fetchUserDetails() {
         .from('users')
         .select('*')
         .eq("user_id", session.user.id)
-        .maybeSingle();
+        .maybeSingle<UserDetailsType>();
 
     if (userError) {
         throw userError;

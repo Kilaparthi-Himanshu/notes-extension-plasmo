@@ -136,6 +136,7 @@ export class NoteSyncEngine {
             },
             500
         );
+        // this.scheduleSync is reference to the same debounce function being called multiple times so timer in debounce is stored
     }
 
     setCapabilities(opts: {

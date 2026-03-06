@@ -1,0 +1,2 @@
+export const FREE_MAX_SYNCED_NOTES_COUNT = 2;
+export const PRO_MAX_SYNCED_NOTES_COUNT = 10;

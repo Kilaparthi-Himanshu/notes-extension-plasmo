@@ -45,6 +45,7 @@ function InjectReact({
     }, []);
 
     const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
+    const { data: { session } } = useUser();
 
     const [note, setNote] = useState<NoteType>(initialNote);
 
@@ -109,10 +110,10 @@ function InjectReact({
     const [dirty, setDirty] = useState(false);
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
-    // Sync toggle only enabled when note is saved AND sync is not enabled AND free user limit not reached AND must be online
-    const syncToggleEnable = saved && !sync && !limitInfo.maxReached && navigator.onLine;
-    // Note can only be edited if note is not synced OR if it is synced then they must be a pro user AND must be online
-    const canEditSyncedNote = !sync || navigator.onLine;
+    // Sync toggle only enabled when Logged In AND note is saved AND sync is not enabled AND free user limit not reached AND must be online
+    const syncToggleEnable = !!session && saved && !sync && !limitInfo.maxReached && navigator.onLine;
+    // Note can only be edited if note is not synced OR if it is synced then they must be a logged in AND must be online
+    const canEditSyncedNote = !sync || (session && navigator.onLine);
 
     useEffect(() => {
         if (note) {

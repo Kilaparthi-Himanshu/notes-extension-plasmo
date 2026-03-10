@@ -35,7 +35,7 @@ function IndexPopup () {
 
     const getNotes = async () => {
         const response = await chrome.runtime.sendMessage({ type: "GET_NOTES" });
-        console.log(response?.notes);
+        console.log("UGG: ", response?.notes);
         return response?.notes ?? [];
     };
 
@@ -212,8 +212,10 @@ function IndexPopup () {
         // If user is not signed in -> only show local notes
         if (!session) {
             setNotes(localNotes);
+            console.log("NO SESSION: ", session, localNotes);
             return;
         }
+        console.log("SESSION: ", session, localNotes);
 
         // remote notes = remote synced (might or might not exist locally)
         let remoteNotes: NoteType[] = [];
@@ -311,8 +313,8 @@ function IndexPopup () {
     }
 
     useEffect(() => {
-        console.log(syncedNotesCount, localNotesCount);
-    }, [syncedNotesCount, localNotesCount]);
+        console.log(syncedNotes, localNotes);
+    }, [syncedNotes, localNotes]);
 
     return (
         <div className="popup p-1">

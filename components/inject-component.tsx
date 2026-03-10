@@ -113,7 +113,7 @@ function InjectReact({
     // Sync toggle only enabled when Logged In AND note is saved AND sync is not enabled AND free user limit not reached AND must be online
     const syncToggleEnable = !!session && saved && !sync && !limitInfo.maxReached && navigator.onLine;
     // Note can only be edited if note is not synced OR if it is synced then they must be a logged in AND must be online
-    const canEditSyncedNote = !sync || (session && navigator.onLine);
+    const canEditSyncedNote = !sync || (!!session && navigator.onLine);
 
     useEffect(() => {
         if (note) {
@@ -139,31 +139,6 @@ function InjectReact({
             // setRemoteId(note.remoteId ?? crypto.randomUUID());
         }
     }, [note]);
-
-    // const setVariables = (note: NoteType) => {
-    //     if (note) {
-    //         setTitle(note.title);
-    //         setContent(note.content);
-    //         setPosition(note.position);
-    //         setTheme(note.theme);
-    //         setCustomColor(note.color);
-    //         setPinned(note.isPinned);
-    //         setSaved(note.saved ?? false);
-    //         setWidth(note.width);
-    //         setHeight(note.height);
-    //         setActive(note.active);
-    //         setIsPasswordProtected(note.isPasswordProtected);
-    //         setRequirePassword(note.isPasswordProtected);
-    //         setPassword(note.password);
-    //         setEmail(note.email);
-    //         setGlassEffect(canHaveGlassEffect && (note.glassEffect ?? false));
-    //         setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
-    //         setSync(note.sync ?? false);
-    //         setBaseVersion(note.baseVersion ?? 0);
-    //         setDirty(note.dirty ?? false);
-    //         // setRemoteId(note.remoteId ?? crypto.randomUUID());
-    //     }
-    // }
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -611,7 +586,11 @@ function InjectReact({
 
                                 {!canEditSyncedNote && 
                                     <div className="absolute bottom-0 left-0 right-0 z-10 h-max p-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">
-                                        <p>Make sure to have a Pro Subcription and an Internet Connection to Edit a Synced Note.</p>
+                                        <p>
+                                            {!session 
+                                                ? 'Sign in to Edit a Synced Note.' 
+                                                : 'Make sure to have a Pro Subcription and an Internet Connection to Edit a Synced Note.'}
+                                        </p>
                                     </div>
                                 }
                             </div>

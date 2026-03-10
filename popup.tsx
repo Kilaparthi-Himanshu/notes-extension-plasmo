@@ -206,11 +206,15 @@ function IndexPopup () {
     }
 
     async function mergeSyncedNotes() {
+        // latest session is crucial here, so we fetch directly instead of relying on react query
+        const { data } = await supabase.auth.getSession();
+        const session = data.session;
+
         // local notes = local synced + local unsynced
         const localNotes: NoteType[] = await getNotes();
 
         // If user is not signed in -> only show local notes
-        if (!session) {
+        if (!session || !navigator.onLine) {
             setNotes(localNotes);
             console.log("NO SESSION: ", session, localNotes);
             return;
@@ -288,6 +292,7 @@ function IndexPopup () {
         }
 
         await chrome.storage.local.set({ notes: merged });
+        console.log("MERGED: ", merged);
 
         setNotes(merged);
     }
@@ -295,13 +300,13 @@ function IndexPopup () {
     useEffect(() => {
         mergeSyncedNotes();
         console.log(userDetails);
-    }, [session]);
+    }, []);
 
     const syncedNotes = notes.filter((n: any) => n.sync);
-    const localNotes = notes.filter((n: any) => !n.sync);
+    const unsyncedNotes = notes.filter((n: any) => !n.sync);
 
     const syncedNotesCount = syncedNotes.length;
-    const localNotesCount = localNotes.length;
+    const unsyncedNotesCount = unsyncedNotes.length;
 
     const maxSyncedNotesCountReached = userDetails?.subscription_status !== "pro"
         && syncedNotesCount >= FREE_MAX_SYNCED_NOTES_COUNT;
@@ -312,9 +317,9 @@ function IndexPopup () {
         maxCount: FREE_MAX_SYNCED_NOTES_COUNT
     }
 
-    useEffect(() => {
-        console.log(syncedNotes, localNotes);
-    }, [syncedNotes, localNotes]);
+    // useEffect(() => {
+    //     console.log(syncedNotes, unsyncedNotes);
+    // }, [syncedNotes, unsyncedNotes]);
 
     return (
         <div className="popup p-1">
@@ -452,16 +457,16 @@ function IndexPopup () {
                     <span className='px-2 pl-0 min-w-0 w-full flex-1 '>Local Notes</span>
 
                     <span className='text-sm'>
-                        {localNotesCount}
+                        {unsyncedNotesCount}
                     </span>
                 </div>
             </div>
 
-            {localNotes.length > 0 ? (
+            {unsyncedNotes.length > 0 ? (
                 <div
                     className="saved-notes-container"
                 >
-                    {localNotes.filter((note: NoteType) =>
+                    {unsyncedNotes.filter((note: NoteType) =>
                         note.title.toLowerCase().includes(search.toLowerCase()) 
                         // || note.content.toLowerCase().includes(search.toLowerCase())
                     )

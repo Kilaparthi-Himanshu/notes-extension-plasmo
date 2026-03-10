@@ -303,6 +303,10 @@ function IndexPopup () {
     const syncedNotesCount = syncedNotes.length;
     const localNotesCount = localNotes.length;
 
+    const maxSyncedNotesCountReached = userDetails?.subscription_status === "pro" 
+        ? syncedNotesCount >= PRO_MAX_SYNCED_NOTES_COUNT 
+        : syncedNotesCount >= FREE_MAX_SYNCED_NOTES_COUNT;
+
     useEffect(() => {
         console.log(syncedNotesCount, localNotesCount);
     }, [syncedNotesCount, localNotesCount]);

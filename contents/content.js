@@ -42,7 +42,8 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
     if (message.type === "INJECT_COMPONENT") {
         injectComponent({
             position: lastRightClickPos,  // Use saved position
-            fromContextMenu: message.fromContextMenu ? true : false
+            fromContextMenu: message.fromContextMenu ? true : false,
+            limitInfo: message.limitInfo
         });
     }
 });
@@ -80,6 +81,7 @@ chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
             injectComponent({
                 note: request.note,
                 fromContextMenu: false,
+                limitInfo: request.limitInfo,
             });
         }
     }
@@ -98,6 +100,7 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
                     injectComponent({
                         note: message.note,
                         fromContextMenu: false,
+                        limitInfo: message.limitInfo,
                     });
                 }, 300); // Match this with animation duration
             }
@@ -183,6 +186,7 @@ const injectComponent = async (data) => {
                 noteId={noteId}
                 rightClickPos={position}
                 initialNote={data.note}
+                limitInfo={data.limitInfo}
             />
         </QueryClientProvider>
     ); // Pass ID to component

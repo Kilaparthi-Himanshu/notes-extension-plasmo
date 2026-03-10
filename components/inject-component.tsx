@@ -17,7 +17,7 @@ import * as Falcon from '~assets/Falcon.jpeg';
 import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import { hexToRgba } from '~utils/colorFormatChange';
 import { SyncConfirmationModal } from './SyncConfirmationModal';
-import type { NoteType } from '../types/noteTypes';
+import type { LimitInfo, NoteType } from '../types/noteTypes';
 import { NoteSyncEngine } from '../lib/sync-engine';
 import { persistLocal } from "~lib/sync-engine/storage";
 
@@ -30,15 +30,18 @@ export const getStyle = () => {
 function InjectReact({
     noteId,
     rightClickPos,
-    initialNote
+    initialNote,
+    limitInfo
 }: {
     noteId: string,
     rightClickPos?: { x: number, y: number },
     initialNote?: NoteType,
+    limitInfo: LimitInfo,
 }) {
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: ['user'] });
         console.log("Note: ", initialNote);
+        console.log("Note Limit Info: ", limitInfo);
     }, []);
 
     const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
@@ -106,10 +109,10 @@ function InjectReact({
     const [dirty, setDirty] = useState(false);
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
-    // Sync toggle only enabled when note is saved AND sync is not enabled
-    const syncToggleEnable = canUseSync && saved && !sync && navigator.onLine; // canUseSync = isProUser
+    // Sync toggle only enabled when note is saved AND sync is not enabled AND free user limit not reached AND must be online
+    const syncToggleEnable = saved && !sync && !limitInfo.maxReached && navigator.onLine;
     // Note can only be edited if note is not synced OR if it is synced then they must be a pro user AND must be online
-    const canEditSyncedNote = !sync || (canUseSync && navigator.onLine); // canUseSync = isProUser
+    const canEditSyncedNote = !sync || navigator.onLine;
 
     useEffect(() => {
         if (note) {
@@ -281,7 +284,7 @@ function InjectReact({
     useEffect(() => {
         syncEngineRef.current = new NoteSyncEngine({
             note,
-            canSync: isProUser && sync,
+            canSync: sync,
             canEditSyncedNote
         });
 
@@ -292,7 +295,7 @@ function InjectReact({
 
     useEffect(() => {
         syncEngineRef.current?.setCapabilities({
-            canSync: isProUser && sync,
+            canSync: sync,
             canEditSyncedNote
         });
     }, [isProUser, sync, canEditSyncedNote]);
@@ -546,7 +549,7 @@ function InjectReact({
                         </button>
                     </div>
                     <DropdownContext.Provider value={{
-                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable
+                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached
                         }}
                     >
                         <DropDown />

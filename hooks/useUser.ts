@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useEffect } from "react";
 
 type UserDetailsType = {
     created_at: string;
@@ -31,6 +32,18 @@ async function fetchUserDetails() {
 }
 
 export function useUser() {
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        const { data: listener } = supabase.auth.onAuthStateChange(() => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        });
+
+        return () => {
+            listener.subscription.unsubscribe();
+        }
+    }, []);
+
     return useQuery({
         queryKey: ['user'],
         queryFn: fetchUserDetails,

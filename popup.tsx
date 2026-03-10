@@ -7,7 +7,7 @@ import { useUser } from "./hooks/useUser";
 import type { NoteType } from './types/noteTypes';
 import { supabase } from '~lib/supabase';
 import { deleteRemote } from '~lib/sync-engine/transport';
-import { FREE_MAX_SYNCED_NOTES_COUNT, PRO_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
+import { FREE_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
 
 function IndexPopup () {
     useEffect(() => {
@@ -39,11 +39,6 @@ function IndexPopup () {
         return response?.notes ?? [];
     };
 
-    // // Call the function to get notes
-    // useEffect(() => {
-    //     getNotes();
-    // }, []);
-
     const handleInject = async () => {
         try {
             const [tab] = await chrome.tabs.query({ 
@@ -54,7 +49,8 @@ function IndexPopup () {
             if (!tab.id) return;
 
             await chrome.tabs.sendMessage(tab.id, { 
-                type: "INJECT_COMPONENT"
+                type: "INJECT_COMPONENT",
+                limitInfo,
             });
 
         } catch (err) {
@@ -75,7 +71,8 @@ function IndexPopup () {
                 type: "LOAD_NOTE",
                 fromLoadNote: true,
                 note: note,
-                doubleClick: doubleClick
+                doubleClick: doubleClick,
+                limitInfo,
             });
 
         } catch (err) {
@@ -149,6 +146,7 @@ function IndexPopup () {
                     type: 'UPDATE_NOTE_POSITION',
                     noteId: note.id,
                     note: note,
+                    limitInfo,
                 });
             }
         }
@@ -303,9 +301,14 @@ function IndexPopup () {
     const syncedNotesCount = syncedNotes.length;
     const localNotesCount = localNotes.length;
 
-    const maxSyncedNotesCountReached = userDetails?.subscription_status === "pro" 
-        ? syncedNotesCount >= PRO_MAX_SYNCED_NOTES_COUNT 
-        : syncedNotesCount >= FREE_MAX_SYNCED_NOTES_COUNT;
+    const maxSyncedNotesCountReached = userDetails?.subscription_status !== "pro"
+        && syncedNotesCount >= FREE_MAX_SYNCED_NOTES_COUNT;
+
+    const limitInfo = {
+        maxReached: maxSyncedNotesCountReached,
+        syncedCount: syncedNotesCount,
+        maxCount: FREE_MAX_SYNCED_NOTES_COUNT
+    }
 
     useEffect(() => {
         console.log(syncedNotesCount, localNotesCount);
@@ -361,7 +364,7 @@ function IndexPopup () {
                     <span className='text-sm'>
                         {syncedNotesCount}/
                         {userDetails?.subscription_status === "pro" 
-                            ? PRO_MAX_SYNCED_NOTES_COUNT 
+                            ? "∞"
                             : FREE_MAX_SYNCED_NOTES_COUNT
                         }
                     </span>

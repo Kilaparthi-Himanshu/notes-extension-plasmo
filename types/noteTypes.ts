@@ -24,3 +24,9 @@ export type NoteType = {
     dirty: boolean,
     remoteId: string,
 }
+
+export type LimitInfo = {
+    maxReached: boolean,
+    syncedCount: number,
+    maxCount: number,
+}

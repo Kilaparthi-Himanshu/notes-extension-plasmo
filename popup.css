@@ -74,7 +74,6 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
     height: 50px;

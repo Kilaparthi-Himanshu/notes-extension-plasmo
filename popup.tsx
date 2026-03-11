@@ -380,7 +380,7 @@ function IndexPopup () {
 
             {syncedNotes.length > 0 ? (
                 <div
-                    className="saved-notes-container"
+                    className="saved-notes-container flex flex-column gap-[10px]"
                 >
                     {syncedNotes.filter((note: NoteType) =>
                         note.title.toLowerCase().includes(search.toLowerCase()) 
@@ -464,7 +464,7 @@ function IndexPopup () {
 
             {unsyncedNotes.length > 0 ? (
                 <div
-                    className="saved-notes-container"
+                    className="saved-notes-container flex flex-column gap-[10px] mb-[10px]"
                 >
                     {unsyncedNotes.filter((note: NoteType) =>
                         note.title.toLowerCase().includes(search.toLowerCase()) 

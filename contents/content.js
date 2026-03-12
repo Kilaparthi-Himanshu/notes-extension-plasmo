@@ -5,6 +5,9 @@ import * as style from "~components/styles.module.css";
 import { getDropdownStyle } from "~components/DropdownItems/ThemeToggle";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "~lib/queryClient";
+import { getLimitInfo } from "~lib/getLimitInfo";
+import { supabase } from "~lib/supabase";
+import { fetchUserDetails } from "~hooks/useUser";
 
 const loadActiveNotes = async () => {
     try {
@@ -13,11 +16,16 @@ const loadActiveNotes = async () => {
 
         const activeNotes = notes.filter(note => note.active);
 
+        // fetch userDetails and compute limitInfo
+        const { userDetails } = await fetchUserDetails();
+        const limitInfo = await getLimitInfo(userDetails);
+
         activeNotes.forEach(note => {
             injectComponent({
                 note: note,
                 fromContextMenu: false,
-                fromActiveNotes: true
+                fromActiveNotes: true,
+                limitInfo
             });
         })
     } catch (error) {

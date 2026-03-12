@@ -8,6 +8,8 @@ import type { NoteType } from './types/noteTypes';
 import { supabase } from '~lib/supabase';
 import { deleteRemote } from '~lib/sync-engine/transport';
 import { FREE_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
+import { VisibleLimit } from "react-visible-limit";
+import { getLimitInfo } from "./lib/getLimitInfo";
 
 function IndexPopup () {
     useEffect(() => {
@@ -18,8 +20,11 @@ function IndexPopup () {
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
-    // const [userDetails, setUserDetails] = useState<any>(null);
-    // const [session, setSession] = useState<Session>(null);
+    const [limitInfo, setLimitInfo] = useState<{
+        maxReached: boolean,
+        syncedCount: number,
+        maxCount: number,
+    } | null>(null);
     const { data, isLoading } = useUser();
     const session = data?.session;
     const userDetails = data?.userDetails;
@@ -308,25 +313,21 @@ function IndexPopup () {
     const syncedNotesCount = syncedNotes.length;
     const unsyncedNotesCount = unsyncedNotes.length;
 
-    const maxSyncedNotesCountReached = userDetails?.subscription_status !== "pro"
-        && syncedNotesCount >= FREE_MAX_SYNCED_NOTES_COUNT;
+    useEffect(() => {
+        const loadLimit = async() => {
+            const info = await getLimitInfo(userDetails);
+            setLimitInfo(info);
+        }
 
-    const limitInfo = {
-        maxReached: maxSyncedNotesCountReached,
-        syncedCount: syncedNotesCount,
-        maxCount: FREE_MAX_SYNCED_NOTES_COUNT
-    }
-
-    // useEffect(() => {
-    //     console.log(syncedNotes, unsyncedNotes);
-    // }, [syncedNotes, unsyncedNotes]);
+        loadLimit();
+    }, [userDetails, notes]);
 
     return (
         <div className="popup p-1">
             <div className='w-full h-max flex flex-col gap-2 p-2'>
                 <button 
                     onClick={handleInject}
-                    className="add-note-button w-full"
+                    className="add-note-button w-full h-[30px] flex items-center justify-center"
                 >
                     Add New Note
                 </button>
@@ -379,8 +380,10 @@ function IndexPopup () {
             </div>
 
             {syncedNotes.length > 0 ? (
-                <div
-                    className="saved-notes-container flex flex-column gap-[10px]"
+                <VisibleLimit
+                    className="saved-notes-container flex flex-column gap-[10px] pb-[10px]"
+                    maxVisible={3}
+                    gap={10}
                 >
                     {syncedNotes.filter((note: NoteType) =>
                         note.title.toLowerCase().includes(search.toLowerCase()) 
@@ -444,8 +447,9 @@ function IndexPopup () {
                                     </button>
                                 </div>
                             </div>
-                        )})}
-                </div>
+                        )})
+                    }
+                </VisibleLimit>
             ) : (
                 <div className="no-notes-container">
                     <p>No Notes To Load 😞.</p>
@@ -463,8 +467,10 @@ function IndexPopup () {
             </div>
 
             {unsyncedNotes.length > 0 ? (
-                <div
-                    className="saved-notes-container flex flex-column gap-[10px] mb-[10px]"
+                <VisibleLimit
+                    className="saved-notes-container flex flex-column gap-[10px] pb-[10px]"
+                    maxVisible={3}
+                    gap={10}
                 >
                     {unsyncedNotes.filter((note: NoteType) =>
                         note.title.toLowerCase().includes(search.toLowerCase()) 
@@ -528,8 +534,9 @@ function IndexPopup () {
                                     </button>
                                 </div>
                             </div>
-                        )})}
-                </div>
+                        )})
+                    }
+                </VisibleLimit>
             ) : (
                 <div className="no-notes-container">
                     <p>No Notes To Load 😞.</p>

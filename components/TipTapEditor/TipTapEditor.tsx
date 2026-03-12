@@ -14,12 +14,15 @@ import Italic from "@tiptap/extension-italic";
 import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import { FontFamily } from "@tiptap/extension-text-style";
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { all, createLowlight } from 'lowlight'
 import { rgbToHex } from '~utils/colorFormatChange';
 import { detectCollapsedCursorFontColor, detectCollapsedCursorFontFamily, detectCollapsedCursorFontSize, detectMixedFontFamily, detectMixedFontSize } from '~utils/detectMixedFunctions';
 import ListItem from '@tiptap/extension-list-item';
 import Highlight from '@tiptap/extension-highlight';
 import { UndoRedo } from '@tiptap/extensions';
 import { EditorState } from "~node_modules/prosemirror-state/dist";
+import hljsStyle from "data-text:highlight.js/styles/github-dark.css";
 
 const ListItemWithStyle = ListItem.extend({
     addAttributes() {
@@ -49,7 +52,7 @@ const ListItemWithStyle = ListItem.extend({
 
 export const getStyle = () => {
     const style = document.createElement("style");
-    style.textContent =  styleText;
+    style.textContent =  styleText + hljsStyle;
     return style;
 }
 
@@ -111,6 +114,8 @@ export default function TipTapEditor({
         },
     });
 
+    const lowlight = createLowlight(all);
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -158,7 +163,15 @@ export default function TipTapEditor({
                 types: ['textStyle'],
             }),
             Highlight,
-            UndoRedo
+            UndoRedo,
+            CodeBlockLowlight.configure({
+                lowlight,
+                enableTabIndentation: true,
+                tabSize: 2,
+                HTMLAttributes: {
+                    class: "hljs"
+                }
+            }),
         ],
         content: content || "<p></p>", // seed empty state
         onUpdate: ({ editor }) => {
@@ -227,6 +240,23 @@ export default function TipTapEditor({
 
     return (
         <>
+            <style>{hljsStyle as unknown as string}
+                {`
+                    .hljs {
+                        // background: transparent !important;
+                    }
+
+                    pre.hljs {
+                        // background: transparent !important;
+                        padding: 14px 16px;
+                        border: 1px solid rgba(255,255,255,0.25);
+                        border-radius: 12px;
+                        margin: 8px 0;
+                        overflow-x: auto;
+                    }
+                `}
+            </style>
+
             <EditorContent 
                 editor={editor}
                 className={`${styleText.textArea} size-full ${!canEditSyncedNote &&

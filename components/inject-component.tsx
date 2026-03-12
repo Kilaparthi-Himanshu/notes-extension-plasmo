@@ -45,7 +45,7 @@ function InjectReact({
     }, []);
 
     const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
-    const { data: { session } } = useUser();
+    const session = useUser().data?.session;
 
     const [note, setNote] = useState<NoteType>(initialNote);
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { useEditor, EditorContent, Editor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import styleText from "data-text:../styles.module.css";
@@ -75,45 +75,6 @@ export default function TipTapEditor({
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
 
-    const BoldExtension = Bold.extend({
-        addKeyboardShortcuts() {
-            if (!canUseAdvancedEditor) {
-                return {
-                    "Mod-b": () => true // true = handled, but does nothing
-                }
-            }
-            return {
-                "Mod-b": () => this.editor.commands.toggleBold(),
-            }
-        },
-    });
-
-    const ItalicExtension = Italic.extend({
-        addKeyboardShortcuts() {
-            if (!canUseAdvancedEditor) {
-                return {
-                    "Mod-i": () => true
-                }
-            }
-            return {
-                "Mod-i": () => this.editor.commands.toggleItalic(),
-            }
-        },
-    });
-
-    const StrikeExtension = Strike.extend({
-        addKeyboardShortcuts() {
-            if (!canUseAdvancedEditor) {
-                return {
-                    "Mod-Shift-s": () => true
-                }
-            }
-            return {
-                "Mod-Shift-s": () => this.editor.commands.toggleStrike(),
-            }
-        },
-    });
-
     const lowlight = createLowlight(all);
 
     const editor = useEditor({
@@ -146,9 +107,12 @@ export default function TipTapEditor({
             }), 
             ListItemWithStyle,
             // Always render Bold/Italic/Strike marks, but disable shortcuts if not pro
-            BoldExtension,
-            ItalicExtension,
-            StrikeExtension,
+            // BoldExtension,
+            // ItalicExtension,
+            // StrikeExtension,
+            Bold,
+            Italic,
+            Strike,
             Image.configure({
                 resize: {
                     enabled: true,
@@ -192,6 +156,39 @@ export default function TipTapEditor({
         //     handleSelectionChange(editor);
         // }
     });
+
+    const canUseAdvancedEditorRef = useRef(canUseAdvancedEditor);
+    useEffect(() => {
+        canUseAdvancedEditorRef.current = canUseAdvancedEditor;
+    }, [canUseAdvancedEditor]);
+
+    useEffect(() => {
+        const dom = editor?.view?.dom;
+        if (!dom) return;
+
+        const root = dom.getRootNode();
+        const target = (root instanceof ShadowRoot ? root : dom) as EventTarget;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (canUseAdvancedEditorRef.current) return;
+            const mod = e.ctrlKey || e.metaKey;
+            if (!mod) return;
+            const key = e.key.toLowerCase();
+            const shouldBlock =
+                key === "b" ||
+                key === "i" ||
+                key === "u" ||
+                (key === "s" && e.shiftKey);
+
+            if (shouldBlock) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        };
+
+        target.addEventListener("keydown", handleKeyDown, true);
+        return () => target.removeEventListener("keydown", handleKeyDown, true);
+    }, [editor?.view?.dom]);
 
     const editorState = useEditorState({
         editor,

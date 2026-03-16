@@ -23,10 +23,12 @@ export type NoteType = {
     baseVersion: number,
     dirty: boolean,
     remoteId: string,
+    createdPlan: "free" | "pro",
 }
 
 export type LimitInfo = {
     maxReached: boolean,
-    syncedCount: number,
+    freeEditableSyncedNotesCount: number,
+    totalSyncedNotesCount: number,
     maxCount: number,
 }

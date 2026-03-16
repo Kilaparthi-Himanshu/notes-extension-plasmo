@@ -110,12 +110,63 @@ function InjectReact({
     const [dirty, setDirty] = useState(false);
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
-    // Sync toggle only enabled when Logged In AND note is saved AND sync is not enabled AND free user limit not reached AND must be online
-    const syncToggleEnable = !!session && saved && !sync && !limitInfo.maxReached && navigator.onLine;
-    // Note can only be edited if note is not synced OR if it is synced then they must be a logged in AND must be online
-    const canEditSyncedNote = !sync || (!!session && navigator.onLine);
+    // Determine the plan under which this note was originally created.
+    //
+    // Backward compatibility:
+    // - If `createdPlan` already exists → use it.
+    // - If the note was previously saved but lacks `createdPlan` → it is an old note (before this feature existed),
+    //   so treat it as a free-plan note.
+    // - If the note is brand new (not yet saved) → derive the plan from the current user's subscription.
+    const createdPlan =
+        note?.createdPlan ??
+        (note?.saved ? "free" : isProUser ? "pro" : "free");
+
+    // Determine if the user has exceeded the free synced-note limit.
+    //
+    // A free user can edit synced notes only if they are within the free limit.
+    // If the user is not Pro AND the free synced note count exceeds the free limit,
+    // additional synced notes become read-only until the user upgrades again.
+    const exceedsFreeLimits = 
+        !isProUser && 
+        sync && 
+        limitInfo.freeEditableSyncedNotesCount > limitInfo.maxCount && 
+        createdPlan !== "pro";
+
+    // Lock editing if:
+    // - the note was created during a Pro plan but the user is currently not Pro
+    // OR
+    // - the user exceeded the free synced-note limit
+    const editLockedByPlan = 
+        (!isProUser && createdPlan === "pro") || 
+        exceedsFreeLimits;
+
+
+    // A note can be edited if:
+    // - it is not synced (local notes are always editable)
+    // OR
+    // - it is synced but the user:
+    //   • is not blocked by plan limits
+    //   • is signed in
+    //   • is online
+    const canEditSyncedNote = 
+        !sync || 
+        (!editLockedByPlan && !!session && navigator.onLine);
+
+    // Enable the sync toggle only if:
+    // - the user is signed in
+    // - the note has already been saved locally
+    // - the note is not already synced
+    // - the free sync limit has not been reached
+    // - the user is online
+    const syncToggleEnable = 
+        !!session && 
+        saved && 
+        !sync && 
+        !limitInfo.maxReached && 
+        navigator.onLine;
 
     useEffect(() => {
+
         if (note) {
             setTitle(note.title);
             setContent(note.content);
@@ -252,6 +303,7 @@ function InjectReact({
         baseVersion: baseVersion,
         dirty: dirty,
         remoteId: remoteId,
+        createdPlan: createdPlan,
     });
 
     const syncEngineRef = useRef<NoteSyncEngine | null>(null);
@@ -587,9 +639,14 @@ function InjectReact({
                                 {!canEditSyncedNote && 
                                     <div className="absolute bottom-0 left-0 right-0 z-10 h-max p-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">
                                         <p>
-                                            {!session 
-                                                ? 'Sign in to Edit a Synced Note.' 
-                                                : 'Make sure to have a Pro Subcription and an Internet Connection to Edit a Synced Note.'}
+                                            {editLockedByPlan 
+                                                ? createdPlan === "pro"
+                                                    ? "This note was created during a Pro plan. Upgrade to edit it."
+                                                    : "You reached the free synced note limit. Upgrade to edit more synced notes."
+                                                : !session 
+                                                    ? 'Sign in to Edit a Synced Note.' 
+                                                    : 'Make sure to have a Pro Subcription and an Internet Connection to Edit a Synced Note.'
+                                            }
                                         </p>
                                     </div>
                                 }

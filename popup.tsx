@@ -4,7 +4,7 @@ import { RefreshCw } from 'lucide-react';
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { useUser } from "./hooks/useUser";
-import type { NoteType } from './types/noteTypes';
+import type { LimitInfo, NoteType } from './types/noteTypes';
 import { supabase } from '~lib/supabase';
 import { deleteRemote } from '~lib/sync-engine/transport';
 import { FREE_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
@@ -20,11 +20,7 @@ function IndexPopup () {
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
-    const [limitInfo, setLimitInfo] = useState<{
-        maxReached: boolean,
-        syncedCount: number,
-        maxCount: number,
-    } | null>(null);
+    const [limitInfo, setLimitInfo] = useState<LimitInfo | null>(null);
     const { data, isLoading } = useUser();
     const session = data?.session;
     const userDetails = data?.userDetails;
@@ -315,7 +311,7 @@ function IndexPopup () {
 
     useEffect(() => {
         const loadLimit = async() => {
-            const info = await getLimitInfo(userDetails);
+            const info = await getLimitInfo(userDetails, notes);
             setLimitInfo(info);
         }
 
@@ -369,13 +365,24 @@ function IndexPopup () {
                 <div className='w-full flex justify-between items-center border-b'>
                     <span className='px-2 pl-0 min-w-0 w-full flex-1 '>Synced Notes</span>
 
-                    <span className='text-sm'>
-                        {syncedNotesCount}/
-                        {userDetails?.subscription_status === "pro" 
-                            ? "∞"
-                            : FREE_MAX_SYNCED_NOTES_COUNT
-                        }
-                    </span>
+                    {userDetails?.subscription_status !== "pro" 
+                        ?
+                            <span className='text-sm flex gap-2'>
+                                <p>
+                                    Editable: {limitInfo?.freeEditableSyncedNotesCount}/{FREE_MAX_SYNCED_NOTES_COUNT}
+                                </p>
+
+                                <p>
+                                    Total: {syncedNotesCount}
+                                </p>
+                            </span>
+                        :
+                            <span className='text-sm flex gap-2'>
+                                <p>
+                                    {limitInfo?.totalSyncedNotesCount}/∞
+                                </p>
+                            </span>
+                    }
                 </div>
             </div>
 

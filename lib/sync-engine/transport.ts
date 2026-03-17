@@ -44,18 +44,23 @@ export async function updateRemote(
 
 export async function updateMetada(
     remoteId: string,
-    note: NoteType
+    note: NoteType,
+    baseVersion: number
 ) {
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from("notes")
         .update({
             note,
+            version: baseVersion + 1,
             updated_at: new Date().toISOString()
         })
         .eq("id", remoteId)
+        .eq("version", baseVersion)
+        .select("version")
+        .single();
 
     if (error) return { success: false, error };
-    return { success: true };
+    return { success: true, version: data.version };
 }
 
 export async function insertRemote(

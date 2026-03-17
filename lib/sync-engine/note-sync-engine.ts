@@ -135,10 +135,18 @@ export class NoteSyncEngine {
                 console.log(res.error);
             }
         } else {
-            await updateMetada(
+            const res = await updateMetada(
                 this.note.remoteId,
-                this.note
+                this.note,
+                this.note.baseVersion
             );
+
+            if (res.success) {
+                this.note.baseVersion = res.version;
+                persistLocal(this.note);
+            } else {
+                console.log(res.error);
+            }
         }
 
         console.log("Sync Phase");

@@ -1,9 +1,10 @@
-import type { NoteType } from "~types/noteTypes"
-import { emitConflict } from "./conflict"
-import { debounce } from "./debounce"
-import { fetchRemote, insertRemote, updateMetada, updateRemote } from "./transport"
-import type { Listener, RemoteNote, SyncPatch } from "./types"
-import { persistLocal } from "./storage"
+import type { NoteType } from "~types/noteTypes";
+import { emitConflict } from "./conflict";
+import { debounce } from "./debounce";
+import { fetchRemote, insertRemote, updateMetada, updateRemote } from "./transport";
+import type { Listener, RemoteNote, SyncPatch } from "./types";
+import { persistLocal } from "./storage";
+import { supabase } from "~lib/supabase";
 
 export class NoteSyncEngine {
     private note: NoteType;
@@ -14,6 +15,10 @@ export class NoteSyncEngine {
 
     private scheduleSync: (contentChanged: boolean) => void;
 
+    // Realtime variables
+    private unsubscribeRelatime?: () => void;
+    private schedulePull: () => void;
+
     constructor(opts: {
         note: NoteType;
         canSync: boolean;
@@ -22,6 +27,7 @@ export class NoteSyncEngine {
         this.note = opts.note;
         this.canSync = opts.canSync;
         this.canEditSyncedNote = opts.canEditSyncedNote;
+        // this.scheduleSync is reference to the same debounce function being called multiple times so timer in debounce is stored
         this.scheduleSync = debounce(
             (contentChanged: boolean) => {
                 // console.log("Debounce Started");
@@ -29,7 +35,14 @@ export class NoteSyncEngine {
             },
             500
         );
-        // this.scheduleSync is reference to the same debounce function being called multiple times so timer in debounce is stored
+
+        // Realtime initialization
+        this.schedulePull = debounce(
+            () => {
+                this.pullLatest();
+            },
+            200
+        )
     }
 
     setCapabilities(opts: {
@@ -154,6 +167,7 @@ export class NoteSyncEngine {
         this.syncing = false;
     }
 
+    // Unused function
     async hydrateFromRemote() {
         if (!this.canSync) return;
 
@@ -185,5 +199,69 @@ export class NoteSyncEngine {
 
             return this.note;
         }
+    }
+
+    // Realtime logic
+    initRealtime() {
+        if (!this.note.remoteId) return;
+
+        const channel = supabase
+            .channel(`note-${this.note.remoteId}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "notes",
+                    filter: `id=eq.${this.note.remoteId}`
+                },
+                (payload: any) => {
+                    const incomingVersion = payload.new.version;
+
+                    console.log("Realtime version: ", incomingVersion);
+
+                    this.onRemoteVersion(incomingVersion);
+                }
+            )
+            .subscribe();
+
+        this.unsubscribeRelatime = () => {
+            supabase.removeChannel(channel);
+        }
+    }
+
+    private onRemoteVersion(incomingVersion: number) {
+        // Ignore stale or same updates
+        if (incomingVersion <= this.note.baseVersion) return;
+
+        // If user is actively editing -> don't override
+        if (this.note.dirty || this.syncing) {
+            console.log("Skip realtime (dirty or syncing)");
+            return;
+        }
+
+        this.schedulePull();
+    }
+
+    private async pullLatest() {
+        const remote = await fetchRemote(this.note.remoteId);
+        if (!remote) return;
+
+        if (remote.version <= this.note.baseVersion) return;
+
+        console.log("Applying realtime update");
+
+        this.note = {
+            ...this.note,
+            ...remote.note,
+            baseVersion: remote.version,
+            dirty: false,
+        }
+
+        persistLocal(this.note);
+    }
+
+    destroy() {
+        this.unsubscribeRelatime?.();
     }
 }

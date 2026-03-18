@@ -21,7 +21,7 @@ function IndexPopup () {
     const [resetDisabled, setResetDisabled] = useState(false);
     const searchRef = useRef<HTMLInputElement | null>(null);
     const [limitInfo, setLimitInfo] = useState<LimitInfo | null>(null);
-    const { data, isLoading } = useUser();
+    const { data, isFetching } = useUser();
     const session = data?.session;
     const userDetails = data?.userDetails;
 
@@ -33,6 +33,10 @@ function IndexPopup () {
         document.addEventListener("keydown", handleSearch);
         return () => document.removeEventListener("keydown", handleSearch);
     }, []);
+
+    useEffect(() => {
+        console.log(isFetching);
+    }, [isFetching]);
 
     const getNotes = async () => {
         const response = await chrome.runtime.sendMessage({ type: "GET_NOTES" });
@@ -300,8 +304,7 @@ function IndexPopup () {
 
     useEffect(() => {
         mergeSyncedNotes();
-        console.log(userDetails);
-    }, []);
+    }, [userDetails]);
 
     const syncedNotes = notes.filter((n: any) => n.sync);
     const unsyncedNotes = notes.filter((n: any) => !n.sync);

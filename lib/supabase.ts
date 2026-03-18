@@ -31,3 +31,5 @@ export const supabase = createClient(
     }
   }
 );
+
+export type SupabaseClientType = typeof supabase;

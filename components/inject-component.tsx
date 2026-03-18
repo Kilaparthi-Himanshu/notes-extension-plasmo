@@ -316,7 +316,10 @@ function InjectReact({
             canEditSyncedNote
         });
 
+        syncEngineRef.current.initRealtime();
+
         return () => {
+            syncEngineRef.current?.destroy();
             syncEngineRef.current = null;
         };
     }, [noteId]);

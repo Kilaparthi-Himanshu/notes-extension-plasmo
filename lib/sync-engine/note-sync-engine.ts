@@ -14,6 +14,8 @@ export class NoteSyncEngine {
 
     private scheduleSync: (contentChanged: boolean) => void;
 
+    private onExternalUpdate?: (note: NoteType) => void;
+
     // Realtime variables
     private unsubscribeRealtime?: () => void;
     private schedulePull: () => void;
@@ -22,6 +24,7 @@ export class NoteSyncEngine {
         note: NoteType;
         canSync: boolean;
         canEditSyncedNote: boolean;
+        onExternalUpdate?: (note: NoteType) => void;
     }) {
         this.note = opts.note;
         this.canSync = opts.canSync;
@@ -34,6 +37,8 @@ export class NoteSyncEngine {
             },
             500
         );
+
+        this.onExternalUpdate = opts.onExternalUpdate;
 
         // Realtime initialization
         this.schedulePull = debounce(
@@ -119,9 +124,9 @@ export class NoteSyncEngine {
         console.log("Remote Ver: ", remote.version);
         console.log("Base Ver: ", this.note.baseVersion);
         if (
-            contentChanged && 
-            remote.version > this.note.baseVersion &&
-            remote.note.content !== this.note.content
+                contentChanged && 
+                remote.version > this.note.baseVersion &&
+                remote.note.content !== this.note.content
         ) {
             this.syncing = false;
 
@@ -235,7 +240,7 @@ export class NoteSyncEngine {
 
     private onRemoteVersion(incomingVersion: number) {
         // Ignore stale or same updates
-        if (incomingVersion < this.note.baseVersion) return;
+        if (incomingVersion <= this.note.baseVersion) return;
 
         // If user is actively editing -> don't override
         if (this.note.dirty || this.syncing) {
@@ -250,7 +255,7 @@ export class NoteSyncEngine {
         const remote = await fetchRemote(this.note.remoteId);
         if (!remote) return;
 
-        if (remote.version < this.note.baseVersion) return;
+        if (remote.version <= this.note.baseVersion) return;
 
         console.log("Applying realtime update");
 
@@ -262,6 +267,8 @@ export class NoteSyncEngine {
         }
 
         persistLocal(this.note);
+
+        this.onExternalUpdate?.(this.note);
     }
 
     destroy() {

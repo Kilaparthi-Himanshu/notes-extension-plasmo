@@ -24,7 +24,6 @@ export type NoteType = {
     dirty: boolean,
     remoteId: string,
     createdPlan: "free" | "pro",
-    updatedAt: string,
 }
 
 export type LimitInfo = {

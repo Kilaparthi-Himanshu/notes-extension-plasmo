@@ -186,7 +186,7 @@ function IndexPopup () {
     async function fetchAllRemoteNotes() {
         const { data, error } = await supabase
             .from("notes")
-            .select("note, version, updated_at")
+            .select("note, version")
             .eq("user_id", session.user.id);
 
         if (error) {
@@ -196,8 +196,7 @@ function IndexPopup () {
 
         return data.map((row: any) => ({
             ...row.note,
-            baseVersion: row.version,
-            updatedAt: row.updated_at,
+            baseVersion: row.version
         }));
     }
 
@@ -282,8 +281,8 @@ function IndexPopup () {
                 continue;
             }
 
-            // synced note already exists locally means we just push it based on greatest updatedVersion as DB has latest usually unless simultaneous editing occurs (logic might change)
-            if (remote.updatedAt > local.updatedAt) {
+            // synced note already exists locally means we just push it based on greatest baseVersion (logic might change)
+            if (remote.baseVersion > local.baseVersion) {
                 // remote synced note newer than local synced note
                 merged.push({
                     ...remote,

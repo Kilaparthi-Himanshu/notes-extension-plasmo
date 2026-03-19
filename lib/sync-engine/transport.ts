@@ -51,7 +51,7 @@ export async function updateMetada(
         .from("notes")
         .update({
             note,
-            // version: baseVersion + 1,
+            version: baseVersion + 1,
             updated_at: new Date().toISOString()
         })
         .eq("id", remoteId)

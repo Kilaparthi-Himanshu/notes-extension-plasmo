@@ -14,8 +14,6 @@ export class NoteSyncEngine {
 
     private scheduleSync: (contentChanged: boolean) => void;
 
-    private onExternalUpdate?: (note: NoteType) => void;
-
     // Realtime variables
     private unsubscribeRealtime?: () => void;
     private schedulePull: () => void;
@@ -24,7 +22,6 @@ export class NoteSyncEngine {
         note: NoteType;
         canSync: boolean;
         canEditSyncedNote: boolean;
-        onExternalUpdate?: (note: NoteType) => void;
     }) {
         this.note = opts.note;
         this.canSync = opts.canSync;
@@ -37,8 +34,6 @@ export class NoteSyncEngine {
             },
             500
         );
-
-        this.onExternalUpdate = opts.onExternalUpdate;
 
         // Realtime initialization
         this.schedulePull = debounce(
@@ -267,8 +262,6 @@ export class NoteSyncEngine {
         }
 
         persistLocal(this.note);
-
-        this.onExternalUpdate?.(this.note);
     }
 
     destroy() {

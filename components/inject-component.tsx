@@ -314,11 +314,7 @@ function InjectReact({
         syncEngineRef.current = new NoteSyncEngine({
             note,
             canSync: sync,
-            canEditSyncedNote,
-            onExternalUpdate: (updatedNote: NoteType) => {
-                console.log("onExternalUpdate");
-                setNote(updatedNote);
-            }
+            canEditSyncedNote
         });
 
         syncEngineRef.current.initRealtime();

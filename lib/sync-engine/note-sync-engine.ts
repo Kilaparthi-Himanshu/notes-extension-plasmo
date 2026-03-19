@@ -240,7 +240,7 @@ export class NoteSyncEngine {
 
     private onRemoteVersion(incomingVersion: number) {
         // Ignore stale or same updates
-        if (incomingVersion <= this.note.baseVersion) return;
+        if (incomingVersion < this.note.baseVersion) return;
 
         // If user is actively editing -> don't override
         if (this.note.dirty || this.syncing) {
@@ -255,7 +255,7 @@ export class NoteSyncEngine {
         const remote = await fetchRemote(this.note.remoteId);
         if (!remote) return;
 
-        if (remote.version <= this.note.baseVersion) return;
+        if (remote.version < this.note.baseVersion) return;
 
         console.log("Applying realtime update");
 

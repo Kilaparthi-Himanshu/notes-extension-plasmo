@@ -2,7 +2,6 @@ import type { NoteType } from "~types/noteTypes";
 import { emitConflict } from "./conflict";
 import { debounce } from "./debounce";
 import { fetchRemote, insertRemote, updateMetada, updateRemote } from "./transport";
-import type { Listener, RemoteNote, SyncPatch } from "./types";
 import { persistLocal } from "./storage";
 import { supabase } from "~lib/supabase";
 
@@ -18,7 +17,7 @@ export class NoteSyncEngine {
     private onExternalUpdate?: (note: NoteType) => void;
 
     // Realtime variables
-    private unsubscribeRelatime?: () => void;
+    private unsubscribeRealtime?: () => void;
     private schedulePull: () => void;
 
     constructor(opts: {
@@ -124,7 +123,11 @@ export class NoteSyncEngine {
         // Only check version if content/title changed
         console.log("Remote Ver: ", remote.version);
         console.log("Base Ver: ", this.note.baseVersion);
-        if (contentChanged && remote.version !== this.note.baseVersion) {
+        if (
+            contentChanged && 
+            remote.version > this.note.baseVersion &&
+            remote.note.content !== this.note.content
+        ) {
             this.syncing = false;
 
             emitConflict(this.note.remoteId, {
@@ -230,7 +233,7 @@ export class NoteSyncEngine {
             )
             .subscribe();
 
-        this.unsubscribeRelatime = () => {
+        this.unsubscribeRealtime = () => {
             supabase.removeChannel(channel);
         }
     }
@@ -269,6 +272,7 @@ export class NoteSyncEngine {
     }
 
     destroy() {
-        this.unsubscribeRelatime?.();
+        console.log("Unsubscribing realtime");
+        this.unsubscribeRealtime?.();
     }
 }

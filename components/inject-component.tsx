@@ -323,6 +323,7 @@ function InjectReact({
         syncEngineRef.current.initRealtime();
 
         return () => {
+            console.log("DESTROY ENGINE");
             syncEngineRef.current?.destroy();
             syncEngineRef.current = null;
         };

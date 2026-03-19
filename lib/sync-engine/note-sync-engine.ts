@@ -8,6 +8,7 @@ import { supabase } from "~lib/supabase";
 export class NoteSyncEngine {
     private note: NoteType;
     private syncing = false;
+    private dirty = false;
 
     private canSync: boolean;
     private canEditSyncedNote: boolean;
@@ -77,7 +78,7 @@ export class NoteSyncEngine {
         };
 
         if (contentChanged) {
-            this.note.dirty = true;
+            this.dirty = true;
         }
 
         persistLocal(this.note);
@@ -98,7 +99,7 @@ export class NoteSyncEngine {
 
         if (res.success) {
             this.note.baseVersion = res.version; // likely 1
-            this.note.dirty = false;
+            this.dirty = false;
             persistLocal(this.note);
             console.log("First Time: ",this.note);
         } else {
@@ -150,7 +151,7 @@ export class NoteSyncEngine {
             if (res.success) {
                 this.note.baseVersion = res.version;
                 console.log("SUCCESS RES: ", this.note.baseVersion);
-                this.note.dirty = false;
+                this.dirty = false;
                 persistLocal(this.note);
             } else {
                 console.log(res.error);
@@ -186,7 +187,7 @@ export class NoteSyncEngine {
         if (remote.note.version > this.note.baseVersion) {
 
             // If local has unsynced changes -> conflict
-            if (this.note.dirty) {
+            if (this.dirty) {
                 emitConflict(this.note.remoteId, {
                     local: this.note.content,
                     remote: remote.note.content
@@ -243,7 +244,7 @@ export class NoteSyncEngine {
         if (incomingVersion <= this.note.baseVersion) return;
 
         // If user is actively editing -> don't override
-        if (this.note.dirty || this.syncing) {
+        if (this.dirty || this.syncing) {
             console.log("Skip realtime (dirty or syncing)");
             return;
         }

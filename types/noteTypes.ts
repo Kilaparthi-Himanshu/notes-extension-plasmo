@@ -21,7 +21,7 @@ export type NoteType = {
     showToolbar: boolean,
     sync: boolean,
     baseVersion: number,
-    dirty: boolean,
+    // dirty: boolean,
     remoteId: string,
     createdPlan: "free" | "pro",
     updatedAt: string

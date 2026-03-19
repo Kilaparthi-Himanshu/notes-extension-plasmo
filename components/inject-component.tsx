@@ -186,8 +186,6 @@ function InjectReact({
             setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
             setSync(note.sync ?? false);
             setBaseVersion(note.baseVersion ?? 0);
-            setDirty(note.dirty ?? false);
-            // setRemoteId(note.remoteId ?? crypto.randomUUID());
         }
     }, [note]);
 
@@ -301,7 +299,6 @@ function InjectReact({
         showToolbar: showToolbar,
         sync: sync,
         baseVersion: baseVersion,
-        dirty: dirty,
         remoteId: remoteId,
         createdPlan: createdPlan,
         updatedAt: new Date().toISOString(),

@@ -304,6 +304,7 @@ function InjectReact({
         dirty: dirty,
         remoteId: remoteId,
         createdPlan: createdPlan,
+        updatedAt: new Date().toISOString(),
     });
 
     const syncEngineRef = useRef<NoteSyncEngine | null>(null);

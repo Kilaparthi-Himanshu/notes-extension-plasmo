@@ -211,7 +211,7 @@ export class NoteSyncEngine {
 
     // Realtime logic
     initRealtime() {
-        if (!this.note.remoteId) return;
+        if (!this.note?.remoteId) return;
 
         const channel = supabase
             .channel(`note-${this.note.remoteId}`)

@@ -12,7 +12,7 @@ export const getStyle = () => {
     return style;
 }
 
-export default function TipTapYjsEditor({ noteId }: { noteId: string }) {
+export default function TipTapYjsEditor({ remoteId }: { remoteId: string }) {
     const ydocRef = useRef<Y.Doc | null>(null);
     const providerRef = useRef<HocuspocusProvider | null>(null);
 
@@ -21,7 +21,7 @@ export default function TipTapYjsEditor({ noteId }: { noteId: string }) {
 
         providerRef.current = new HocuspocusProvider({
             url: "ws://localhost:1234",
-            name: noteId,
+            name: remoteId,
             document: ydocRef.current,
         });
     }

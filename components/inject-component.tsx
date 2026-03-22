@@ -634,16 +634,17 @@ function InjectReact({
                                     flex: 1,
                                 }}
                             >
-                                {/* <TipTapEditor
+                                <TipTapEditor
                                     content={content}
                                     onChange={setContent}
                                     customColor={customColor}
                                     theme={theme}
                                     showToolbar={showToolbar}
                                     canEditSyncedNote={canEditSyncedNote}
-                                /> */}
+                                    remoteId={remoteId}
+                                />
 
-                                <TipTapYjsEditor noteId={remoteId} />
+                                {/* <TipTapYjsEditor remoteId={remoteId} /> */}
 
                                 {!canEditSyncedNote && 
                                     <div className="absolute bottom-0 left-0 right-0 z-10 h-max p-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">

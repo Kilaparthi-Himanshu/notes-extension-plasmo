@@ -446,23 +446,28 @@
 } */
 
     /* Bullet list markers */
-    ul li::marker {
+ul li::marker {
     color: inherit;
     font-size: inherit;
-    }
+}
 
-    /* Ordered list markers */
-    ol li::marker {
+/* Ordered list markers */
+ol li::marker {
     color: inherit;
     font-size: inherit;
-    }
+}
 
-    .ProseMirror li {
+.ProseMirror li {
     color: inherit !important;
     font-size: inherit !important;
-    }
+}
 
-    .ProseMirror li::marker {
+.ProseMirror li::marker {
     color: inherit !important;
     font-size: inherit !important;
-    }
+}
+
+.ProseMirror {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

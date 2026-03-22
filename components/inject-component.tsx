@@ -20,6 +20,7 @@ import { SyncConfirmationModal } from './SyncConfirmationModal';
 import type { LimitInfo, NoteType } from '../types/noteTypes';
 import { NoteSyncEngine } from '../lib/sync-engine';
 import { persistLocal } from "~lib/sync-engine/storage";
+import TipTapYjsEditor from './TipTapEditor/TipTapYjsEditor';
 
 export const getStyle = () => {
     const style = document.createElement("style");
@@ -307,25 +308,25 @@ function InjectReact({
     const syncEngineRef = useRef<NoteSyncEngine | null>(null);
 
     // Subscribe to sync engine
-    useEffect(() => {
-        syncEngineRef.current = new NoteSyncEngine({
-            note,
-            canSync: sync,
-            canEditSyncedNote,
-            onExternalUpdate: (updatedNote: NoteType) => {
-                console.log("onExternalUpdate");
-                setNote(updatedNote);
-            }
-        });
+    // useEffect(() => {
+    //     syncEngineRef.current = new NoteSyncEngine({
+    //         note,
+    //         canSync: sync,
+    //         canEditSyncedNote,
+    //         onExternalUpdate: (updatedNote: NoteType) => {
+    //             console.log("onExternalUpdate");
+    //             setNote(updatedNote);
+    //         }
+    //     });
 
-        syncEngineRef.current.initRealtime();
+    //     syncEngineRef.current.initRealtime();
 
-        return () => {
-            console.log("DESTROY ENGINE");
-            syncEngineRef.current?.destroy();
-            syncEngineRef.current = null;
-        };
-    }, [noteId]);
+    //     return () => {
+    //         console.log("DESTROY ENGINE");
+    //         syncEngineRef.current?.destroy();
+    //         syncEngineRef.current = null;
+    //     };
+    // }, [noteId]);
 
     useEffect(() => {
         syncEngineRef.current?.setCapabilities({
@@ -334,12 +335,12 @@ function InjectReact({
         });
     }, [isProUser, sync, canEditSyncedNote]);
 
-    useEffect(() => {
-        if (saved) {
-            console.log(remoteId);
-            syncEngineRef.current?.updateNote(assembleNote());
-        }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty, remoteId]);
+    // useEffect(() => {
+    //     if (saved) {
+    //         console.log(remoteId);
+    //         syncEngineRef.current?.updateNote(assembleNote());
+    //     }
+    // }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty, remoteId]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -633,14 +634,16 @@ function InjectReact({
                                     flex: 1,
                                 }}
                             >
-                                <TipTapEditor
+                                {/* <TipTapEditor
                                     content={content}
                                     onChange={setContent}
                                     customColor={customColor}
                                     theme={theme}
                                     showToolbar={showToolbar}
                                     canEditSyncedNote={canEditSyncedNote}
-                                />
+                                /> */}
+
+                                <TipTapYjsEditor noteId={remoteId} />
 
                                 {!canEditSyncedNote && 
                                     <div className="absolute bottom-0 left-0 right-0 z-10 h-max p-1 bg-red-400 flex items-center justify-center text-center text-white font-semibold">

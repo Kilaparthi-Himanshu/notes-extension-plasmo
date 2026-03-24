@@ -86,6 +86,13 @@ export default function TipTapEditor({
     const ydocRef = useRef<Y.Doc | null>(null);
     const providerRef = useRef<HocuspocusProvider | null>(null);
 
+    // Populatigng contentRef
+    const contentRef = useRef(content);
+    useEffect(() => {
+        contentRef.current = content;
+    }, [content]);
+
+    // Populating ydocRef and providerRef
     if (!ydocRef.current) {
         ydocRef.current = new Y.Doc();
 
@@ -96,6 +103,7 @@ export default function TipTapEditor({
         });
     }
 
+    // Creating the editor
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -163,6 +171,18 @@ export default function TipTapEditor({
             }),
         ],
         // content: content || "<p></p>", // seed empty state
+        onCreate: ({ editor: currentEditor }) => {
+            const provider = providerRef.current;
+            if (!provider) return;
+
+            provider.on("synced", () => {
+                const latestContent = contentRef.current;
+
+                if (currentEditor.isEmpty && latestContent && latestContent !== "<p></p>") {
+                    currentEditor.commands.setContent(latestContent);
+                }
+            });
+        },
         onUpdate: ({ editor }) => {
             if (!canEditSyncedNote) return;
             onChange(editor.getHTML());

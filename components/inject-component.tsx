@@ -107,8 +107,7 @@ function InjectReact({
     const [sync, setSync] = useState(false);
     const [showSyncConfirmationModal, setShowSyncConfirmationModal] = useState(false);
     const [baseVersion, setBaseVersion] = useState(0);
-    const [dirty, setDirty] = useState(false);
-    const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
+    const [remoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
     // Determine the plan under which this note was originally created.
     //
@@ -339,7 +338,7 @@ function InjectReact({
             console.log(remoteId);
             syncEngineRef.current?.updateNote(assembleNote());
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty, remoteId]);
+    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, remoteId]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);

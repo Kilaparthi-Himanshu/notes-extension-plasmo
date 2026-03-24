@@ -109,9 +109,9 @@ export default function TipTapEditor({
             Collaboration.configure({
                 document: ydocRef.current,
             }),
-            CollaborationCaret.configure({
-                provider: providerRef.current,
-            }),
+            // CollaborationCaret.configure({
+            //     provider: providerRef.current,
+            // }),
             TextStyle,
             FontSize.configure({
                 types: ["textStyle"], // applies to textStyle mark
@@ -172,9 +172,6 @@ export default function TipTapEditor({
                 class: "ProseMirror flex-1 h-max rounded-xl py-4 px-6 focus:outline-none",
                 // style: `font-size: ${fontSize}px;`
             },
-
-            // @ts-expect-error Shadow DOM fix
-            root: document,
         },
         autofocus: false,
         // onSelectionUpdate({ editor }) {
@@ -237,25 +234,6 @@ export default function TipTapEditor({
         }
     });
 
-    // Set Content
-    // useEffect(() => {
-    //     if (!editor) return;
-    //     if (!content) return;
-
-    //     const current = editor.getHTML();
-    //     if (current === content) return; // block unnecessary resets
-
-    //     editor.commands.setContent(content);
-
-    //     const newState = EditorState.create({
-    //         doc: editor.state.doc,
-    //         plugins: editor.state.plugins,
-    //         schema: editor.state.schema,
-    //     });
-
-    //     editor.view.updateState(newState);
-    // }, [editor, content]);
-
     // Can Edit note depends on canEditSyncedNote
     useEffect(() => {
         if (!editor) return;
@@ -264,19 +242,17 @@ export default function TipTapEditor({
     }, [editor, canEditSyncedNote]);
 
     useEffect(() => {
-        if (!editor) return
-
-        const view = editor.view as any
-
-        if (view && view._root !== document) {
-            view._root = document
+        if (!editor) return;
+        const shadowRoot = editor.view.dom.getRootNode();
+        if (shadowRoot instanceof ShadowRoot) {
+            // Patch missing methods onto shadowRoot that ProseMirror/Y.js expect
+            if (!(shadowRoot as any).createRange) {
+                (shadowRoot as any).createRange = () => document.createRange();
+            }
+            if (!(shadowRoot as any).getSelection) {
+                (shadowRoot as any).getSelection = () => document.getSelection();
+            }
         }
-
-        editor.on("create", () => {
-            const v = editor.view as any
-            if (v) v._root = document
-        })
-
     }, [editor]);
 
     useEffect(()=> {

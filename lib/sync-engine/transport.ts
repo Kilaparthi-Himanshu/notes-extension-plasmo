@@ -75,7 +75,6 @@ export async function insertRemote(
             id: remoteId,
             title,
             note,
-            version: baseVersion + 1,
             updated_at: new Date().toISOString()
         })
         .select("version")

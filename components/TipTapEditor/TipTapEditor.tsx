@@ -17,7 +17,6 @@ import { FontFamily } from "@tiptap/extension-text-style";
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { all, createLowlight } from 'lowlight'
 import { rgbToHex } from '~utils/colorFormatChange';
-import { detectCollapsedCursorFontColor, detectCollapsedCursorFontFamily, detectCollapsedCursorFontSize, detectMixedFontFamily, detectMixedFontSize } from '~utils/detectMixedFunctions';
 import ListItem from '@tiptap/extension-list-item';
 import Highlight from '@tiptap/extension-highlight';
 import { UndoRedo } from '@tiptap/extensions';
@@ -88,6 +87,7 @@ export default function TipTapEditor({
 
     // Populatigng contentRef
     const contentRef = useRef(content);
+    const hasSeededRef = useRef(false);
     useEffect(() => {
         contentRef.current = content;
     }, [content]);
@@ -176,9 +176,14 @@ export default function TipTapEditor({
             if (!provider) return;
 
             provider.on("synced", () => {
+                if (hasSeededRef.current) return; // only seed once per mount
+                hasSeededRef.current = true;
+                console.log("SEEDED FROM REMOTE");
+
                 const latestContent = contentRef.current;
 
-                if (currentEditor.isEmpty && latestContent && latestContent !== "<p></p>") {
+                if (latestContent && latestContent !== "<p></p>") {
+                    // Always overwrite Y.js in-memory state with Supabase truth
                     currentEditor.commands.setContent(latestContent);
                 }
             });

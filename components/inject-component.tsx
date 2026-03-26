@@ -313,9 +313,12 @@ function InjectReact({
             note,
             canSync: sync,
             canEditSyncedNote,
-            onExternalUpdate: (updatedNote: NoteType) => {
+            onExternalUpdate: (incomingMeta: Partial<NoteType>) => {
                 console.log("onExternalUpdate");
-                setNote(updatedNote);
+                setNote(prev => ({
+                    ...prev,
+                    ...incomingMeta,
+                }));
             }
         });
 
@@ -340,7 +343,7 @@ function InjectReact({
             console.log(remoteId);
             syncEngineRef.current?.updateNote(assembleNote());
         }
-    }, [title, content, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, baseVersion, dirty, remoteId]);
+    }, [title, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, remoteId]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -635,6 +638,7 @@ function InjectReact({
                                 }}
                             >
                                 <TipTapEditor
+                                    note={note}
                                     content={content}
                                     onChange={setContent}
                                     customColor={customColor}

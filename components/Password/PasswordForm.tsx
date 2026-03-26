@@ -78,73 +78,48 @@ const PasswordForm = ({ theme, customColor, setRequirePassword, password, email,
                             {isResetPassword ? 'Enter 5-Digit Code' : 'Enter Password'}
                         <div className={style.borderBottom} style={{width: '100%'}}></div>
                     </label>
-                    <div style={{position: 'relative'}}>
-                        <input 
-                            disabled={isResetPassword}
-                            type={isPasswordVisible ? 'text' : 'password'}
-                            placeholder="Enter password..."
-                            className={`${style.passwordInput} ${style[theme]}`}
-                            style={{
-                                backgroundColor: isResetPassword && 'lightgray',
-                                cursor: isResetPassword ? 'not-allowed' : 'auto'
-                            }}
-                            onChange={(e) => setPassword1(e.target.value)}
-                        />
-                        <div className={style.passwordEye}
-                            style={{
-                                pointerEvents: isResetPassword ? 'none' : 'auto'
-                            }}
-                        >
-                            {isPasswordVisible ? 
-                            <FaRegEye 
-                                className={style.eye}
+
+                    {!isResetPassword &&
+                        <div style={{position: 'relative'}}>
+                            <input 
+                                disabled={isResetPassword}
+                                type={isPasswordVisible ? 'text' : 'password'}
+                                placeholder="Enter password..."
+                                className={`${style.passwordInput} ${style[theme]}`}
                                 style={{
-                                    color: theme === 'light' ? 'gray' : 'white',
+                                    backgroundColor: isResetPassword && 'lightgray',
+                                    cursor: isResetPassword ? 'not-allowed' : 'auto'
                                 }}
-                                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                                size={28}
-                            /> : 
-                            <FaRegEyeSlash 
-                                className={style.eye}
+                                onChange={(e) => setPassword1(e.target.value)}
+                            />
+
+                            <div className={style.passwordEye}
                                 style={{
-                                    color: theme === 'light' ? 'gray' : 'white',
+                                    pointerEvents: isResetPassword ? 'none' : 'auto'
                                 }}
-                                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                                size={28}
-                            />}
+                            >
+                                {isPasswordVisible ? 
+                                <FaRegEye 
+                                    className={style.eye}
+                                    style={{
+                                        color: theme === 'light' ? 'gray' : 'white',
+                                    }}
+                                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                                    size={28}
+                                /> : 
+                                <FaRegEyeSlash 
+                                    className={style.eye}
+                                    style={{
+                                        color: theme === 'light' ? 'gray' : 'white',
+                                    }}
+                                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                                    size={28}
+                                />}
+                            </div>
                         </div>
-                    </div>
-                    <button 
-                        type="submit" 
-                        className={`${style.passwordSubmitButton} ${style[theme]}`}
-                        style={{
-                            color: theme === 'light' ? 'black' : 'white'
-                        }}
-                    >
-                        {isResetPassword ? 'Confirm' : 'Unlock'}
-                    </button>
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '10px',
-                            textAlign: 'center',
-                            width: '100%'
-                        }}
-                    >
-                        <button 
-                            className={style.resetPassword} 
-                            onClick={() => handleSendResetCode()}
-                            disabled = {isResetPassword || isThrottled}
-                            title={isThrottled ? 'Try Again After Some Time!' : 'Reset Password'}
-                            style={{
-                                cursor: isResetPassword || isThrottled ? 'not-allowed' : 'pointer'
-                            }}
-                        > 
-                            Reset Password
-                        </button>
-                        {isResetPassword && 
+                    }
+
+                    {isResetPassword && 
                         <div>
                             <div>
                                 <VerificationInput 
@@ -160,6 +135,40 @@ const PasswordForm = ({ theme, customColor, setRequirePassword, password, email,
                                 Cancel
                             </div>
                         </div>
+                    }
+
+                    <button 
+                        type="submit" 
+                        className={`${style.passwordSubmitButton} ${style[theme]}`}
+                        style={{
+                            color: theme === 'light' ? 'black' : 'white'
+                        }}
+                    >
+                        {isResetPassword ? 'Confirm' : 'Unlock'}
+                    </button>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '10px',
+                            textAlign: 'center',
+                            width: '100%'
+                        }}
+                    >
+                        {!isResetPassword &&
+                            <button 
+                                className={style.resetPassword} 
+                                onClick={() => handleSendResetCode()}
+                                disabled = {isResetPassword || isThrottled}
+                                title={isThrottled ? 'Try Again After Some Time!' : 'Reset Password'}
+                                style={{
+                                    cursor: isResetPassword || isThrottled ? 'not-allowed' : 'pointer'
+                                }}
+                            > 
+                                Reset Password
+                            </button>
                         }
                     </div>
                 </div>

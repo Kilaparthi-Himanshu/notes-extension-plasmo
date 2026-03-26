@@ -26,6 +26,9 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
+import type { NoteType } from "~types/noteTypes";
+import { debounce } from "~lib/sync-engine/debounce";
+import { supabase } from "~lib/supabase";
 
 const ListItemWithStyle = ListItem.extend({
     addAttributes() {
@@ -60,6 +63,7 @@ export const getStyle = () => {
 }
 
 interface TipTapEditorProps {
+    note: NoteType
     content: string;
     onChange: (html: string) => void;
     customColor: string;
@@ -70,6 +74,7 @@ interface TipTapEditorProps {
 }
 
 export default function TipTapEditor({ 
+    note,
     content, 
     onChange, 
     customColor, 
@@ -102,6 +107,27 @@ export default function TipTapEditor({
             document: ydocRef.current,
         });
     }
+
+    const saveContentRef = useRef<((html: string) => void) | null>(null);
+    if (!saveContentRef.current) {
+        saveContentRef.current = debounce(async (html: string) => {
+            const { data, error } = await supabase
+                .from("notes")
+                .update({
+                    id: note.remoteId,
+                    title: note.title,
+                    note: { ...note, content: html },
+                    updated_at: new Date().toISOString(),
+                })
+                .eq("id", remoteId)
+                .select();
+
+            console.log("DATA", data);
+
+            if (error) console.log("Error: ", error);
+        }, 500);
+    }
+    const saveContent = saveContentRef.current;
 
     // Creating the editor
     const editor = useEditor({
@@ -190,7 +216,14 @@ export default function TipTapEditor({
         },
         onUpdate: ({ editor }) => {
             if (!canEditSyncedNote) return;
-            onChange(editor.getHTML());
+
+            const html = editor.getHTML();
+
+            onChange(html);
+
+            console.log("WTF");
+
+            saveContent(html);
         },
         editorProps: {
             attributes: {

@@ -9,6 +9,9 @@ export class NoteSyncEngine {
     private canSync: boolean;
     private canEditSyncedNote: boolean;
 
+    private clientId = crypto.randomUUID();
+    private skipNextSave = false;
+
     private scheduleSave: () => void;
 
     private onExternalUpdate?: (note: NoteType) => void;
@@ -51,22 +54,34 @@ export class NoteSyncEngine {
     updateNote(note: NoteType) {
         this.note = note;
 
+        console.log(note.content);
+
         persistLocal(this.note);
 
         if (!this.canSync || !this.canEditSyncedNote) return;
+
+        if (this.skipNextSave) {
+            this.skipNextSave = false;
+            console.log("Skipped DB write (remote update)");
+            return;
+        }
 
         this.scheduleSave();
     }
 
     async saveToSupabase() {
-        const { error } =  await supabase
+        const { data, error } =  await supabase
             .from("notes")
             .upsert({
                 id: this.note.remoteId,
                 title: this.note.title,
                 note: this.note, // metadata only
                 updated_at: new Date().toISOString(),
-            });
+                updated_by: this.clientId,
+            })
+            .select();
+
+        console.log(data);
 
         if (error) console.log("Error: ", error);
     }
@@ -74,6 +89,7 @@ export class NoteSyncEngine {
     // Realtime logic
     initRealtime() {
         if (!this.note?.remoteId) return;
+        console.log("REALTIME INITIALZED");
 
         const channel = supabase
             .channel(`note-${this.note.remoteId}`)
@@ -88,14 +104,27 @@ export class NoteSyncEngine {
                 (payload: any) => {
                     const incoming = payload.new.note;
 
-                    const { content, ...incomingMeta } = incoming;
+                   if (payload.new.updated_by === this.clientId) {
+                        console.log("Skipping self update");
+                        return;
+                    }
 
-                    console.log("Realtime metadata update");
+                    console.log("REALTIME STARTED xD", this.clientId);
+
+                    const { content, isPasswordProtected, password, ...incomingMeta } = incoming;
+
+                    console.log("Realtime metadata update", this.note, incoming);
+
+                    this.skipNextSave = true;
 
                     this.onExternalUpdate?.({
                         ...this.note,
                         ...incomingMeta,
                     });
+
+                    this.note = incoming;
+
+                    persistLocal(this.note);
                 }
             )
             .subscribe();

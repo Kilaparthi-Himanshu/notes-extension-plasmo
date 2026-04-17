@@ -10,6 +10,7 @@
     "./types.d.ts"
   ],
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "jsx": "react",
     "target": "ESNext",
     "lib": ["DOM", "ESNext"],

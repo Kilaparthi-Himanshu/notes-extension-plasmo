@@ -219,6 +219,8 @@ function IndexPopup () {
         // local notes = local synced + local unsynced
         const localNotes: NoteType[] = await getNotes();
 
+        console.log("NOTES xD: ", localNotes);
+
         // If user is not signed in -> only show local notes
         if (!session || !navigator.onLine) {
             setNotes(localNotes);
@@ -253,6 +255,8 @@ function IndexPopup () {
             if (!n.sync) return true; // if it is non synced note let it pass through
             return remoteIds.has(n.remoteId); // if it is synced and exists both locally and remotely let is pass through
         });
+
+        console.log("NOTES FILTERED xD: ", filterLocal);
 
         // Merge synced new, synced existing and local notes
         const localSynced = filterLocal.filter(n => n.sync);

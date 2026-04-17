@@ -322,13 +322,13 @@ function InjectReact({
             }
         });
 
-        syncEngineRef.current.initRealtime();
+        // syncEngineRef.current.initRealtime();
 
-        return () => {
-            console.log("DESTROY ENGINE");
-            syncEngineRef.current?.destroy();
-            syncEngineRef.current = null;
-        };
+        // return () => {
+        //     console.log("DESTROY ENGINE");
+        //     syncEngineRef.current?.destroy();
+        //     syncEngineRef.current = null;
+        // };
     }, [noteId]);
 
     useEffect(() => {

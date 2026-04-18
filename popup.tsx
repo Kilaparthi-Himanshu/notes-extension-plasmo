@@ -39,7 +39,7 @@ function IndexPopup () {
     }, [isFetching]);
 
     const getNotes = async () => {
-        const response = await chrome.runtime.sendMessage({ type: "GET_NOTES" });
+        const response = await chrome.storage.local.get("notes");
         console.log("UGG: ", response?.notes);
         return response?.notes ?? [];
     };

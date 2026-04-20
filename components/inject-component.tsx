@@ -343,7 +343,7 @@ function InjectReact({
             console.log(remoteId);
             syncEngineRef.current?.updateNote(assembleNote());
         }
-    }, [title, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, remoteId]);
+    }, [content, title, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, remoteId]);
 
     const handleResize = (e: any) => {
         const noteElement = document.getElementById(noteId);
@@ -646,6 +646,7 @@ function InjectReact({
                                     showToolbar={showToolbar}
                                     canEditSyncedNote={canEditSyncedNote}
                                     remoteId={remoteId}
+                                    enableRealtime={sync && canEditSyncedNote}
                                 />
 
                                 {/* <TipTapYjsEditor remoteId={remoteId} /> */}

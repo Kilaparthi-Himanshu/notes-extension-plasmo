@@ -25,7 +25,7 @@ import hljsStyle from "data-text:highlight.js/styles/github-dark.css";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import * as Y from "yjs";
-import { HocuspocusProvider } from "@hocuspocus/provider";
+import { HocuspocusProvider, HocuspocusProviderWebsocket } from "@hocuspocus/provider";
 import type { NoteType } from "~types/noteTypes";
 import { debounce } from "~lib/sync-engine/debounce";
 import { supabase } from "~lib/supabase";
@@ -71,6 +71,7 @@ interface TipTapEditorProps {
     showToolbar: boolean;
     canEditSyncedNote: boolean;
     remoteId: string;
+    enableRealtime: boolean;
 }
 
 export default function TipTapEditor({ 
@@ -81,7 +82,8 @@ export default function TipTapEditor({
     theme,
     showToolbar,
     canEditSyncedNote,
-    remoteId
+    remoteId,
+    enableRealtime
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
 
@@ -93,24 +95,32 @@ export default function TipTapEditor({
     // Populatigng contentRef
     const contentRef = useRef(content);
     const hasSeededRef = useRef(false);
-    useEffect(() => {
-        contentRef.current = content;
-    }, [content]);
 
     // Populating ydocRef and providerRef
     if (!ydocRef.current) {
         ydocRef.current = new Y.Doc();
 
-        providerRef.current = new HocuspocusProvider({
-            url: "ws://localhost:1234",
-            name: remoteId,
-            document: ydocRef.current,
-        });
+        // enableRealtime = sync && canEditSyncedNote
+        if (!providerRef.current && enableRealtime && remoteId) {
+            const websocketProvider = new HocuspocusProviderWebsocket({
+                url: "ws://localhost:1234",
+                maxAttempts: 3,
+                delay: 2000,
+            });
+
+            providerRef.current = new HocuspocusProvider({
+                websocketProvider,
+                name: remoteId,
+                document: ydocRef.current,
+            });
+        }
     }
 
     const saveContentRef = useRef<((html: string) => void) | null>(null);
     if (!saveContentRef.current) {
         saveContentRef.current = debounce(async (html: string) => {
+            if (!note.sync) return;
+
             const { data, error } = await supabase
                 .from("notes")
                 .update({
@@ -122,7 +132,7 @@ export default function TipTapEditor({
                 .eq("id", remoteId)
                 .select();
 
-            console.log("DATA", data);
+            console.log("DATA CONTENT", data[0].note.content);
 
             if (error) console.log("Error: ", error);
         }, 500);
@@ -202,12 +212,11 @@ export default function TipTapEditor({
             if (!provider) return;
 
             provider.on("synced", () => {
-                if (hasSeededRef.current) return; // only seed once per mount
-                hasSeededRef.current = true;
-                console.log("SEEDED FROM REMOTE");
+                // if (hasSeededRef.current) return; // only seed once per mount
+                // hasSeededRef.current = true;
+                // console.log("SEEDED FROM REMOTE");
 
                 const latestContent = contentRef.current;
-
                 if (latestContent && latestContent !== "<p></p>") {
                     // Always overwrite Y.js in-memory state with Supabase truth
                     currentEditor.commands.setContent(latestContent);
@@ -223,7 +232,7 @@ export default function TipTapEditor({
 
             console.log("WTF");
 
-            saveContent(html);
+            // saveContent(html);
         },
         editorProps: {
             attributes: {
@@ -239,6 +248,16 @@ export default function TipTapEditor({
         //     handleSelectionChange(editor);
         // }
     });
+
+    useEffect(() => {
+        contentRef.current = content;
+        console.log("CONTENTUHHHH: ", contentRef.current);
+
+        if (editor && !hasSeededRef.current && content && content !== "<p></p>") {
+            hasSeededRef.current = true;
+            editor.commands.setContent(content);
+        }
+    }, [content, editor]);
 
     const canUseAdvancedEditorRef = useRef(canUseAdvancedEditor);
     useEffect(() => {

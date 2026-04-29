@@ -3,7 +3,7 @@ import React from "react";
 import styleText from "data-text:./styles.module.css";
 import * as style from "./styles.module.css";
 import { X, Save, Check, Minimize} from "lucide-react";
-import { removeNoteIdFromAddedNotesIds } from "../contents/content";
+import { closeNote, removeNoteIdFromAddedNotesIds } from "../contents/content";
 import DropDown from './Dropdown';
 import { DropdownContext } from "./context";
 import icon from "../assets/icon.png";
@@ -221,19 +221,7 @@ function InjectReact({
 
         if (shouldClose) {
             setActive(false);
-            const noteElement = document.getElementById(noteId);
-            if (noteElement) {
-                // Add fade-out animation
-                const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
-                if (component) {
-                    component.classList.add(style.fadeOut);
-                    // Remove element after animation
-                    removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
-                    setTimeout(() => {
-                        noteElement.remove();
-                    }, 300); // Match this with animation duration
-                }
-            }
+            closeNote(noteId);
         }
     };
 
@@ -424,6 +412,8 @@ function InjectReact({
         borderBottomRightRadius: '16px',
         borderTop: '0px'
     }
+
+    console.log("INJECT INFO: ", sync, canEditSyncedNote);
 
     return (
         <>

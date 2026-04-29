@@ -9,6 +9,8 @@ import { getLimitInfo } from "~lib/getLimitInfo";
 import { supabase } from "~lib/supabase";
 import { fetchUserDetails } from "~hooks/useUser";
 
+const rootsMap = new Map();
+
 const loadActiveNotes = async () => {
     try {
         const result = await chrome.storage.local.get("notes");
@@ -70,18 +72,7 @@ chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
         });
 
         if (noteExists && request.doubleClick) {
-            const noteElement = document.getElementById(noteId);
-            if (noteElement) {
-                // Add fade-out animation
-                const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
-                if (component) {
-                    component.classList.add(style.fadeOut);
-                    // Remove element after animation
-                    setTimeout(() => {
-                        noteElement.remove();
-                    }, 300); // Match this with animation duration
-                }
-            }
+            closeNote(noteId);
         } else if (noteExists) {
             alert("Note already exists");
             return;
@@ -101,10 +92,9 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
         if (noteElement) {
             const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
             if (component) {
-                component.classList.add(style.fadeOut);
                 // Remove element after animation
+                closeNote(message.noteId);
                 setTimeout(() => {
-                    noteElement.remove();
                     injectComponent({
                         note: message.note,
                         fromContextMenu: false,
@@ -118,18 +108,7 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
 
 chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
     if (request.type === "REMOVE_NOTE") {
-        const noteElement = document.getElementById(request.noteId);
-        if (noteElement) {
-            // Add fade-out animation
-            const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
-            if (component) {
-                component.classList.add(style.fadeOut);
-                // Remove element after animation
-                setTimeout(() => {
-                    noteElement.remove();
-                }, 300); // Match this with animation duration
-            }
-        }
+        closeNote(request.noteId);
     }
 });
 
@@ -140,6 +119,28 @@ export function removeNoteIdFromAddedNotesIds(noteId) {
         if(addedNotesIds[i] === noteId) {
             addedNotesIds.splice(i, 1);
             break;
+        }
+    }
+}
+
+export function closeNote(noteId) {
+    const noteElement = document.getElementById(noteId);
+    console.log("FUNCION CALLED AHHH");
+    if (noteElement) {
+        // Add fade-out animation
+        const component = noteElement.shadowRoot?.querySelector('#react-injected-component');
+        const root = rootsMap.get(noteId);
+        if (component) {
+            component.classList.add(style.fadeOut);
+            // Remove element after animation
+            removeNoteIdFromAddedNotesIds(parseInt(noteId.split('-')[1]));
+            setTimeout(() => {
+                if (root) {
+                    root.unmount();
+                    rootsMap.delete(noteId);
+                }
+                noteElement.remove();
+            }, 300); // Match this with animation duration
         }
     }
 }
@@ -188,6 +189,7 @@ const injectComponent = async (data) => {
     shadowRoot.appendChild(rootContainer);
 
     const root = createRoot(rootContainer);
+    rootsMap.set(noteId, root);
     root.render(
         <QueryClientProvider client={queryClient}>
             <InjectReact 

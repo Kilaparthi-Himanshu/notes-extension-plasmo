@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react"
-import { useEditor, EditorContent, Editor, useEditorState } from "@tiptap/react";
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { useEditor, EditorContent, Editor, useEditorState, type AnyExtension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import styleText from "data-text:../styles.module.css";
 import MenuBar from "./MenuBar";
@@ -86,15 +86,12 @@ export default function TipTapEditor({
     enableRealtime
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
+    console.log("CONTENT: ", content);
 
     const lowlight = createLowlight(all);
 
     const ydocRef = useRef<Y.Doc | null>(new Y.Doc());
-    const providerRef = useRef<HocuspocusProvider | null>(new HocuspocusProvider({
-        url: "ws://localhost:1234",
-        name: remoteId,
-        document: ydocRef.current,
-    }));
+    const providerRef = useRef<HocuspocusProvider | null>(null);
 
     // Populatigng contentRef
     const contentRef = useRef(content);
@@ -104,16 +101,13 @@ export default function TipTapEditor({
     console.log("PROVIDERREF: ", providerRef.current);
     console.log("REMOTEID: ", remoteId);
 
+    const [isConnected, setIsConnected] = useState(false);
+
+    // 🟢 create HP connection ONLY when needed
     useEffect(() => {
         if (!enableRealtime || !remoteId) return;
 
-        if (!ydocRef.current) {
-            ydocRef.current = new Y.Doc();
-        }
-
-        if (providerRef.current) return;
-
-        console.log("CREATING PROVIDER");
+        console.log("🟢 Connecting to Hocuspocus");
 
         const websocketProvider = new HocuspocusProviderWebsocket({
             url: "ws://localhost:1234",
@@ -121,45 +115,45 @@ export default function TipTapEditor({
             delay: 2000,
         });
 
-        providerRef.current = new HocuspocusProvider({
-            url: "ws://localhost:1234",
+        const provider = new HocuspocusProvider({
+            websocketProvider,
             name: remoteId,
-            document: ydocRef.current,
+            document: ydocRef.current!,
+        });
+
+        providerRef.current = provider;
+
+        provider.on("status", (event) => {
+            console.log("HP status:", event.status);
+
+            if (event.status === "connected") {
+                setIsConnected(true);
+            }
+
+            if (event.status === "disconnected") {
+                setIsConnected(false);
+            }
+        });
+
+        provider.on("synced", () => {
+            console.log("✅ YJS SYNCED");
         });
 
         return () => {
-            console.log("DESTROYING PROVIDER");
+            console.log("🔴 Disconnecting Hocuspocus");
+
             providerRef.current?.destroy();
             providerRef.current = null;
+
+            ydocRef.current?.destroy();
+            ydocRef.current = null;
+
+            setIsConnected(false);
         }
     }, [enableRealtime, remoteId]);
 
-    const saveContentRef = useRef<((html: string) => void) | null>(null);
-    if (!saveContentRef.current) {
-        saveContentRef.current = debounce(async (html: string) => {
-            if (!note.sync) return;
-
-            const { data, error } = await supabase
-                .from("notes")
-                .update({
-                    id: note.remoteId,
-                    title: note.title,
-                    note: { ...note, content: html },
-                    updated_at: new Date().toISOString(),
-                })
-                .eq("id", remoteId)
-                .select();
-
-            console.log("DATA CONTENT", data[0].note.content);
-
-            if (error) console.log("Error: ", error);
-        }, 500);
-    }
-    const saveContent = saveContentRef.current;
-
-    // Creating the editor
-    const editor = useEditor({
-        extensions: [
+    const extensions = useMemo<AnyExtension[]>(() => {
+        const base: AnyExtension[] = [
             StarterKit.configure({
                 bold: false,
                 italic: false,
@@ -168,9 +162,9 @@ export default function TipTapEditor({
                 orderedList: false,
                 undoRedo: false,
             }),
-            Collaboration.configure({
-                document: ydocRef.current,
-            }),
+            // Collaboration.configure({
+            //     document: ydocRef.current,
+            // }),
             // CollaborationCaret.configure({
             //     provider: providerRef.current,
             // }),
@@ -223,37 +217,23 @@ export default function TipTapEditor({
                     class: "hljs"
                 }
             }),
-        ],
-        // content: content || "<p></p>", // seed empty state
-        // onCreate: ({ editor: currentEditor }) => {
-        //     const provider = providerRef.current;
-        //     console.log("THE PROVIDER ISSSS: ", provider);
-        //     if (!provider) {console.log("NO PROVIDER, RETURNING"); return};
+        ];
 
-        //     provider.on("synced", () => {
-        //         // if (hasSeededRef.current) return; // only seed once per mount
-        //         // hasSeededRef.current = true;
-        //         console.log("SEEDED FROM REMOTE");
+        if (enableRealtime && isConnected && ydocRef.current) {
+            base.push(
+                Collaboration.configure({
+                    document: ydocRef.current,
+                })
+            );
+        }
 
-        //         const ydoc = ydocRef.current;
-        //         // Check if Yjs doc is EMPTY
-        //         const isEmpty = ydoc?.getXmlFragment("default").length === 0;
+        return base;
+    }, [enableRealtime, isConnected]);
 
-        //         console.log("ODIYAMA: ", ydoc?.getXmlFragment("default"), ydoc?.getText("default"));
-
-        //         const latestContent = contentRef.current;
-
-        //         if (isEmpty && latestContent && latestContent !== "<p></p>") {
-        //             // Always overwrite Y.js in-memory state with Supabase truth
-        //             console.log("Seeding Yjs doc from Supabase");
-        //             currentEditor.commands.setContent(latestContent);
-        //         } else {
-        //             console.log("Using existing Yjs content (no seeding)");
-        //         }
-        //     });
-
-        //     provider.on("status", (e: any) => console.log("STATUSSSS: ", e.status));
-        // },
+    // Creating the editor
+    const editor = useEditor({
+        extensions: extensions,
+        content: !isConnected ? content : undefined,
         onUpdate: ({ editor }) => {
             if (!canEditSyncedNote) return;
 
@@ -272,49 +252,25 @@ export default function TipTapEditor({
             },
         },
         autofocus: false,
-        // onSelectionUpdate({ editor }) {
-        //     handleSelectionChange(editor);
-        // },
-        // onTransaction({ editor }) {
-        //     handleSelectionChange(editor);
-        // }
     });
 
+    // Ensure Supabase content always applied
     useEffect(() => {
-        const provider = providerRef.current;
-        if (!provider || !editor) return;
+        if (!editor) return;
 
-        provider.on("synced", () => {
-            console.log("YJS SYNCED");
+        // Only apply in NON-realtime mode
+        if (!enableRealtime || !isConnected) {
+            if (content && content !== editor.getHTML()) {
+                console.log("🔥 Setting fallback content");
 
-            if (hasSeededRef.current) return;
-
-            const yText = ydocRef.current?.getXmlFragment("default");
-            const isEmpty = !yText || yText.length === 0;
-
-            if (isEmpty && contentRef.current && contentRef.current !== "<p></p>") {
-                console.log("SEEDING FROM SUPABASE");
-
-                editor.commands.setContent(contentRef.current);
+                editor.commands.setContent(content);
             }
-
-            hasSeededRef.current = true;
-        });
-    }, [editor]);
-
-    // useEffect(() => {
-    //     contentRef.current = content;
-    //     console.log("CONTENTUHHHH: ", contentRef.current);
-
-    //     if (editor && !hasSeededRef.current && content && content !== "<p></p>") {
-    //         hasSeededRef.current = true;
-    //         editor.commands.setContent(content);
-    //     }
-    // }, [content, editor]);
+        }
+    }, [content, editor, enableRealtime, isConnected]);
 
     const canUseAdvancedEditorRef = useRef(canUseAdvancedEditor);
     useEffect(() => {
-        canUseAdvancedEditorRef.current = canUseAdvancedEditor;
+            canUseAdvancedEditorRef.current = canUseAdvancedEditor;
     }, [canUseAdvancedEditor]);
 
     useEffect(() => {
@@ -385,12 +341,7 @@ export default function TipTapEditor({
         }
     }, [editor]);
 
-    useEffect(()=> {
-        return () => {
-            providerRef.current?.destroy();
-            ydocRef.current?.destroy();
-        }
-    }, []);
+    if (!editor) return null;
 
     return (
         <>

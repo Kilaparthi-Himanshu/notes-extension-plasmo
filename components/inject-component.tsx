@@ -111,6 +111,8 @@ function InjectReact({
     const [dirty, setDirty] = useState(false);
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
+    const [syncSettled, setSyncSettled] = useState(false);
+
     // Determine the plan under which this note was originally created.
     //
     // Backward compatibility:
@@ -187,6 +189,7 @@ function InjectReact({
             setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
             setSync(note.sync ?? false);
             setBaseVersion(note.baseVersion ?? 0);
+            setSyncSettled(true);
         }
     }, [note]);
 
@@ -627,17 +630,19 @@ function InjectReact({
                                     flex: 1,
                                 }}
                             >
-                                <TipTapEditor
-                                    note={note}
-                                    content={content}
-                                    onChange={setContent}
-                                    customColor={customColor}
-                                    theme={theme}
-                                    showToolbar={showToolbar}
-                                    canEditSyncedNote={canEditSyncedNote}
-                                    remoteId={remoteId}
-                                    enableRealtime={sync && canEditSyncedNote}
-                                />
+                                {syncSettled && (
+                                    <TipTapEditor
+                                        note={note}
+                                        content={content}
+                                        onChange={setContent}
+                                        customColor={customColor}
+                                        theme={theme}
+                                        showToolbar={showToolbar}
+                                        canEditSyncedNote={canEditSyncedNote}
+                                        remoteId={remoteId}
+                                        enableRealtime={sync && canEditSyncedNote}
+                                    />)
+                                }
 
                                 {/* <TipTapYjsEditor remoteId={remoteId} /> */}
 

@@ -92,6 +92,7 @@ export default function TipTapEditor({
 
     const ydocRef = useRef<Y.Doc | null>(new Y.Doc());
     const providerRef = useRef<HocuspocusProvider | null>(null);
+    const isSyncedRef = useRef(!enableRealtime); 
 
     // Populatigng contentRef
     const contentRef = useRef(content);
@@ -102,58 +103,162 @@ export default function TipTapEditor({
     console.log("REMOTEID: ", remoteId);
 
     const [isConnected, setIsConnected] = useState(false);
+    const [hasTriedRealtime, setHasTriedRealtime] = useState(false);
 
-    // 🟢 create HP connection ONLY when needed
-    useEffect(() => {
-        if (!enableRealtime || !remoteId) return;
+    const [isSynced, setIsSynced] = useState(!enableRealtime);
 
-        console.log("🟢 Connecting to Hocuspocus");
-
-        const websocketProvider = new HocuspocusProviderWebsocket({
+    // Create provider synchronously on first render if realtime
+    if (enableRealtime && !providerRef.current) {
+        providerRef.current = new HocuspocusProvider({
             url: "ws://localhost:1234",
-            maxAttempts: 3,
-            delay: 2000,
-        });
-
-        const provider = new HocuspocusProvider({
-            websocketProvider,
             name: remoteId,
-            document: ydocRef.current!,
+            document: ydocRef.current,
+            onSynced() {
+                isSyncedRef.current = true;
+                setIsSynced(true);
+            },
         });
+    }
 
-        providerRef.current = provider;
-
-        provider.on("status", (event) => {
-            console.log("HP status:", event.status);
-
-            if (event.status === "connected") {
-                setIsConnected(true);
-            }
-
-            if (event.status === "disconnected") {
-                setIsConnected(false);
-            }
-        });
-
-        provider.on("synced", () => {
-            console.log("✅ YJS SYNCED");
-        });
-
+    // Cleanup on unmount
+    useEffect(() => {
         return () => {
-            console.log("🔴 Disconnecting Hocuspocus");
-
             providerRef.current?.destroy();
             providerRef.current = null;
+        };
+    }, []);
 
-            ydocRef.current?.destroy();
-            ydocRef.current = null;
+    // 🟢 create HP connection ONLY when needed
+    // useEffect(() => {
+    //     if (!enableRealtime || !remoteId) return;
 
-            setIsConnected(false);
-        }
-    }, [enableRealtime, remoteId]);
+    //     console.log("🟢 Connecting to Hocuspocus");
 
-    const extensions = useMemo<AnyExtension[]>(() => {
-        const base: AnyExtension[] = [
+    //     const websocketProvider = new HocuspocusProviderWebsocket({
+    //         url: "ws://localhost:1234",
+    //         maxAttempts: 3,
+    //         delay: 2000,
+    //     });
+
+    //     const provider = new HocuspocusProvider({
+    //         url: "ws://localhost:1234",
+    //         name: remoteId,
+    //         document: ydocRef.current!,
+    //     });
+
+    //     providerRef.current = provider;
+    //     setHasTriedRealtime(true);
+
+    //     provider.on("status", (event) => {
+    //         console.log("HP status:", event.status);
+
+    //         if (event.status === "connected") {
+    //             setIsConnected(true);
+    //         }
+
+    //         if (event.status === "disconnected") {
+    //             setIsConnected(false);
+    //         }
+    //     });
+
+    //     provider.on("synced", () => {
+    //         console.log("✅ YJS SYNCED");
+    //     });
+
+    //     return () => {
+    //         console.log("🔴 Disconnecting Hocuspocus");
+
+    //         providerRef.current?.destroy();
+    //         providerRef.current = null;
+
+    //         ydocRef.current?.destroy();
+    //         ydocRef.current = null;
+
+    //         setIsConnected(false);
+    //     }
+    // }, [enableRealtime, remoteId]);
+
+    // const extensions = useMemo<AnyExtension[]>(() => {
+    //     const base: AnyExtension[] = [
+    //         StarterKit.configure({
+    //             bold: false,
+    //             italic: false,
+    //             strike: false,
+    //             bulletList: false,
+    //             orderedList: false,
+    //             undoRedo: false,
+    //         }),
+    //         // Collaboration.configure({
+    //         //     document: ydocRef.current,
+    //         // }),
+    //         // CollaborationCaret.configure({
+    //         //     provider: providerRef.current,
+    //         // }),
+    //         TextStyle,
+    //         FontSize.configure({
+    //             types: ["textStyle"], // applies to textStyle mark
+    //         }),
+    //         BulletList.configure({
+    //             HTMLAttributes: {
+    //                 class: `list-disc ml-4 ProseMirror`, // Tailwind: disc bullets + margin
+    //             },
+    //             keepMarks: true,
+    //             keepAttributes: true,
+    //         }),
+    //         OrderedList.configure({
+    //             HTMLAttributes: {
+    //                 class: `list-decimal ml-4 [&>ol]:ml-4 ProseMirror`, // Tailwind: numbered list + margin
+    //             },
+    //             keepMarks: true,
+    //             keepAttributes: true,
+    //         }), 
+    //         ListItemWithStyle,
+    //         // Always render Bold/Italic/Strike marks, but disable shortcuts if not pro
+    //         // BoldExtension,
+    //         // ItalicExtension,
+    //         // StrikeExtension,
+    //         Bold,
+    //         Italic,
+    //         Strike,
+    //         Image.configure({
+    //             resize: {
+    //                 enabled: true,
+    //                 alwaysPreserveAspectRatio: true,
+    //             },
+    //         }),
+    //         TextAlign.configure({
+    //             types: ['heading', 'paragraph'],
+    //         }),
+    //         FontFamily,
+    //         Color.configure({
+    //             types: ['textStyle'],
+    //         }),
+    //         Highlight,
+    //         UndoRedo,
+    //         CodeBlockLowlight.configure({
+    //             lowlight,
+    //             enableTabIndentation: true,
+    //             tabSize: 2,
+    //             HTMLAttributes: {
+    //                 class: "hljs"
+    //             }
+    //         }),
+    //     ];
+
+    //     if (enableRealtime && isConnected && ydocRef.current) {
+    //         base.push(
+    //             Collaboration.configure({
+    //                 document: ydocRef.current,
+    //             })
+    //         );
+    //     }
+
+    //     return base;
+    // }, [enableRealtime, isConnected]);
+
+    // Creating the editor
+    const editor = useEditor({
+        extensions: [
             StarterKit.configure({
                 bold: false,
                 italic: false,
@@ -217,30 +322,21 @@ export default function TipTapEditor({
                     class: "hljs"
                 }
             }),
-        ];
-
-        if (enableRealtime && isConnected && ydocRef.current) {
-            base.push(
+            ...(enableRealtime
+            ? [
                 Collaboration.configure({
-                    document: ydocRef.current,
-                })
-            );
-        }
-
-        return base;
-    }, [enableRealtime, isConnected]);
-
-    // Creating the editor
-    const editor = useEditor({
-        extensions: extensions,
-        content: !isConnected ? content : undefined,
+                    document: ydocRef.current!,
+                }),
+            ]
+            : []),
+        ],
+        content: !enableRealtime ? content : undefined,
         onUpdate: ({ editor }) => {
             if (!canEditSyncedNote) return;
+            if (!isSyncedRef.current) return;
 
             const html = editor.getHTML();
-
             onChange(html);
-
             console.log("WTF");
 
             // saveContent(html);
@@ -255,18 +351,18 @@ export default function TipTapEditor({
     });
 
     // Ensure Supabase content always applied
-    useEffect(() => {
-        if (!editor) return;
+    // useEffect(() => {
+    //     if (!editor) return;
 
-        // Only apply in NON-realtime mode
-        if (!enableRealtime || !isConnected) {
-            if (content && content !== editor.getHTML()) {
-                console.log("🔥 Setting fallback content");
+    //     // Only apply in NON-realtime mode
+    //     if ((!enableRealtime || !isConnected) && hasTriedRealtime) {
+    //         if (content && content !== editor.getHTML()) {
+    //             console.log("🔥 Setting fallback content");
 
-                editor.commands.setContent(content);
-            }
-        }
-    }, [content, editor, enableRealtime, isConnected]);
+    //             editor.commands.setContent(content);
+    //         }
+    //     }
+    // }, [content, editor, enableRealtime, isConnected, hasTriedRealtime]);
 
     const canUseAdvancedEditorRef = useRef(canUseAdvancedEditor);
     useEffect(() => {
@@ -341,6 +437,7 @@ export default function TipTapEditor({
         }
     }, [editor]);
 
+    if (!isSynced) return <div>Connecting…</div>;
     if (!editor) return null;
 
     return (

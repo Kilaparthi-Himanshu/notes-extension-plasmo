@@ -125,7 +125,7 @@ export function removeNoteIdFromAddedNotesIds(noteId) {
 
 export function closeNote(noteId) {
     const noteElement = document.getElementById(noteId);
-    console.log("FUNCION CALLED AHHH");
+    console.log("FUNCTION CALLED AHHH");
     if (noteElement) {
         // Add fade-out animation
         const component = noteElement.shadowRoot?.querySelector('#react-injected-component');

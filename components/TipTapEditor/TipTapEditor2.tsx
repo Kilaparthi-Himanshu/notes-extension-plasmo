@@ -29,23 +29,6 @@ import { HocuspocusProvider, HocuspocusProviderWebsocket } from "@hocuspocus/pro
 import type { NoteType } from "~types/noteTypes";
 import { debounce } from "~lib/sync-engine/debounce";
 import { supabase } from "~lib/supabase";
-import NoteSpinner from "../misc/NoteSpinner";
-
-if (typeof window !== "undefined") {
-    const proto = ShadowRoot.prototype as any;
-
-    if (!proto.createRange) {
-        proto.createRange = function () {
-            return document.createRange();
-        };
-    }
-
-    if (!proto.getSelection) {
-        proto.getSelection = function () {
-            return document.getSelection();
-        };
-    }
-}
 
 const ListItemWithStyle = ListItem.extend({
     addAttributes() {
@@ -91,67 +74,111 @@ interface TipTapEditorProps {
     enableRealtime: boolean;
 }
 
-export default function TipTapEditor({ 
-    note,
-    content, 
-    onChange, 
-    customColor, 
-    theme,
-    showToolbar,
-    canEditSyncedNote,
-    remoteId,
-    enableRealtime
-}: TipTapEditorProps) {
-    const { canUseAdvancedEditor } = useFeatureFlags();
-    console.log("CONTENT: ", content);
-
-    const lowlight = createLowlight(all);
+export default function TipTapEditor2(props: TipTapEditorProps) {
+    const { enableRealtime, remoteId, content } = props;
 
     const ydocRef = useRef<Y.Doc | null>(new Y.Doc());
     const providerRef = useRef<HocuspocusProvider | null>(null);
-    const isSyncedRef = useRef(!enableRealtime); 
-
-    // Populatigng contentRef
-    const contentRef = useRef(content);
-    const hasSeededRef = useRef(false);
+    const isSyncedRef = useRef(!enableRealtime);
+    const websocketRef = useRef<HocuspocusProviderWebsocket | null>(null);
 
     console.log("YDOCREF: ", ydocRef.current);
     console.log("PROVIDERREF: ", providerRef.current);
     console.log("REMOTEID: ", remoteId);
 
     const [isSynced, setIsSynced] = useState(!enableRealtime);
-    const websocketRef = useRef<HocuspocusProviderWebsocket | null>(null);
-
-    // if (!websocketRef.current && enableRealtime) {
-    //     websocketRef.current = new HocuspocusProviderWebsocket({
-    //         url: "ws://localhost:1234",
-    //         maxAttempts: 1,     // stop infinite retries
-    //         delay: 1000,
-    //     });
-    // }
+    const [connectionFailed, setConnectionFailed] = useState(false);
 
     // Create provider synchronously on first render if realtime
     if (enableRealtime && !providerRef.current) {
-        providerRef.current = new HocuspocusProvider({
+        const websocket = new HocuspocusProviderWebsocket({
             url: "ws://localhost:1234",
+            maxAttempts: 3,
+            minDelay: 500,
+            maxDelay: 3000,
+        });
+
+        websocketRef.current = websocket;
+
+        websocket.on("disconnect", () => {
+            if (!isSyncedRef.current) {
+                console.log("LOL xD");
+                setConnectionFailed(true);
+                setIsSynced(true);
+            }
+        });
+
+        const provider = new HocuspocusProvider({
+            websocketProvider: websocket,
             name: remoteId,
             document: ydocRef.current,
             onSynced() {
                 isSyncedRef.current = true;
                 setIsSynced(true);
             },
+            onDisconnect() {
+                if (!isSyncedRef.current) {
+                    setConnectionFailed(true);
+                    setIsSynced(true); // unblock UI
+                }
+            },
         });
+
+        provider.on("synced", () => {
+            console.log("NOT SO LOL xD");
+            isSyncedRef.current = true;
+            setIsSynced(true);
+        });
+
+        providerRef.current = provider;
     }
 
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            // websocketRef.current.destroy();
-            providerRef.current?.disconnect();
             providerRef.current?.destroy();
             providerRef.current = null;
+            websocketRef.current?.destroy();
+            websocketRef.current = null;
         };
     }, []);
+
+    if (!isSynced) {
+        return (
+            <div className="flex items-center justify-center h-full text-sm opacity-50">
+                Connecting…
+            </div>
+        );
+    }
+
+    return (
+        <ActualEditor 
+            {...props}
+            ydoc={ydocRef.current}
+            isSyncedRef={isSyncedRef}
+            // If connection failed: disable realtime, seed with HTML content as fallback
+            enableRealtime={enableRealtime && !connectionFailed}
+            content={connectionFailed ? content : props.content}
+        />
+    );
+}
+
+function ActualEditor({
+    ydoc,
+    isSyncedRef,
+    note,
+    content,
+    onChange,
+    customColor,
+    theme,
+    showToolbar,
+    canEditSyncedNote,
+    enableRealtime,
+}: TipTapEditorProps & { ydoc: Y.Doc; isSyncedRef: React.MutableRefObject<boolean> }) {
+    const { canUseAdvancedEditor } = useFeatureFlags();
+    console.log("CONTENT: ", content);
+
+    const lowlight = createLowlight(all);
 
     // Creating the editor
     const editor = useEditor({
@@ -163,8 +190,6 @@ export default function TipTapEditor({
                 bulletList: false,
                 orderedList: false,
                 undoRedo: false,
-                listItem: false,
-                codeBlock: false,
             }),
             // Collaboration.configure({
             //     document: ydocRef.current,
@@ -212,6 +237,7 @@ export default function TipTapEditor({
                 types: ['textStyle'],
             }),
             Highlight,
+            UndoRedo,
             CodeBlockLowlight.configure({
                 lowlight,
                 enableTabIndentation: true,
@@ -223,7 +249,7 @@ export default function TipTapEditor({
             ...(enableRealtime
             ? [
                 Collaboration.configure({
-                    document: ydocRef.current!,
+                    document: ydoc,
                 }),
             ]
             : []),
@@ -247,29 +273,6 @@ export default function TipTapEditor({
         },
         autofocus: false,
     });
-
-    useEffect(() => {
-        if (!enableRealtime) return;
-        if (isSynced) return;
-
-        const timeout = setTimeout(() => {
-            console.warn("⚠️ Sync timed out, rendering as local note");
-
-            isSyncedRef.current = true;
-            setIsSynced(true); // unblock the UI
-
-            editor.commands.setContent(content);
-
-            console.log("PROVIDER RA BABU: ", providerRef.current, websocketRef.current);
-            // websocketRef.current.destroy();
-            providerRef.current?.disconnect();
-            providerRef.current?.destroy();
-            providerRef.current = null;
-            console.log("PROVIDER RA BABU: ", providerRef.current, websocketRef.current);
-        }, 5000);
-
-        return () => clearTimeout(timeout);
-    }, [enableRealtime, isSynced, editor]);
 
     const canUseAdvancedEditorRef = useRef(canUseAdvancedEditor);
     useEffect(() => {
@@ -343,16 +346,6 @@ export default function TipTapEditor({
             }
         }
     }, [editor]);
-
-    if (!isSynced) return (
-        <div className="flex flex-col items-center justify-center gap-2">
-            <NoteSpinner />
-            <span className="inline-block text-black border border-blue-500 bg-blue-50 rounded-full px-3 py-1 text-sm shadow-xl">
-                Connecting…
-            </span>
-        </div>
-    );
-    if (!editor) return null;
 
     return (
         <>

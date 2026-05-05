@@ -112,7 +112,9 @@ function InjectReact({
     const [dirty, setDirty] = useState(false);
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
 
-    const [syncSettled, setSyncSettled] = useState(false);
+    // If no initialNote → this is a new note → no sync needed → render editor immediately
+    // If initialNote exists → wait for note initialization / sync before rendering
+    const [syncSettled, setSyncSettled] = useState(!initialNote);
 
     // Determine the plan under which this note was originally created.
     //
@@ -170,7 +172,6 @@ function InjectReact({
         navigator.onLine;
 
     useEffect(() => {
-
         if (note) {
             setTitle(note.title);
             setContent(note.content);
@@ -190,6 +191,7 @@ function InjectReact({
             setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
             setSync(note.sync ?? false);
             setBaseVersion(note.baseVersion ?? 0);
+
             setSyncSettled(true);
         }
     }, [note]);

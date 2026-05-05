@@ -31,6 +31,21 @@ import { debounce } from "~lib/sync-engine/debounce";
 import { supabase } from "~lib/supabase";
 import NoteSpinner from "../misc/NoteSpinner";
 
+// Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
+//
+// Problem:
+// ProseMirror expects `root.createRange()` and `root.getSelection()` to exist.
+// In Shadow DOM, `root` is a ShadowRoot, which DOES NOT implement these methods.
+// This causes runtime errors like:
+//   "this.prosemirrorView._root.createRange is not a function"
+//
+// Solution:
+// Monkey-patch ShadowRoot prototype to delegate these calls to the global document.
+//
+// Notes:
+// - Safe because ShadowRoot should conceptually behave like Document for selection APIs
+// - Guarded to avoid overriding if browser adds native support in future
+// - Must run BEFORE editor initializes
 if (typeof window !== "undefined") {
     const proto = ShadowRoot.prototype as any;
 
@@ -79,6 +94,41 @@ export const getStyle = () => {
     return style;
 }
 
+// Forcefully stops a Hocuspocus provider and its underlying WebSocket.
+//
+// Why this exists:
+// - HocuspocusProvider internally keeps retrying connections (infinite by default)
+// - This can cause:
+//    • infinite reconnect loops when server is offline
+//    • duplicate Yjs content when connection resumes
+// - `provider.destroy()` alone is NOT sufficient (WebSocket may still retry)
+//
+// What this does:
+// 1. Accesses internal WebSocket instance (not officially exposed)
+// 2. Explicitly closes + destroys it
+// 3. Disconnects and destroys the provider
+//
+// Notes:
+// - Uses internal/private fields → not future-proof, but necessary workaround
+// - Safe in current Hocuspocus implementation
+// - Should be called when:
+//      • connection fails / times out
+//      • falling back to local mode
+//      • unmount cleanup (optional but good)
+//
+// This is critical to prevent "Hello → Hello Hello" duplication bug
+const forceStopProvider = (provider: HocuspocusProvider | null) => {
+    if (!provider) return;
+
+    // Access the internal websocket and destroy it first
+    const ws = (provider as any).configuration?.websocketProvider ?? (provider as any).webSocket;
+    ws?.close?.();
+    ws?.destroy?.();
+
+    provider.disconnect();
+    provider.destroy();
+}
+
 interface TipTapEditorProps {
     note: NoteType
     content: string;
@@ -120,15 +170,6 @@ export default function TipTapEditor({
     console.log("REMOTEID: ", remoteId);
 
     const [isSynced, setIsSynced] = useState(!enableRealtime);
-    const websocketRef = useRef<HocuspocusProviderWebsocket | null>(null);
-
-    // if (!websocketRef.current && enableRealtime) {
-    //     websocketRef.current = new HocuspocusProviderWebsocket({
-    //         url: "ws://localhost:1234",
-    //         maxAttempts: 1,     // stop infinite retries
-    //         delay: 1000,
-    //     });
-    // }
 
     // Create provider synchronously on first render if realtime
     if (enableRealtime && !providerRef.current) {
@@ -146,9 +187,7 @@ export default function TipTapEditor({
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            // websocketRef.current.destroy();
-            providerRef.current?.disconnect();
-            providerRef.current?.destroy();
+            forceStopProvider(providerRef.current);
             providerRef.current = null;
         };
     }, []);
@@ -260,12 +299,12 @@ export default function TipTapEditor({
 
             editor.commands.setContent(content);
 
-            console.log("PROVIDER RA BABU: ", providerRef.current, websocketRef.current);
-            // websocketRef.current.destroy();
-            providerRef.current?.disconnect();
-            providerRef.current?.destroy();
-            providerRef.current = null;
-            console.log("PROVIDER RA BABU: ", providerRef.current, websocketRef.current);
+            console.log("PROVIDER RA BABU: ", providerRef.current);
+            // providerRef.current?.disconnect();
+            // providerRef.current?.destroy();
+            // providerRef.current = null;
+            forceStopProvider(providerRef.current);
+            console.log("PROVIDER RA BABU: ", providerRef.current);
         }, 5000);
 
         return () => clearTimeout(timeout);
@@ -317,8 +356,8 @@ export default function TipTapEditor({
                             : null,
                 fontFamily: attrs.fontFamily ?? null,
                 color: attrs.color ? rgbToHex(attrs.color) : null,
-                canUndo: ctx.editor.can().chain().focus().undo().run(),
-                canRedo: ctx.editor.can().chain().focus().redo().run(),
+                canUndo: ctx.editor.can().chain().focus().undo?.().run?.() ?? false,
+                canRedo: ctx.editor.can().chain().focus().redo?.().run?.() ?? false,
             }
         }
     });

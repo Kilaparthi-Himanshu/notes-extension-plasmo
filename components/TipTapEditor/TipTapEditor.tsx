@@ -297,6 +297,40 @@ export default function TipTapEditor({
                 class: "ProseMirror flex-1 h-max rounded-xl py-4 px-6 focus:outline-none",
                 // style: `font-size: ${fontSize}px;`
             },
+            // Block native rich-text formatting commands for non-pro users.
+            //
+            // Why this exists:
+            // - Browsers apply shortcuts like Cmd/Ctrl+B, Cmd/Ctrl+I, etc.
+            //   through the native `beforeinput` contenteditable pipeline
+            // - These formatting actions bypass normal Tiptap/ProseMirror keymaps,
+            //   so blocking keydown events alone is NOT sufficient
+            //
+            // This prevents non-pro users from creating/modifying rich text formatting
+            // while still allowing previously formatted content to render correctly.
+            handleDOMEvents: {
+                beforeinput(view, event: InputEvent) {
+                    if (canUseAdvancedEditorRef.current) {
+                        return false;
+                    }
+
+                    const blockedInputTypes = [
+                        "formatBold",
+                        "formatItalic",
+                        "formatUnderline",
+                        "formatStrikeThrough",
+                        "formatRemove",
+                        "historyUndo",
+                        "historyRedo",
+                    ];
+
+                    if (blockedInputTypes.includes(event.inputType)) {
+                        event.preventDefault();
+                        return true;
+                    }
+
+                    return false;
+                },
+            },
         },
         autofocus: false,
     });
@@ -329,34 +363,6 @@ export default function TipTapEditor({
     useEffect(() => {
             canUseAdvancedEditorRef.current = canUseAdvancedEditor;
     }, [canUseAdvancedEditor]);
-
-    useEffect(() => {
-        const dom = editor?.view?.dom;
-        if (!dom) return;
-
-        const root = dom.getRootNode();
-        const target = (root instanceof ShadowRoot ? root : dom) as EventTarget;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (canUseAdvancedEditorRef.current) return;
-            const mod = e.ctrlKey || e.metaKey;
-            if (!mod) return;
-            const key = e.key.toLowerCase();
-            const shouldBlock =
-                key === "b" ||
-                key === "i" ||
-                key === "u" ||
-                (key === "s" && e.shiftKey);
-
-            if (shouldBlock) {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-            }
-        };
-
-        target.addEventListener("keydown", handleKeyDown, true);
-        return () => target.removeEventListener("keydown", handleKeyDown, true);
-    }, [editor?.view?.dom]);
 
     const editorState = useEditorState({
         editor,

@@ -69,7 +69,7 @@ export class NoteSyncEngine {
         this.scheduleSave();
     }
 
-    async saveToSupabase() {
+    private async saveToSupabase() {
         const { data, error } =  await supabase
             .from("notes")
             .upsert({
@@ -86,56 +86,64 @@ export class NoteSyncEngine {
         if (error) console.log("Error: ", error);
     }
 
+    async forceSaveToSupabase() {
+        await this.saveToSupabase();
+    }
+
+    markSkipNextSave() {
+        this.skipNextSave = true;
+    }
+
     // Realtime logic
-    initRealtime() {
-        if (!this.note?.remoteId) return;
-        console.log("REALTIME INITIALZED");
+    // initRealtime() {
+    //     if (!this.note?.remoteId) return;
+    //     console.log("REALTIME INITIALZED");
 
-        const channel = supabase
-            .channel(`note-${this.note.remoteId}`)
-            .on(
-                "postgres_changes",
-                {
-                    event: "UPDATE",
-                    schema: "public",
-                    table: "notes",
-                    filter: `id=eq.${this.note.remoteId}`
-                },
-                (payload: any) => {
-                    const incoming = payload.new.note;
+    //     const channel = supabase
+    //         .channel(`note-${this.note.remoteId}`)
+    //         .on(
+    //             "postgres_changes",
+    //             {
+    //                 event: "UPDATE",
+    //                 schema: "public",
+    //                 table: "notes",
+    //                 filter: `id=eq.${this.note.remoteId}`
+    //             },
+    //             (payload: any) => {
+    //                 const incoming = payload.new.note;
 
-                   if (payload.new.updated_by === this.clientId) {
-                        console.log("Skipping self update");
-                        return;
-                    }
+    //                if (payload.new.updated_by === this.clientId) {
+    //                     console.log("Skipping self update");
+    //                     return;
+    //                 }
 
-                    console.log("REALTIME STARTED xD", this.clientId);
+    //                 console.log("REALTIME STARTED xD", this.clientId);
 
-                    const { content, isPasswordProtected, password, ...incomingMeta } = incoming;
+    //                 const { content, isPasswordProtected, password, ...incomingMeta } = incoming;
 
-                    console.log("Realtime metadata update", this.note, incoming);
+    //                 console.log("Realtime metadata update", this.note, incoming);
 
-                    this.skipNextSave = true;
+    //                 this.skipNextSave = true;
 
-                    this.onExternalUpdate?.({
-                        ...this.note,
-                        ...incomingMeta,
-                    });
+    //                 this.onExternalUpdate?.({
+    //                     ...this.note,
+    //                     ...incomingMeta,
+    //                 });
 
-                    this.note = incoming;
+    //                 this.note = incoming;
 
-                    persistLocal(this.note);
-                }
-            )
-            .subscribe();
+    //                 persistLocal(this.note);
+    //             }
+    //         )
+    //         .subscribe();
 
-        this.unsubscribeRealtime = () => {
-            supabase.removeChannel(channel);
-        }
-    }
+    //     this.unsubscribeRealtime = () => {
+    //         supabase.removeChannel(channel);
+    //     }
+    // }
 
-    destroy() {
-        console.log("Unsubscribing realtime");
-        this.unsubscribeRealtime?.();
-    }
+    // destroy() {
+    //     console.log("Unsubscribing realtime");
+    //     this.unsubscribeRealtime?.();
+    // }
 }

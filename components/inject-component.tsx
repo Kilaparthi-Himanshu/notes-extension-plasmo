@@ -620,6 +620,7 @@ function InjectReact({
                                 setSync={setSync}
                                 setShowSyncConfirmationModal={setShowSyncConfirmationModal}
                                 theme={theme}
+                                syncEngineRef={syncEngineRef}
                             />
                         );
                     } else {

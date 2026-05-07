@@ -159,20 +159,26 @@ export default function TipTapEditor({
 
     const ydocRef = useRef<Y.Doc | null>(new Y.Doc());
     const providerRef = useRef<HocuspocusProvider | null>(null);
-    const isSyncedRef = useRef(!enableRealtime); 
+    const isSyncedRef = useRef(!enableRealtime);
+
+    // Prevent reconnecting to the collaboration server after falling back to local mode.
+    // Reconnecting the same editor/Y.Doc instance after manual local content injection
+    // can cause duplicated CRDT content merges.
+    const preventReconnectRef = useRef(false);
 
     // Populatigng contentRef
     const contentRef = useRef(content);
     const hasSeededRef = useRef(false);
 
-    console.log("YDOCREF: ", ydocRef.current);
-    console.log("PROVIDERREF: ", providerRef.current);
-    console.log("REMOTEID: ", remoteId);
+    console.log("\n", ydocRef.current);
+    console.log("PROVIDERREF: \n", providerRef.current);
+    console.log("REMOTEID: \n", remoteId);
+    console.log("PREVENTRECONNECTREF: \n", preventReconnectRef);
 
     const [isSynced, setIsSynced] = useState(!enableRealtime);
 
     // Create provider synchronously on first render if realtime
-    if (enableRealtime && !providerRef.current) {
+    if (enableRealtime && !providerRef.current && !preventReconnectRef.current) {
         providerRef.current = new HocuspocusProvider({
             url: "ws://localhost:1234",
             name: remoteId,
@@ -181,6 +187,14 @@ export default function TipTapEditor({
                 isSyncedRef.current = true;
                 setIsSynced(true);
             },
+            onDisconnect() {
+                console.warn("❌ Server disconnected");
+
+                forceStopProvider(providerRef.current);
+                providerRef.current = null;
+
+                preventReconnectRef.current = true;
+            }
         });
     }
 
@@ -296,6 +310,7 @@ export default function TipTapEditor({
 
             isSyncedRef.current = true;
             setIsSynced(true); // unblock the UI
+            preventReconnectRef.current = true;
 
             editor.commands.setContent(content);
 

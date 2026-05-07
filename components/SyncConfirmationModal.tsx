@@ -1,22 +1,29 @@
 import React from 'react';
 import * as style from './styles.module.css';
+import type { NoteSyncEngine } from '~lib/sync-engine';
 
 export const SyncConfirmationModal = ({
     customColor,
     setSync,
     setShowSyncConfirmationModal,
-    theme
+    theme,
+    syncEngineRef
 }: {
     customColor: string;
     setSync: (value: boolean) => void;
     setShowSyncConfirmationModal: (value: boolean) => void;
     theme: string;
+    syncEngineRef: React.MutableRefObject<NoteSyncEngine>;
 }) => {
     const handleClose = () => {
         setShowSyncConfirmationModal(false);
     }
 
-    const handleConfirm = () => {
+    const handleConfirm = async() => {
+        // First save content to supabase so the HocusPocus server can read the content
+        await syncEngineRef.current?.forceSaveToSupabase();
+        syncEngineRef.current?.markSkipNextSave();
+
         setSync(true);
         alert("Sync Enabled Successfully!");
         handleClose();

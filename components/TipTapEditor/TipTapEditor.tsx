@@ -253,6 +253,16 @@ export default function TipTapEditor({
             Strike,
             Image.configure({
                 resize: {
+                    directions: [
+                        // 'top',
+                        // 'bottom',
+                        // 'left',
+                        // 'right',
+                        'top-left',
+                        'top-right',
+                        'bottom-left',
+                        'bottom-right',
+                    ],
                     enabled: true,
                     alwaysPreserveAspectRatio: true,
                 },

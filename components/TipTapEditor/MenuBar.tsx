@@ -42,8 +42,10 @@ const MenuBar = ({ editor, editorState, theme }: {
     }, [editor]);
 
     return (
-        <div className={`flex flex-col space-y-1 items-center p-1 ${theme === 'light' ? 'bg-neutral-300' : 'bg-[#454545] text-white'} rounded-xl shadow-lg hover:scale-[1.05] transition-transform`}style={{
-            border: '1px solid rgba(255, 255, 255, 0.25)'
+        <div className={`flex flex-col space-y-1 items-center p-1 ${theme === 'light' ? 'bg-neutral-300' : 'bg-[#454545] text-white'} rounded-xl shadow-lg hover:scale-[1.05] transition-transform`}
+        style={{
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            zIndex: 9999
         }}>
             <div className="flex space-x-2 items-center">
                 <button
@@ -119,9 +121,9 @@ const MenuBar = ({ editor, editorState, theme }: {
                         backgroundColor: theme === "light" ? 
                         "white" : "#262626",
                         color: theme === "light" ? "black" : "white",
-                        border: theme === "light" ? "1px solid #262626" : "1px solid white"
+                        border: theme === "light" ? "1px solid #262626" : "1px solid white",
                     }}
-                    className="rounded-lg max-w-[64px] text-sm h-[20px]"
+                    className="rounded-lg max-w-[97px] text-sm h-[20px]" // original is 64px
                 >
                     <option value="" disabled className='hidden'></option>
                     <option value="Gill Sans MT">Gill Sans MT</option>
@@ -190,6 +192,14 @@ const MenuBar = ({ editor, editorState, theme }: {
                 </button>
 
                 <button
+                    onClick={addImage}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                    title="Image URL Upload"
+                >
+                    <FaImages size={16} />
+                </button>
+
+                <button
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                     className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bulletList") ? highlightColor : ""} cursor-pointer`}
                     title="Bullet List"
@@ -204,15 +214,6 @@ const MenuBar = ({ editor, editorState, theme }: {
                 >
                     <ListOrdered size={16} />
                 </button>
-
-                {/* <button
-                    onClick={addImage}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
-                    title="Image URL Upload"
-                >
-                    <FaImages size={16} />
-                </button> */}
-                {/* Planned for later */}
 
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}

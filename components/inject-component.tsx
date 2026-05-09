@@ -21,7 +21,6 @@ import type { LimitInfo, NoteType } from '../types/noteTypes';
 import { NoteSyncEngine } from '../lib/sync-engine';
 import { persistLocal } from "~lib/sync-engine/storage";
 import TipTapYjsEditor from './TipTapEditor/TipTapYjsEditor';
-import TipTapEditor2 from './TipTapEditor/TipTapEditor2';
 
 export const getStyle = () => {
     const style = document.createElement("style");

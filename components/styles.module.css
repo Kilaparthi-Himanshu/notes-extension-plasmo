@@ -468,6 +468,57 @@ ol li::marker {
 }
 
 .ProseMirror {
-  white-space: pre-wrap;
-  word-break: break-word;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+[data-node="image"][class*="ProseMirror-selectednode"] img {
+    box-shadow: 0 0 0 3px #a855f7 !important;
+}
+
+[data-node="image"] [data-resize-handle] {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 2px solid #a855f7;
+    border-radius: 999px;
+    position: absolute;
+    z-index: 1000;
+}
+
+[data-resize-handle="top-left"] {
+    top: -6px !important;
+    left: -6px !important;
+    cursor: nwse-resize;
+}
+
+[data-resize-handle="top-right"] {
+    top: -6px !important;
+    right: -6px !important;
+    cursor: nesw-resize;
+}
+
+[data-resize-handle="bottom-left"] {
+    bottom: -6px !important;
+    left: -6px !important;
+    cursor: nesw-resize;
+}
+
+[data-resize-handle="bottom-right"] {
+    bottom: -6px !important;
+    right: -6px !important;
+    cursor: nwse-resize;
+}
+
+[data-node="image"] [data-resize-handle] {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+[data-node="image"]:hover [data-resize-handle],
+[data-node="image"][class*="ProseMirror-selectednode"] [data-resize-handle],
+[data-node="image"][data-resize-state="true"] [data-resize-handle] {
+    opacity: 1;
+    pointer-events: auto;
 }

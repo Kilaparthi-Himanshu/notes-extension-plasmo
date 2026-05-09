@@ -17,7 +17,8 @@ import * as Falcon from '~assets/Falcon.jpeg';
 import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import { hexToRgba } from '~utils/colorFormatChange';
 import { SyncConfirmationModal } from './SyncConfirmationModal';
-import type { LimitInfo, NoteType } from '../types/noteTypes';
+import { ExportModal } from './ExportModal';
+import type { LimitInfo, NoteType, TipTapEditorHandle } from '../types/noteTypes';
 import { NoteSyncEngine } from '../lib/sync-engine';
 import { persistLocal } from "~lib/sync-engine/storage";
 import TipTapYjsEditor from './TipTapEditor/TipTapYjsEditor';
@@ -107,9 +108,12 @@ function InjectReact({
     const [showToolbar, setShowToolbar] = useState(true);
     const [sync, setSync] = useState(false);
     const [showSyncConfirmationModal, setShowSyncConfirmationModal] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
     const [baseVersion, setBaseVersion] = useState(0);
     const [dirty, setDirty] = useState(false);
     const [remoteId, setRemoteId] = useState(() => note?.remoteId ?? crypto.randomUUID());
+
+    const editorRef = useRef<TipTapEditorHandle>(null);
 
     // If no initialNote → this is a new note → no sync needed → render editor immediately
     // If initialNote exists → wait for note initialization / sync before rendering
@@ -582,7 +586,7 @@ function InjectReact({
                         </button>
                     </div>
                     <DropdownContext.Provider value={{
-                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached
+                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached, showExportModal,setShowExportModal
                         }}
                     >
                         <DropDown />
@@ -644,6 +648,7 @@ function InjectReact({
                                         canEditSyncedNote={canEditSyncedNote}
                                         remoteId={remoteId}
                                         enableRealtime={sync && canEditSyncedNote}
+                                        editorRef={editorRef}
                                     />)
                                 }
 
@@ -663,6 +668,17 @@ function InjectReact({
                                         </p>
                                     </div>
                                 }
+
+                                {showExportModal && (
+                                    <div className="absolute top-0 left-0 size-full">
+                                        <ExportModal
+                                            customColor={customColor}
+                                            theme={theme}
+                                            setShowExportModal={setShowExportModal}
+                                            editorRef={editorRef}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         );
                     }

@@ -10,5 +10,6 @@ export function useFeatureFlags() {
         canUseAdvancedEditor: isProUser,
         canHaveGlassEffect: isProUser,
         canUseSync: isProUser,
+        canExport: isProUser,
     }
 }

@@ -33,3 +33,9 @@ export type LimitInfo = {
     totalSyncedNotesCount: number,
     maxCount: number,
 }
+
+export type TipTapEditorHandle = {
+    exportMarkdown: () => void;
+    exportHtml: () => void;
+    exportPdf: () => void;
+}

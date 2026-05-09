@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useImperativeHandle, useMemo, useRef, useState } from "react"
 import { useEditor, EditorContent, Editor, useEditorState, type AnyExtension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import styleText from "data-text:../styles.module.css";
@@ -26,10 +26,11 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import * as Y from "yjs";
 import { HocuspocusProvider, HocuspocusProviderWebsocket } from "@hocuspocus/provider";
-import type { NoteType } from "~types/noteTypes";
+import type { NoteType, TipTapEditorHandle } from "~types/noteTypes";
 import { debounce } from "~lib/sync-engine/debounce";
 import { supabase } from "~lib/supabase";
 import NoteSpinner from "../misc/NoteSpinner";
+import { Markdown } from "@tiptap/markdown";
 
 // Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
 //
@@ -139,6 +140,7 @@ interface TipTapEditorProps {
     canEditSyncedNote: boolean;
     remoteId: string;
     enableRealtime: boolean;
+    editorRef: React.MutableRefObject<TipTapEditorHandle>
 }
 
 export default function TipTapEditor({ 
@@ -150,7 +152,8 @@ export default function TipTapEditor({
     showToolbar,
     canEditSyncedNote,
     remoteId,
-    enableRealtime
+    enableRealtime,
+    editorRef
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
     console.log("CONTENT: ", content);
@@ -219,6 +222,7 @@ export default function TipTapEditor({
                 listItem: false,
                 codeBlock: false,
             }),
+            Markdown,
             // Collaboration.configure({
             //     document: ydocRef.current,
             // }),
@@ -413,6 +417,101 @@ export default function TipTapEditor({
             }
         }
     }, [editor]);
+
+    console.log(editor.storage);
+
+    useImperativeHandle(editorRef, () => ({
+        exportMarkdown() {
+            if (!editor) return;
+
+            const markdown = editor.getMarkdown();
+
+            const blob = new Blob([markdown], {
+                type: "text/markdown",
+            });
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "note.md";
+            a.click();
+
+            URL.revokeObjectURL(url);
+            console.log("GG WP RA BABU");
+        },
+        exportHtml() {
+            if (!editor) return;
+
+            const html = editor.getHTML();
+
+            const blob = new Blob([html], {
+                type: "text/html",
+            });
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "note.html";
+            a.click();
+
+            URL.revokeObjectURL(url);
+            console.log("GG WP RA BABU");
+        },
+        exportPdf() {
+            if (!editor) return;
+
+            const html = editor.getHTML();
+
+            const printWindow = window.open("", "_blank");
+
+            if (!printWindow) return;
+
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Note Export</title>
+
+                        <style>
+                            body {
+                                font-family: sans-serif;
+                                padding: 40px;
+                                line-height: 1.5;
+                            }
+
+                            img {
+                                max-width: 100%;
+                            }
+
+                            pre {
+                                background: #f4f4f4;
+                                padding: 12px;
+                                overflow-x: auto;
+                            }
+                        </style>
+                    </head>
+
+                    <body>
+                        ${html}
+                    </body>
+                </html>
+            `);
+
+            printWindow.document.close();
+
+            printWindow.focus();
+
+            // Wait a bit so content fully renders
+            setTimeout(() => {
+                printWindow.print();
+
+                // Optional
+                printWindow.close();
+            }, 300);
+            console.log("GG WP RA BABU");
+        },
+    }));
 
     if (!isSynced) return (
         <div className="flex flex-col items-center justify-center gap-2">

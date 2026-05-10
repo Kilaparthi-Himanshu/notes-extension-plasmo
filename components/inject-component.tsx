@@ -18,10 +18,11 @@ import { useFeatureFlags } from "~hooks/useFeatureFlags";
 import { hexToRgba } from '~utils/colorFormatChange';
 import { SyncConfirmationModal } from './SyncConfirmationModal';
 import { ExportModal } from './ExportModal';
-import type { LimitInfo, NoteType, TipTapEditorHandle } from '../types/noteTypes';
+import type { LimitInfo, NoteType } from '../types/noteTypes';
 import { NoteSyncEngine } from '../lib/sync-engine';
 import { persistLocal } from "~lib/sync-engine/storage";
 import TipTapYjsEditor from './TipTapEditor/TipTapYjsEditor';
+import type { TipTapEditorHandle } from "../hooks/useEditorExports";
 
 export const getStyle = () => {
     const style = document.createElement("style");

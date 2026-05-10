@@ -26,17 +26,12 @@ import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import * as Y from "yjs";
 import { HocuspocusProvider, HocuspocusProviderWebsocket } from "@hocuspocus/provider";
-import type { NoteType, TipTapEditorHandle } from "~types/noteTypes";
+import type { NoteType } from "~types/noteTypes";
 import { debounce } from "~lib/sync-engine/debounce";
 import { supabase } from "~lib/supabase";
 import NoteSpinner from "../misc/NoteSpinner";
 import { Markdown } from "@tiptap/markdown";
-import {
-    Document,
-    Packer,
-    Paragraph,
-    TextRun,
-} from "docx";
+import { useEditorExports, type TipTapEditorHandle } from "../../hooks/useEditorExports";
 
 // Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
 //
@@ -426,170 +421,7 @@ export default function TipTapEditor({
 
     console.log(editor.storage);
 
-    useImperativeHandle(editorRef, () => ({
-        exportMarkdown() {
-            if (!editor) return;
-
-            const markdown = editor.getMarkdown();
-
-            const blob = new Blob([markdown], {
-                type: "text/markdown",
-            });
-
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "note.md";
-            a.click();
-
-            URL.revokeObjectURL(url);
-            console.log("GG WP RA BABU");
-        },
-        exportHtml() {
-            if (!editor) return;
-
-            const html = editor.getHTML();
-
-            const blob = new Blob([html], {
-                type: "text/html",
-            });
-
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "note.html";
-            a.click();
-
-            URL.revokeObjectURL(url);
-            console.log("GG WP RA BABU");
-        },
-        exportPdf() {
-            if (!editor) return;
-
-            const html = editor.getHTML();
-
-            const printWindow = window.open("", "_blank");
-
-            if (!printWindow) return;
-
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <style>
-                            body {
-                                font-family: sans-serif;
-                                padding: 40px;
-                                line-height: 1.5;
-                            }
-
-                            img {
-                                max-width: 100%;
-                            }
-
-                            pre {
-                                background: #f4f4f4;
-                                padding: 12px;
-                                overflow-x: auto;
-                            }
-                        </style>
-                    </head>
-
-                    <body>
-                        ${html}
-                    </body>
-                </html>
-            `);
-
-            printWindow.document.close();
-
-            printWindow.focus();
-
-            // Wait a bit so content fully renders
-            setTimeout(() => {
-                printWindow.print();
-
-                // Optional
-                printWindow.close();
-            }, 300);
-            console.log("GG WP RA BABU");
-        },
-
-        async exportDocx() {
-            if (!editor) return;
-
-            const json = editor.getJSON();
-
-            const paragraphs: Paragraph[] = [];
-
-            for (const node of json.content ?? []) {
-                if (node.type === "paragraph") {
-                    const runs: TextRun[] = [];
-
-                    for (const child of node.content ?? []) {
-                        if (child.type !== "text") continue;
-
-                        const marks = child.marks ?? [];
-
-                        const textStyleMark = marks.find(m => m.type === "textStyle");
-
-                        const rawColor = textStyleMark?.attrs?.color;
-
-                        const docxColor = rawColor
-                            ? rgbToHex(rawColor).replace("#", "")
-                            : undefined;
-
-                        runs.push(
-                            new TextRun({
-                                text: (child as any).text ?? "",
-
-                                bold: marks.some(m => m.type === "bold"),
-                                italics: marks.some(m => m.type === "italic"),
-                                strike: marks.some(m => m.type === "strike"),
-
-                                color: docxColor,
-
-                                size:
-                                    (
-                                        parseInt(
-                                            marks.find(m => m.type === "textStyle")
-                                                ?.attrs?.fontSize ?? "16"
-                                        )
-                                    ) * 2,
-                            })
-                        );
-                    }
-
-                    paragraphs.push(
-                        new Paragraph({
-                            children: runs,
-                        })
-                    );
-                }
-            }
-
-            const doc = new Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: paragraphs,
-                    },
-                ],
-            });
-
-            const blob = await Packer.toBlob(doc);
-
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "note.docx";
-            a.click();
-
-            URL.revokeObjectURL(url);
-        }
-    }));
+    useEditorExports(editor, editorRef);
 
     if (!isSynced) return (
         <div className="flex flex-col items-center justify-center gap-2">

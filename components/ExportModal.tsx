@@ -1,9 +1,10 @@
 import React from 'react';
 import * as style from './styles.module.css';
-import type { TipTapEditorHandle } from '~types/noteTypes';
-import { FaRegFilePdf } from "react-icons/fa6";
+import type { TipTapEditorHandle } from '../hooks/useEditorExports';
+import { TbFileTypePdf } from "react-icons/tb";
 import { TbFileTypeHtml } from "react-icons/tb";
-import { AiOutlineFileMarkdown } from "react-icons/ai";
+import { TbMarkdown } from "react-icons/tb";
+import { TbFileTypeDocx } from "react-icons/tb";
 
 export const ExportModal = ({
     customColor,
@@ -38,9 +39,9 @@ export const ExportModal = ({
                             editorRef.current?.exportMarkdown()}
                         }
                     >
-                        <span>Export as Markdown</span>
+                        <span>Markdown</span>
 
-                        <AiOutlineFileMarkdown size={24} />
+                        <TbMarkdown size={24} />
                     </button>
 
                     <button 
@@ -50,7 +51,7 @@ export const ExportModal = ({
                             editorRef.current?.exportHtml()}
                         }
                     >
-                        <span>Export as HTML</span>
+                        <span>HTML</span>
 
                         <TbFileTypeHtml size={24} />
                     </button>
@@ -62,9 +63,24 @@ export const ExportModal = ({
                             editorRef.current?.exportPdf()}
                         }
                     >
-                        <span>Export as PDF</span>
+                        <span className='flex gap-2'>
+                            PDF
+                            <span
+                                className="
+                                    text-[10px]
+                                    py-1
+                                    px-1
+                                    rounded-full
+                                    bg-amber-400
+                                    text-purple-600
+                                    font-medium
+                                "
+                            >
+                                Recommended
+                            </span>
+                        </span>
 
-                        <FaRegFilePdf size={24} />
+                        <TbFileTypePdf size={24} />
                     </button>
 
                     <button 
@@ -74,9 +90,9 @@ export const ExportModal = ({
                             editorRef.current?.exportDocx()}
                         }
                     >
-                        <span>Export as DOCX shit</span>
+                        <span>DOCX</span>
 
-                        <FaRegFilePdf size={24} />
+                        <TbFileTypeDocx size={24} />
                     </button>
                 </div>
 

@@ -38,4 +38,5 @@ export type TipTapEditorHandle = {
     exportMarkdown: () => void;
     exportHtml: () => void;
     exportPdf: () => void;
+    exportDocx: () => void;
 }

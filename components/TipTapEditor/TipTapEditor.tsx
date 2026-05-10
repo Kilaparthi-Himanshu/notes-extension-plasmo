@@ -31,6 +31,12 @@ import { debounce } from "~lib/sync-engine/debounce";
 import { supabase } from "~lib/supabase";
 import NoteSpinner from "../misc/NoteSpinner";
 import { Markdown } from "@tiptap/markdown";
+import {
+    Document,
+    Packer,
+    Paragraph,
+    TextRun,
+} from "docx";
 
 // Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
 //
@@ -471,8 +477,6 @@ export default function TipTapEditor({
             printWindow.document.write(`
                 <html>
                     <head>
-                        <title>Note Export</title>
-
                         <style>
                             body {
                                 font-family: sans-serif;
@@ -511,6 +515,80 @@ export default function TipTapEditor({
             }, 300);
             console.log("GG WP RA BABU");
         },
+
+        async exportDocx() {
+            if (!editor) return;
+
+            const json = editor.getJSON();
+
+            const paragraphs: Paragraph[] = [];
+
+            for (const node of json.content ?? []) {
+                if (node.type === "paragraph") {
+                    const runs: TextRun[] = [];
+
+                    for (const child of node.content ?? []) {
+                        if (child.type !== "text") continue;
+
+                        const marks = child.marks ?? [];
+
+                        const textStyleMark = marks.find(m => m.type === "textStyle");
+
+                        const rawColor = textStyleMark?.attrs?.color;
+
+                        const docxColor = rawColor
+                            ? rgbToHex(rawColor).replace("#", "")
+                            : undefined;
+
+                        runs.push(
+                            new TextRun({
+                                text: (child as any).text ?? "",
+
+                                bold: marks.some(m => m.type === "bold"),
+                                italics: marks.some(m => m.type === "italic"),
+                                strike: marks.some(m => m.type === "strike"),
+
+                                color: docxColor,
+
+                                size:
+                                    (
+                                        parseInt(
+                                            marks.find(m => m.type === "textStyle")
+                                                ?.attrs?.fontSize ?? "16"
+                                        )
+                                    ) * 2,
+                            })
+                        );
+                    }
+
+                    paragraphs.push(
+                        new Paragraph({
+                            children: runs,
+                        })
+                    );
+                }
+            }
+
+            const doc = new Document({
+                sections: [
+                    {
+                        properties: {},
+                        children: paragraphs,
+                    },
+                ],
+            });
+
+            const blob = await Packer.toBlob(doc);
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "note.docx";
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
     }));
 
     if (!isSynced) return (

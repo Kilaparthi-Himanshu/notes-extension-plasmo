@@ -3,6 +3,7 @@ module.exports = {
   mode: "jit",
   darkMode: "class",
   content: [
+    "./options/pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./contents/**/*.{ts,tsx}",
     "./hooks/**/*.{ts,tsx}",

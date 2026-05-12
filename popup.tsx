@@ -341,20 +341,63 @@ function IndexPopup () {
                 >
                     <div className='flex flex-col items-center py-1'>
                         {session ? (
-                            <div>
-                                <div>Signed in as: &nbsp;
-                                    <span className='bg-green-700 px-1 rounded-md'>{session.user.email}
+                            <div className='flex justify-between gap-2 items-center'>
+                                <div>
+                                    <div>
+                                    Signed in as: &nbsp;
+                                        <span className='bg-green-700 px-1 rounded-md'>{session.user.email}
+                                            </span>
+                                    </div>
+
+                                    <div>
+                                        Subscription Plan: &nbsp;
+                                        <span className={`capitalize ${userDetails?.subscription_status === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.subscription_status === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
+                                            {userDetails?.subscription_status}
                                         </span>
                                     </div>
-                                <div>
-                                    Subscription Plan: &nbsp;
-                                    <span className={`capitalize ${userDetails?.subscription_status === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.subscription_status === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
-                                        {userDetails?.subscription_status}
-                                    </span>
+                                </div>
+
+                                <div className='flex flex-col gap-2'>
+                                    <button
+                                        onClick={() => {
+                                            chrome.tabs.create({
+                                                url: chrome.runtime.getURL("options.html#/signin")
+                                            });
+                                        }}
+                                        className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded-md transition-all"
+                                    >
+                                        Sign Out
+                                    </button>
+
+                                    <button
+                                        onClick={() => chrome.runtime.openOptionsPage()}
+                                        className="bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded-md transition-all"
+                                    >
+                                        Options
+                                    </button>
                                 </div>
                             </div>
                         ) : (
-                            <div>Not signed in</div>
+                            <div className='flex justify-between gap-2 items-center'>
+                                Not signed in
+                                <button
+                                    onClick={() => {
+                                        chrome.tabs.create({
+                                            url: chrome.runtime.getURL("options.html#/signin")
+                                        });
+                                    }}
+                                    className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded-md transition-all"
+                                >
+                                    Sign In
+                                </button>
+
+                                <button
+                                    onClick={() => chrome.runtime.openOptionsPage()}
+                                    className="bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded-md transition-all"
+                                >
+                                    Options
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>

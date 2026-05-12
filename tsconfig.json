@@ -11,7 +11,7 @@
   ],
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "target": "ESNext",
     "lib": ["DOM", "ESNext"],
     "esModuleInterop": true,

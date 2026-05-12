@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { supabase } from "~lib/supabase";
-import "./styles/global.css";
-import NoteToGoIcon from "./assets/icon.png";
-import TrafficLights from "./components//misc/TrafficLight";
-import DebugButtons from "./components/misc/DebugButtons";
+import "~styles/global.css";
+import NoteToGoIcon from "~assets/icon.png";
+import TrafficLights from "../../components/misc/TrafficLight";
+import DebugButtons from "../../components/misc/DebugButtons";
 import type { Session } from "~node_modules/@supabase/auth-js/dist/module";
+import googleLogo from "~assets/google_logo.png"
 
 function Options() {
     const [user, setUser] = useState<any>(null);
@@ -181,6 +182,78 @@ function Options() {
         chrome.runtime.sendMessage({ type: "PRINT_SESSION" });
     }
 
+    const signInWithGoogle = async () => {
+        const manifest = chrome.runtime.getManifest();
+
+        const url = new URL(
+            "https://accounts.google.com/o/oauth2/auth"
+        );
+
+        url.searchParams.set(
+            "client_id",
+            manifest.oauth2.client_id
+        );
+
+        url.searchParams.set(
+            "response_type",
+            "id_token"
+        );
+
+        url.searchParams.set(
+            "redirect_uri",
+            `https://${chrome.runtime.id}.chromiumapp.org`
+        );
+
+        url.searchParams.set(
+            "scope",
+            manifest.oauth2.scopes.join(" ")
+        );
+
+        chrome.identity.launchWebAuthFlow(
+            {
+                url: url.href,
+                interactive: true,
+            },
+            async (redirectedTo) => {
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                    return;
+                }
+
+                if (!redirectedTo) return;
+
+                const responseUrl = new URL(redirectedTo);
+
+                const params = new URLSearchParams(
+                    responseUrl.hash.substring(1)
+                );
+
+                const token = params.get("id_token");
+
+                if (!token) {
+                    alert("No Google token received");
+                    return;
+                }
+
+                const { data, error } =
+                    await supabase.auth.signInWithIdToken({
+                        provider: "google",
+                        token,
+                    });
+
+                if (error) {
+                    console.error(error);
+                    alert("Google sign in failed");
+                    return;
+                }
+
+                console.log(data);
+
+                alert("Signed in successfully!");
+            }
+        );
+    }
+
     const inputClasses = "w-full rounded-xl h-[45px] text-violet-300 text-xl px-2 outline-none border-2 border-transparent focus:border-2 focus:border-purple-400 bg-neutral-800 transition-[border] duration-[100ms]";
 
     return (
@@ -192,7 +265,7 @@ function Options() {
                 className="w-full h-full absolute z-0"
             />
 
-            <DebugButtons user={user} userDetails={userDetails} supabase={supabase} />
+            {/* <DebugButtons user={user} userDetails={userDetails} supabase={supabase} /> */}
 
             <div className="w-full flex items-center justify-center h-[200px] gap-[20px] z-10">
                 <span className="text-8xl max-sm:text-6xl text-white underline decoration-purple-200 decoration-[4px] underline-offset-4">NoteToGo</span>
@@ -270,6 +343,19 @@ function Options() {
                                     )}
                                 </div>
                             </div>
+
+                            <button 
+                                className="w-full rounded-xl h-[45px] text-violet-300 text-xl px-2 outline-none border-2 border-transparent hover:border-2 hover:border-purple-400 bg-neutral-800 transition-all duration-[100ms] active:scale-95 flex items-center justify-center gap-4"
+                                type="button"
+                                onClick={signInWithGoogle}
+                            >
+                                <img src={googleLogo}
+                                    alt="Google logo"
+                                    className="w-6 h-6" 
+                                />
+
+                               <span> Continue with Google</span>
+                            </button>
                         </>
                     ) : (
                         <>

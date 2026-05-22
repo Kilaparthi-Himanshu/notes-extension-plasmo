@@ -6,7 +6,8 @@ import NoteToGoIcon from "~assets/icon.png";
 import TrafficLights from "../../components/misc/TrafficLight";
 import DebugButtons from "../../components/misc/DebugButtons";
 import type { Session } from "~node_modules/@supabase/auth-js/dist/module";
-import googleLogo from "~assets/google_logo.png"
+import googleLogo from "~assets/google_logo.png";
+import githubLogo from "~assets/github_logo.png";
 
 function Options() {
     const [user, setUser] = useState<any>(null);
@@ -107,8 +108,8 @@ function Options() {
 
         const redirectUrl =
             process.env.NODE_ENV == "development"
-            ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html"
-            : "chrome-extension://aacbmfpcgjlmefmhhbafimdaefpifkjk/options.html"
+            ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html#/signin"
+            : "chrome-extension://aacbmfpcgjlmefmhhbafimdaefpifkjk/options.html#/signin";
 
         if (!email || !password || !confirmPassword) {
             alert("All Fields Must Be Filled!");
@@ -247,8 +248,6 @@ function Options() {
                     return;
                 }
 
-                console.log(data);
-
                 alert("Signed in successfully!");
             }
         );
@@ -286,9 +285,11 @@ function Options() {
                         <TrafficLights />
                     </div>
 
+                    {!user && <span className='w-max text-4xl font-semibold text-center'>Welcome to<br /> NoteToGo</span>}
+
                     {!user ? (
                         <>
-                            <div className="w-full h-[30px] relative">
+                            {/* <div className="w-full h-[30px] relative">
                                 <span className="text-4xl absolute -top-3 -left-3">
                                     {actionType === 'signin' ? 'Sign In' : 'Sign Up'}
                                 </span>
@@ -342,20 +343,37 @@ function Options() {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             <button 
                                 className="w-full rounded-xl h-[45px] text-violet-300 text-xl px-2 outline-none border-2 border-transparent hover:border-2 hover:border-purple-400 bg-neutral-800 transition-all duration-[100ms] active:scale-95 flex items-center justify-center gap-4"
                                 type="button"
                                 onClick={signInWithGoogle}
                             >
-                                <img src={googleLogo}
-                                    alt="Google logo"
-                                    className="w-6 h-6" 
-                                />
+                                <div className="w-8 flex justify-center">
+                                    <img src={googleLogo}
+                                        alt="Google logo"
+                                        className="w-6 h-6" 
+                                    />
+								</div>
 
-                               <span> Continue with Google</span>
+                               <span>Continue with Google</span>
                             </button>
+
+                            {/* <button 
+                                className="w-full rounded-xl h-[45px] text-violet-300 text-xl px-2 outline-none border-2 border-transparent hover:border-2 hover:border-purple-400 bg-neutral-800 transition-all duration-[100ms] active:scale-95 flex items-center justify-center gap-4"
+                                type="button"
+                                onClick={signInWithGoogle}
+                            >
+                                <div className="w-8 flex justify-center">
+                                    <img src={githubLogo}
+                                        alt="GitHub logo"
+                                        className="w-6 h-6" 
+                                    />
+								</div>
+
+                               <span>Continue with GitHub</span>
+                            </button> */}
                         </>
                     ) : (
                         <>

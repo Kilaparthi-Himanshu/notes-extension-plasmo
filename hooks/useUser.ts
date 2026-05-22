@@ -42,7 +42,7 @@ export function useUser() {
         return () => {
             listener.subscription.unsubscribe();
         }
-    }, []);
+    }, []); 
 
     return useQuery({
         queryKey: ['user'],

@@ -50,7 +50,7 @@ const MenuBar = ({ editor, editorState, theme }: {
             <div className="flex space-x-2 items-center">
                 <button
                     onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bold") ? highlightColor : ""}`}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bold") ? highlightColor : ""} cursor-pointer`}
                     title="Bold"
                 >
                     <Bold size={16} />
@@ -123,7 +123,7 @@ const MenuBar = ({ editor, editorState, theme }: {
                         color: theme === "light" ? "black" : "white",
                         border: theme === "light" ? "1px solid #262626" : "1px solid white",
                     }}
-                    className="rounded-lg max-w-[97px] text-sm h-[20px]" // original is 64px
+                    className="rounded-lg max-w-[97px] text-sm h-[20px] cursor-pointer" // original is 64px
                 >
                     <option value="" disabled className='hidden'></option>
                     <option value="Gill Sans MT">Gill Sans MT</option>
@@ -217,7 +217,7 @@ const MenuBar = ({ editor, editorState, theme }: {
 
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'left' }) ? highlightColor : ''}`}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'left' }) ? highlightColor : ''} cursor-pointer`}
                     title="Align Left"
                 >
                     <FiAlignLeft />
@@ -225,7 +225,7 @@ const MenuBar = ({ editor, editorState, theme }: {
 
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'center' }) ? highlightColor : ''}`}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'center' }) ? highlightColor : ''} cursor-pointer`}
                     title="Align Center"
                 >
                     <FiAlignCenter />
@@ -233,7 +233,7 @@ const MenuBar = ({ editor, editorState, theme }: {
 
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'right' }) ? highlightColor : ''}`}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'right' }) ? highlightColor : ''} cursor-pointer`}
                     title="Align Right"
                 >
                     <FiAlignRight />
@@ -241,7 +241,7 @@ const MenuBar = ({ editor, editorState, theme }: {
 
                 <button
                     onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'justify' }) ? highlightColor : ''}`}
+                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'justify' }) ? highlightColor : ''} cursor-pointer`}
                     title="Align Justify"
                 >
                     <FiAlignJustify />

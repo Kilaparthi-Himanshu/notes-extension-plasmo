@@ -5,7 +5,7 @@ import { useEffect } from "react";
 export type UserDetailsType = {
     created_at: string;
     email: string;
-    subscription_status: string;
+    plan: "free" | "pro";
     user_id: string;
 }
 

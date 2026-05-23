@@ -388,8 +388,8 @@ function Options() {
 
                                     <div>
                                         <span>Subscription Plan:<br /></span>
-                                        <b className={`text-2xl capitalize ${userDetails?.subscription_status === 'pro' && 'text-yellow-400'}`}>
-                                            {userDetails?.subscription_status}
+                                        <b className={`text-2xl capitalize ${userDetails?.plan === 'pro' && 'text-yellow-400'}`}>
+                                            {userDetails?.plan}
                                         </b>
                                     </div>
                                 </div>

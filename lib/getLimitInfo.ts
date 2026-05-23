@@ -3,7 +3,7 @@ import type { NoteType } from '../types/noteTypes';
 import { FREE_MAX_SYNCED_NOTES_COUNT } from './constants';
 
 export async function getLimitInfo(userDetails?: UserDetailsType, notes: NoteType[] = []) {
-    const isPro = userDetails?.subscription_status === "pro";
+    const isPro = userDetails?.plan === "pro";
 
     const totalSyncedNotesCount = notes.reduce(
         (count, n) => count + (n.sync ? 1 : 0),

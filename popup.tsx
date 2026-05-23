@@ -351,8 +351,8 @@ function IndexPopup () {
 
                                     <div>
                                         Subscription Plan: &nbsp;
-                                        <span className={`capitalize ${userDetails?.subscription_status === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.subscription_status === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
-                                            {userDetails?.subscription_status}
+                                        <span className={`capitalize ${userDetails?.plan === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.plan === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
+                                            {userDetails?.plan}
                                         </span>
                                     </div>
                                 </div>
@@ -416,7 +416,7 @@ function IndexPopup () {
                 <div className='w-full flex justify-between items-center border-b'>
                     <span className='px-2 pl-0 min-w-0 w-full flex-1 '>Synced Notes</span>
 
-                    {userDetails?.subscription_status !== "pro" 
+                    {userDetails?.plan !== "pro" 
                         ?
                             <span className='text-sm flex gap-2'>
                                 <p>

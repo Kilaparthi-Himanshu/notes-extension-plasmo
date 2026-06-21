@@ -326,8 +326,14 @@ function IndexPopup () {
         loadLimit();
     }, [userDetails, notes]);
 
+    function truncateTitle(title: string, max = 28) {
+        return title.length > max
+            ? title.slice(0, max) + "..."
+            : title;
+    }
+
     return (
-        <div className="popup p-1">
+        <div className="popup p-1 overflow-y-hidden">
             <div className='w-full h-max flex flex-col gap-2 p-2'>
                 <button 
                     onClick={handleInject}
@@ -339,25 +345,25 @@ function IndexPopup () {
                 <div
                     className='border border-purple-400 rounded-lg text-white w-full'
                 >
-                    <div className='flex flex-col items-center py-1'>
+                    <div className='p-1'>
                         {session ? (
                             <div className='flex justify-between gap-2 items-center'>
                                 <div>
                                     <div>
-                                    Signed in as: &nbsp;
+                                    Email: &nbsp;
                                         <span className='bg-green-700 px-1 rounded-md'>{session.user.email}
                                             </span>
                                     </div>
 
                                     <div>
-                                        Subscription Plan: &nbsp;
+                                        Plan: &nbsp;
                                         <span className={`capitalize ${userDetails?.plan === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.plan === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
                                             {userDetails?.plan}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className='flex flex-col gap-2'>
+                                <div className='flex flex-col gap-1'>
                                     <button
                                         onClick={() => {
                                             chrome.tabs.create({
@@ -380,23 +386,26 @@ function IndexPopup () {
                         ) : (
                             <div className='flex justify-between gap-2 items-center'>
                                 Not signed in
-                                <button
-                                    onClick={() => {
-                                        chrome.tabs.create({
-                                            url: chrome.runtime.getURL("options.html#/signin")
-                                        });
-                                    }}
-                                    className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded-md transition-all"
-                                >
-                                    Sign In
-                                </button>
 
-                                <button
-                                    onClick={() => chrome.runtime.openOptionsPage()}
-                                    className="bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded-md transition-all"
-                                >
-                                    Options
-                                </button>
+                                <div className='flex gap-1'>
+                                    <button
+                                        onClick={() => {
+                                            chrome.tabs.create({
+                                                url: chrome.runtime.getURL("options.html#/signin")
+                                            });
+                                        }}
+                                        className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded-md transition-all"
+                                    >
+                                        Sign In
+                                    </button>
+
+                                    <button
+                                        onClick={() => chrome.runtime.openOptionsPage()}
+                                        className="bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded-md transition-all"
+                                    >
+                                        Options
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -452,14 +461,14 @@ function IndexPopup () {
                         const textColor = getReadableTextColor(note.color);
 
                         return (
-                            <div className="saved-note border-2 border-green-600"
+                            <div className="saved-note border-2 border-green-600 overflow-hidden"
                                 style={{
                                     backgroundColor: note.color
                                 }}
                                 onDoubleClick={() => handleLoadNote(note, true)}
                                 key={note.id || index}
                             >
-                                <div className="saved-note-content">
+                                <div className="saved-note-content flex-1 min-w-0">
                                     <h2
                                         style={{
                                             color: textColor,
@@ -471,11 +480,11 @@ function IndexPopup () {
                                                 : "0 1px 1px rgba(255,255,255,0.25)"
                                         }}
                                     >
-                                        {note.title}
+                                        {truncateTitle(note.title)}
                                     </h2>
                                 </div>
 
-                                <div className="saved-note-buttons">
+                                <div className="saved-note-buttons justify-center">
                                     <button 
                                         className="open-button"
                                         onClick={() => handleLoadNote(note)}
@@ -546,7 +555,7 @@ function IndexPopup () {
                                 onDoubleClick={() => handleLoadNote(note, true)}
                                 key={note.id || index}
                             >
-                                <div className="saved-note-content">
+                                <div className="saved-note-content flex-1 min-w-0">
                                     <h2
                                         style={{
                                             color: textColor,
@@ -558,11 +567,11 @@ function IndexPopup () {
                                                 : "0 1px 1px rgba(255,255,255,0.25)"
                                         }}
                                     >
-                                        {note.title}
+                                        {truncateTitle(note.title)}
                                     </h2>
                                 </div>
 
-                                <div className="saved-note-buttons">
+                                <div className="saved-note-buttons justify-center">
                                     <button 
                                         className="open-button"
                                         onClick={() => handleLoadNote(note)}

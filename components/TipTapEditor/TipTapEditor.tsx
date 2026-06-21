@@ -419,8 +419,6 @@ export default function TipTapEditor({
         }
     }, [editor]);
 
-    console.log(editor.storage);
-
     useEditorExports(editor, editorRef);
 
     if (!isSynced) return (
@@ -462,6 +460,7 @@ export default function TipTapEditor({
                     minWidth: "100%",
                     overflowY: "auto",
                 }}
+                data-lenis-prevent
             />
 
             {canUseAdvancedEditor && showToolbar && (

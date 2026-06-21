@@ -497,13 +497,14 @@ function InjectReact({
                 >
                     <input
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(e) => canEditSyncedNote && setTitle(e.target.value)}
                         onKeyDown={(e) => e.stopPropagation()}
                         className={style.topbarInput}
                         style={{
                             backgroundColor: theme === "light" ? "#D9D9D9" : "#454545",
                             color: theme === "light" ? "black" : "white",
                             pointerEvents: requirePassword ? "none" : "auto",
+                            cursor: !canEditSyncedNote && 'not-allowed',
                         }}
                         placeholder="Enter The Title..."
                         title="Title"

@@ -9,14 +9,10 @@ import type { Session } from "~node_modules/@supabase/auth-js/dist/module";
 import googleLogo from "~assets/google_logo.png";
 import githubLogo from "~assets/github_logo.png";
 
-function Options() {
+function SignIn() {
     const [user, setUser] = useState<any>(null);
     const [userDetails, setUserDetails] = useState<any>(null);
     const [actionType, setActionType] = useState<'signup' | 'signin'>('signup');
-
-    useEffect(() => {
-        console.log("THE EXT ENV IS: ", process.env.NODE_ENV);
-    }, []);
 
     useEffect(() => {
         const init = async () => {
@@ -106,10 +102,9 @@ function Options() {
         const password = formData.get("password") as string;
         const confirmPassword = formData.get("confirmPassword") as string;
 
-        const redirectUrl =
-            process.env.NODE_ENV == "development"
-            ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html#/signin"
-            : "chrome-extension://aacbmfpcgjlmefmhhbafimdaefpifkjk/options.html#/signin";
+        const redirectUrl = chrome.runtime.getURL(
+            "options.html#/signin"
+        );
 
         if (!email || !password || !confirmPassword) {
             alert("All Fields Must Be Filled!");
@@ -380,8 +375,8 @@ function Options() {
                             <div className="w-full text-center">
                                 <div className="text-3xl text-wrap flex flex-col gap-6">
                                     <div>
-                                        <span>Signed In As:<br /></span>
-                                        <span className="underline text-2xl break-all">
+                                        <span className="font-semibold">Signed In As:<br /></span>
+                                        <span className="underline text-2xl break-all text-purple-400">
                                             {user.email}
                                         </span>
                                     </div>
@@ -406,4 +401,4 @@ function Options() {
     );
 }
 
-export default Options;
+export default SignIn;

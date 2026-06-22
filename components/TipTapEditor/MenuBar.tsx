@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Editor } from "@tiptap/react";
-import { Bold, Italic, Underline, List, ListOrdered, Strikethrough } from "lucide-react";
+import { Bold, Italic, Underline, List, ListOrdered, Strikethrough, ListTodo } from "lucide-react";
 import styleText from "data-text:../styles.module.css";
 import { FaImages } from "react-icons/fa6";
 import { FiAlignLeft } from "react-icons/fi";
@@ -79,6 +79,13 @@ const MenuBar = ({ editor, editorState, theme }: {
                     >
                     <Strikethrough size={16} />
                 </button>
+
+                {/* <button
+                    onClick={() => editor.chain().focus().toggleTaskList().run()}
+                    className={editor.isActive('taskList') ? 'is-active' : ''}
+                >
+                    <ListTodo size={16} />
+                </button> */}
 
                 <div
                     className="relative hover:bg-neutral-400 p-1 rounded-lg flex items-center justify-center"

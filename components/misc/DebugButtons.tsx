@@ -41,10 +41,7 @@ export default function DebugButtons ({
                 </button>
 
                 <button className="bg-blue-200 p-4" onClick={() => {
-                    const redirectUrl =
-                        process.env.NODE_ENV == "development"
-                        ? "chrome-extension://jgemkmaojakmnlmbbjjokmkbpdngnckg/options.html"
-                        : "chrome-extension://omniokhaanekilmkofmbfnbchoaifnbh/options.html"
+                    const redirectUrl = chrome.runtime.getURL("options.html");
                         console.log(redirectUrl);
                 }}>
                     Print Redirect Email

@@ -16,6 +16,8 @@ function IndexPopup () {
         queryClient.invalidateQueries({ queryKey: ['user'] });
     }, []);
 
+    console.log("EXTENSION ID: ", chrome.runtime.id);
+
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);

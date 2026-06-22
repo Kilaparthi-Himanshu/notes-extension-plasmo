@@ -32,6 +32,7 @@ import { supabase } from "~lib/supabase";
 import NoteSpinner from "../misc/NoteSpinner";
 import { Markdown } from "@tiptap/markdown";
 import { useEditorExports, type TipTapEditorHandle } from "../../hooks/useEditorExports";
+// import { TaskItem, TaskList } from '@tiptap/extension-list';
 
 // Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
 //
@@ -184,7 +185,9 @@ export default function TipTapEditor({
     // Create provider synchronously on first render if realtime
     if (enableRealtime && !providerRef.current && !preventReconnectRef.current) {
         providerRef.current = new HocuspocusProvider({
-            url: "ws://localhost:1234",
+            url: process.env.NODE_ENV == "development" 
+                ? "ws://localhost:1234"
+                : "<SERVER_URL>",
             name: remoteId,
             document: ydocRef.current,
             onSynced() {
@@ -280,6 +283,14 @@ export default function TipTapEditor({
                 types: ['textStyle'],
             }),
             Highlight,
+            // TODO:
+            // Reintroduce TaskList support both in extension and server code.
+            // Current implementation conflicts with custom ListItemWithStyle.
+            // Investigate extending TaskItem instead of ListItem.
+            // TaskList,
+            // TaskItem.configure({
+            //     nested: true,
+            // }),
             CodeBlockLowlight.configure({
                 lowlight,
                 enableTabIndentation: true,

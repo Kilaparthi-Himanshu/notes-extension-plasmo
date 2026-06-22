@@ -74,3 +74,13 @@ chrome.commands.onCommand.addListener((command) => {
         });
     }
 });
+
+chrome.runtime.onInstalled.addListener(async (details) => {
+    if (details.reason === "update") {
+        chrome.tabs.create({
+            url: chrome.runtime.getURL(
+                "options.html#/whats-new"
+            )
+        });
+    }
+});

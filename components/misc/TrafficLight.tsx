@@ -11,21 +11,21 @@ export default function TrafficLights () {
                 />
             </svg> */}
 
-            <div className='bg-green-400 group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'>
+            <div className='bg-green-400 group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale] cursor-pointer'>
                 <Check
                 className="hidden group-hover:block transition-[display] relative text-[green] mx-[4px]"
                 size={10}
-                /> 
+                />
             </div>
 
-            <div className='bg-[#FFBF48] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale]'>
+            <div className='bg-[#FFBF48] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale] cursor-pointer'>
                 <Minimize
                 className="hidden group-hover:block transition-[display] relative text-[rgb(158,124,0)]"
                 size={14}
                 />
             </div>
 
-            <div className='bg-[#FF4848] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale] relative text-[darkred]'>
+            <div className='bg-[#FF4848] group rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center hover:scale-110 transition-[scale] relative text-[darkred] cursor-pointer'>
                 <X
                 className="hidden group-hover:block"
                 size={14}

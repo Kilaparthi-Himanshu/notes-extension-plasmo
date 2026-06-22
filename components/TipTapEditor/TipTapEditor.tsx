@@ -458,12 +458,30 @@ export default function TipTapEditor({
                         margin: 8px 0;
                         overflow-x: auto;
                     }
+
+                    /* Scrollbar */
+                    .textArea::-webkit-scrollbar {
+                        width: 10px;
+                    }
+
+                    .textArea::-webkit-scrollbar-track {
+                        background: transparent;
+                    }
+
+                    .textArea::-webkit-scrollbar-thumb {
+                        background: rgba(255,255,255,0.25);
+                        border-radius: 999px;
+                    }
+
+                    .textArea::-webkit-scrollbar-thumb:hover {
+                        background: rgba(255,255,255,0.45);
+                    }
                 `}
             </style>
 
             <EditorContent 
                 editor={editor}
-                className={`${styleText.textArea} size-full ${!canEditSyncedNote &&
+                className={`textArea size-full ${!canEditSyncedNote &&
                     "cursor-not-allowed"}`
                 }
                 style={{

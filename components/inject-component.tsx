@@ -651,8 +651,8 @@ function InjectReact({
                                         remoteId={remoteId}
                                         enableRealtime={sync && canEditSyncedNote}
                                         editorRef={editorRef}
-                                    />)
-                                }
+                                    />
+                                )}
 
                                 {/* <TipTapYjsEditor remoteId={remoteId} /> */}
 

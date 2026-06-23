@@ -33,7 +33,7 @@ import NoteSpinner from "../misc/NoteSpinner";
 import { Markdown } from "@tiptap/markdown";
 import { useEditorExports, type TipTapEditorHandle } from "../../hooks/useEditorExports";
 import { AlertTriangle } from "lucide-react";
-import { IoMdCloseCircle } from "~node_modules/react-icons/io";
+import { CircleX } from 'lucide-react';
 // import { TaskItem, TaskList } from '@tiptap/extension-list';
 
 // Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
@@ -204,6 +204,13 @@ export default function TipTapEditor({
                 providerRef.current = null;
 
                 preventReconnectRef.current = true;
+            },
+            token: async () => {
+                const {
+                    data: { session }
+                } = await supabase.auth.getSession();
+
+                return session?.access_token;
             }
         });
     }
@@ -485,30 +492,30 @@ export default function TipTapEditor({
             </style>
 
             {syncFailed && (
-                <div className="w-full bg-amber-500/90 text-gray-700 text-sm font-medium p-1 flex items-center justify-center gap-1">
-                    <span>
-                        Realtime sync is unavailable. Your changes are still being saved to cloud. If the issue still persists
+                <div className="w-full bg-amber-500/90 text-gray-700 text-sm font-medium p-1 px-3 flex items-center justify-center gap-1 relative">
+                    <span className="block text-center">
+                        Realtime sync is unavailable. Your changes are still being saved to cloud. If the issue still persists{" "}
+
+                        <button
+                            className="underline font-semibold hover:opacity-80 inline-flex gap-2 items-center"
+                            onClick={() => {
+                                window.open(
+                                    chrome.runtime.getURL("options.html#/bug-report"),
+                                    "_blank"
+                                );
+                            }}
+                        >
+                            submit a bug report.
+
+                            <AlertTriangle size={18} className="shrink-0" />
+                        </button>
                     </span>
 
                     <button
-                        className="underline font-semibold hover:opacity-80 flex gap-2 items-center"
-                        onClick={() => {
-                            window.open(
-                                chrome.runtime.getURL("options.html#/bug-report"),
-                                "_blank"
-                            );
-                        }}
-                    >
-                        <span>submit a bug report.</span>
-
-                        <AlertTriangle size={18} className="shrink-0" />
-                    </button>
-
-                    <button
-                        className="font-bold text-lg leading-none"
+                        className="absolute right-1 top-1"
                         onClick={() => setSyncFailed(false)}
                     >
-                        <IoMdCloseCircle size={20} className="text-red-500 shrink-0" />
+                        <CircleX size={20} className="text-red-500 shrink-0" />
                     </button>
                 </div>
             )}

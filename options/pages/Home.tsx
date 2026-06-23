@@ -5,6 +5,7 @@ import { FaSignInAlt } from "react-icons/fa";
 import { MdOutlineBugReport } from "react-icons/md";
 import TrafficLights from '~components/misc/TrafficLight';
 import { HiMiniSparkles } from "react-icons/hi2";
+import { FaCrown } from "react-icons/fa";
 
 function Home() {
     return (
@@ -52,6 +53,16 @@ function Home() {
                         <span className='text-center'>Whats New!</span>
 
                         <HiMiniSparkles size={30} className='text-center text-yellow-400' />
+                    </Link>
+
+                    <Link
+                        to="https://notetogo.vercel.app/"
+                        target='_blank'
+                        className="w-full h-[60px] text-violet-300 text-2xl outline-none border-2 border-transparent hover:border-2 hover:border-purple-400 bg-neutral-800 transition-all duration-[100ms] active:scale-95 flex items-center justify-between px-4 gap-4 rounded-xl"
+                    >
+                        <span className='text-center'>Get Pro!</span>
+
+                        <FaCrown size={30} className='text-center text-orange-400' />
                     </Link>
                 </div>
             </div>

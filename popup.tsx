@@ -10,6 +10,7 @@ import { deleteRemote } from '~lib/sync-engine/transport';
 import { FREE_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
 import { VisibleLimit } from "react-visible-limit";
 import { getLimitInfo } from "./lib/getLimitInfo";
+import NoteToGoIcon from "./assets/icon.png";
 
 function IndexPopup () {
     useEffect(() => {
@@ -337,73 +338,111 @@ function IndexPopup () {
     return (
         <div className="popup p-1 overflow-y-hidden">
             <div className='w-full h-max flex flex-col gap-2 p-2'>
-                <button 
+                <button
                     onClick={handleInject}
-                    className="add-note-button w-full h-[30px] flex items-center justify-center"
+                    className="w-full h-10 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-semibold text-lg shadow-lg shadow-purple-900/30 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                 >
-                    Add New Note
+                    Add New Note <img src={NoteToGoIcon} className='size-[18px]' />
                 </button>
 
-                <div
-                    className='border border-purple-400 rounded-lg text-white w-full'
-                >
-                    <div className='p-1'>
+                <div className="border border-purple-400 rounded-lg text-white w-full">
+                    <div className="p-1">
                         {session ? (
-                            <div className='flex justify-between gap-2 items-center'>
-                                <div>
-                                    <div>
-                                    Email: &nbsp;
-                                        <span className='bg-green-700 px-1 rounded-md'>{session.user.email}
-                                            </span>
+                            <div className="flex justify-between gap-2 items-center">
+                                {/* Left Side */}
+                                <div className="min-w-0 flex-1">
+                                    <div
+                                        className="truncate text-sm font-medium"
+                                        title={session.user.email}
+                                    >
+                                        {session.user.email}
                                     </div>
 
-                                    <div>
-                                        Plan: &nbsp;
-                                        <span className={`capitalize ${userDetails?.plan === 'pro' ? 'text-yellow-400 bg-yellow-700 px-1 rounded-md' : userDetails?.plan === 'free' ? 'text-blue-300 bg-blue-700 px-1 rounded-md' : ''}`}>
-                                            {userDetails?.plan}
+                                    <div className="mt-1 flex items-center gap-2 flex-wrap">
+                                        <span
+                                            className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${
+                                                userDetails?.plan === "pro"
+                                                    ? "bg-yellow-700 text-yellow-200"
+                                                    : "bg-blue-700 text-blue-200"
+                                            }`}
+                                        >
+                                            {userDetails?.plan === "pro"
+                                                ? "⭐ Pro"
+                                                : "Free"}
                                         </span>
+
+                                        {userDetails?.plan === "free" && (
+                                            <button
+                                                onClick={() =>
+                                                    chrome.tabs.create({
+                                                        url: "https://notetogo.vercel.app/",
+                                                    })
+                                                }
+                                                className="
+                                                    text-xs
+                                                    font-semibold
+                                                    px-2 py-0.5
+                                                    rounded-full
+                                                    bg-gradient-to-r
+                                                    from-orange-500
+                                                    to-yellow-500
+                                                    text-black
+                                                    hover:opacity-90
+                                                    transition-all
+                                                "
+                                            >
+                                                ✨ Get Pro
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className='flex flex-col gap-1'>
+                                {/* Right Side */}
+                                <div className="flex flex-col gap-1 shrink-0">
                                     <button
-                                        onClick={() => {
-                                            chrome.tabs.create({
-                                                url: chrome.runtime.getURL("options.html#/signin")
-                                            });
-                                        }}
-                                        className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded-md transition-all"
+                                        onClick={() => chrome.runtime.openOptionsPage()}
+                                        className="bg-cyan-600 hover:bg-cyan-700 text-sm px-3 py-1 rounded-md transition-all"
                                     >
-                                        Sign Out
+                                        Options
                                     </button>
 
                                     <button
-                                        onClick={() => chrome.runtime.openOptionsPage()}
-                                        className="bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded-md transition-all"
+                                        onClick={() => {
+                                            chrome.tabs.create({
+                                                url: chrome.runtime.getURL(
+                                                    "options.html#/signin"
+                                                ),
+                                            });
+                                        }}
+                                        className="bg-purple-600 hover:bg-purple-700 text-sm px-3 py-1 rounded-md transition-all"
                                     >
-                                        Options
+                                        Sign Out
                                     </button>
                                 </div>
                             </div>
                         ) : (
-                            <div className='flex justify-between gap-2 items-center'>
-                                Not signed in
+                            <div className="flex justify-between gap-2 items-center">
+                                <span className="text-sm text-gray-300">
+                                    Not signed in
+                                </span>
 
-                                <div className='flex gap-1'>
+                                <div className="flex gap-1">
                                     <button
                                         onClick={() => {
                                             chrome.tabs.create({
-                                                url: chrome.runtime.getURL("options.html#/signin")
+                                                url: chrome.runtime.getURL(
+                                                    "options.html#/signin"
+                                                ),
                                             });
                                         }}
-                                        className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded-md transition-all"
+                                        className="bg-purple-600 hover:bg-purple-700 text-sm px-3 py-1 rounded-md transition-all"
                                     >
                                         Sign In
                                     </button>
 
                                     <button
                                         onClick={() => chrome.runtime.openOptionsPage()}
-                                        className="bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded-md transition-all"
+                                        className="bg-cyan-600 hover:bg-cyan-700 text-sm px-3 py-1 rounded-md transition-all"
                                     >
                                         Options
                                     </button>

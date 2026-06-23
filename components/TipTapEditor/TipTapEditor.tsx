@@ -32,6 +32,8 @@ import { supabase } from "~lib/supabase";
 import NoteSpinner from "../misc/NoteSpinner";
 import { Markdown } from "@tiptap/markdown";
 import { useEditorExports, type TipTapEditorHandle } from "../../hooks/useEditorExports";
+import { AlertTriangle } from "lucide-react";
+import { IoMdCloseCircle } from "~node_modules/react-icons/io";
 // import { TaskItem, TaskList } from '@tiptap/extension-list';
 
 // Fix for ProseMirror/Yjs inside Shadow DOM environments (e.g. Chrome extensions)
@@ -181,6 +183,7 @@ export default function TipTapEditor({
     console.log("PREVENTRECONNECTREF: \n", preventReconnectRef);
 
     const [isSynced, setIsSynced] = useState(!enableRealtime);
+    const [syncFailed, setSyncFailed] = useState(false);
 
     // Create provider synchronously on first render if realtime
     if (enableRealtime && !providerRef.current && !preventReconnectRef.current) {
@@ -370,6 +373,8 @@ export default function TipTapEditor({
 
             isSyncedRef.current = true;
             setIsSynced(true); // unblock the UI
+            setSyncFailed(true);
+
             preventReconnectRef.current = true;
 
             editor.commands.setContent(content);
@@ -443,7 +448,7 @@ export default function TipTapEditor({
     if (!editor) return null;
 
     return (
-        <>
+        <div className="min-h-full min-w-full flex flex-col">
             <style>{hljsStyle as unknown as string}
                 {`
                     .hljs {
@@ -479,6 +484,35 @@ export default function TipTapEditor({
                 `}
             </style>
 
+            {syncFailed && (
+                <div className="w-full bg-amber-500/90 text-gray-700 text-sm font-medium p-1 flex items-center justify-center gap-1">
+                    <span>
+                        Realtime sync is unavailable. Your changes are still being saved to cloud. If the issue still persists
+                    </span>
+
+                    <button
+                        className="underline font-semibold hover:opacity-80 flex gap-2 items-center"
+                        onClick={() => {
+                            window.open(
+                                chrome.runtime.getURL("options.html#/bug-report"),
+                                "_blank"
+                            );
+                        }}
+                    >
+                        <span>submit a bug report.</span>
+
+                        <AlertTriangle size={18} className="shrink-0" />
+                    </button>
+
+                    <button
+                        className="font-bold text-lg leading-none"
+                        onClick={() => setSyncFailed(false)}
+                    >
+                        <IoMdCloseCircle size={20} className="text-red-500 shrink-0" />
+                    </button>
+                </div>
+            )}
+
             <EditorContent 
                 editor={editor}
                 className={`textArea size-full ${!canEditSyncedNote &&
@@ -493,10 +527,10 @@ export default function TipTapEditor({
             />
 
             {canUseAdvancedEditor && showToolbar && (
-                <div className="absolute bottom-4">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
                     <MenuBar editor={editor} editorState={editorState} theme={theme} />
                 </div>
             )}
-        </>
+        </div>
     );
 }

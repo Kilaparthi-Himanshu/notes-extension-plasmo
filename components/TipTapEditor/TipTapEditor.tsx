@@ -184,7 +184,7 @@ export default function TipTapEditor({
         providerRef.current = new HocuspocusProvider({
             url: process.env.NODE_ENV == "development" 
                 ? "ws://localhost:1234"
-                : "<SERVER_URL>",
+                : "wss://notetogo-server-production.up.railway.app",
             name: remoteId,
             document: ydocRef.current,
             onSynced() {
@@ -198,6 +198,8 @@ export default function TipTapEditor({
                 providerRef.current = null;
 
                 preventReconnectRef.current = true;
+
+                setSyncFailed(true);
             },
             token: async () => {
                 const {
@@ -506,7 +508,7 @@ export default function TipTapEditor({
                         className="absolute right-1 top-1"
                         onClick={() => setSyncFailed(false)}
                     >
-                        <CircleX size={20} className="text-red-500 shrink-0" />
+                        <CircleX size={20} className="text-white bg-red-500 shrink-0 rounded-full" />
                     </button>
                 </div>
             )}

@@ -327,7 +327,7 @@ function IndexPopup () {
             <div className='w-full h-max flex flex-col gap-2 p-2'>
                 <button
                     onClick={handleInject}
-                    className="w-full h-10 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-semibold text-lg shadow-lg shadow-purple-900/30 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+                    className="w-full h-7 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-semibold text-lg shadow-lg shadow-purple-900/30 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                 >
                     Add New Note <img src={NoteToGoIcon} className='size-[18px]' />
                 </button>
@@ -410,7 +410,7 @@ function IndexPopup () {
                         ) : (
                             <div className="flex justify-between gap-2 items-center">
                                 <span className="text-sm text-gray-300">
-                                    Not signed in
+                                    Not Signed In
                                 </span>
 
                                 <div className="flex gap-1">

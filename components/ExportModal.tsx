@@ -35,7 +35,6 @@ export const ExportModal = ({
                     <button 
                         className={`w-full flex justify-between ${theme === "light" ? "bg-neutral-800 text-stone-200" : "bg-white text-stone-700"} p-2 rounded-lg cursor-pointer active:scale-[97%] transition-all hover:outline hover:outline-purple-400`}
                         onClick={() => {
-                            console.log("SEE THIS: ", editorRef);
                             editorRef.current?.exportMarkdown()}
                         }
                     >
@@ -47,7 +46,6 @@ export const ExportModal = ({
                     <button 
                         className={`w-full flex justify-between ${theme === "light" ? "bg-neutral-800 text-stone-200" : "bg-white text-stone-700"} p-2 rounded-lg cursor-pointer active:scale-[97%] transition-all hover:outline hover:outline-purple-400`}
                         onClick={() => {
-                            console.log("SEE THIS: ", editorRef);
                             editorRef.current?.exportHtml()}
                         }
                     >
@@ -59,7 +57,6 @@ export const ExportModal = ({
                     <button 
                         className={`w-full flex justify-between ${theme === "light" ? "bg-neutral-800 text-stone-200" : "bg-white text-stone-700"} p-2 rounded-lg cursor-pointer active:scale-[97%] transition-all hover:outline hover:outline-purple-400`}
                         onClick={() => {
-                            console.log("SEE THIS: ", editorRef);
                             editorRef.current?.exportPdf()}
                         }
                     >
@@ -86,7 +83,6 @@ export const ExportModal = ({
                     <button 
                         className={`w-full flex justify-between ${theme === "light" ? "bg-neutral-800 text-stone-200" : "bg-white text-stone-700"} p-2 rounded-lg cursor-pointer active:scale-[97%] transition-all hover:outline hover:outline-purple-400`}
                         onClick={() => {
-                            console.log("SEE THIS: ", editorRef);
                             editorRef.current?.exportDocx()}
                         }
                     >

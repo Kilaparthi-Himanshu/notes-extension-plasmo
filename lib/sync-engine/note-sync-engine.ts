@@ -47,14 +47,12 @@ export class NoteSyncEngine {
 
     firstLocalSave(note: NoteType) {
         this.note = note;
-        console.log(this.note);
         persistLocal(this.note);
     }
 
     updateNote(note: NoteType) {
         this.note = note;
 
-        console.log(note.content);
 
         persistLocal(this.note);
 
@@ -62,7 +60,6 @@ export class NoteSyncEngine {
 
         if (this.skipNextSave) {
             this.skipNextSave = false;
-            console.log("Skipped DB write (remote update)");
             return;
         }
 
@@ -80,8 +77,6 @@ export class NoteSyncEngine {
                 updated_by: this.clientId,
             })
             .select();
-
-        console.log(data);
 
         if (error) console.log("Error: ", error);
     }

@@ -160,7 +160,6 @@ export default function TipTapEditor({
     editorRef
 }: TipTapEditorProps) {
     const { canUseAdvancedEditor } = useFeatureFlags();
-    console.log("CONTENT: ", content);
 
     const lowlight = createLowlight(all);
 
@@ -176,11 +175,6 @@ export default function TipTapEditor({
     // Populatigng contentRef
     const contentRef = useRef(content);
     const hasSeededRef = useRef(false);
-
-    console.log("\n", ydocRef.current);
-    console.log("PROVIDERREF: \n", providerRef.current);
-    console.log("REMOTEID: \n", remoteId);
-    console.log("PREVENTRECONNECTREF: \n", preventReconnectRef);
 
     const [isSynced, setIsSynced] = useState(!enableRealtime);
     const [syncFailed, setSyncFailed] = useState(false);
@@ -324,7 +318,6 @@ export default function TipTapEditor({
 
             const html = editor.getHTML();
             onChange(html);
-            console.log("WTF");
 
             // saveContent(html);
         },
@@ -386,12 +379,10 @@ export default function TipTapEditor({
 
             editor.commands.setContent(content);
 
-            console.log("PROVIDER RA BABU: ", providerRef.current);
             // providerRef.current?.disconnect();
             // providerRef.current?.destroy();
             // providerRef.current = null;
             forceStopProvider(providerRef.current);
-            console.log("PROVIDER RA BABU: ", providerRef.current);
         }, 5000);
 
         return () => clearTimeout(timeout);

@@ -43,8 +43,6 @@ function InjectReact({
 }) {
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: ['user'] });
-        console.log("Note: ", initialNote);
-        console.log("Note Limit Info: ", limitInfo);
     }, []);
 
     const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
@@ -312,7 +310,6 @@ function InjectReact({
             canSync: sync,
             canEditSyncedNote,
             onExternalUpdate: (incomingMeta: Partial<NoteType>) => {
-                console.log("onExternalUpdate");
                 setNote(prev => ({
                     ...prev,
                     ...incomingMeta,
@@ -338,7 +335,6 @@ function InjectReact({
 
     useEffect(() => {
         if (saved) {
-            console.log(remoteId);
             syncEngineRef.current?.updateNote(assembleNote());
         }
     }, [content, title, position, theme, customColor, pinned, width, height, active, isPasswordProtected, password, email, glassEffect, showToolbar, sync, remoteId]);
@@ -422,8 +418,6 @@ function InjectReact({
         borderBottomRightRadius: '16px',
         borderTop: '0px'
     }
-
-    console.log("INJECT INFO: ", sync, canEditSyncedNote);
 
     return (
         <>

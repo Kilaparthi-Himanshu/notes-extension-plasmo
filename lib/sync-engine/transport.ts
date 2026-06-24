@@ -35,8 +35,6 @@ export async function updateRemote(
         .select("version")
         .single();
 
-    console.log("DATA: ", data, error);
-
     if (error) return { success: false, error }
 
     return { success: true, version: data.version }

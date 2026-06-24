@@ -172,7 +172,6 @@ function SignIn() {
             .auth
             .getSession();
 
-        console.log("Session from storage:", data.session);
         setUser(data.session?.user ?? null);
 
         chrome.runtime.sendMessage({ type: "PRINT_SESSION" });

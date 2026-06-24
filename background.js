@@ -39,7 +39,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Retrieve notes from storage
         chrome.storage.local.get("notes", (result) => {
             const notes = result.notes || [];
-            console.log("GGWPGGWP: ", result.notes);
             sendResponse({ notes });
         });
         return true; // Keep the message channel open for sendResponse
@@ -48,14 +47,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 supabase.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_OUT") {
-        console.log(chrome.storage.local.session);
         chrome.storage.local.remove("session");
-        console.log("Session removed!");
     }
 
     if (event === "SIGNED_IN") {
         chrome.storage.local.set({ session });
-        console.log("Session created!");
     }
 });
 

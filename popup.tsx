@@ -17,8 +17,6 @@ function IndexPopup () {
         queryClient.invalidateQueries({ queryKey: ['user'] });
     }, []);
 
-    console.log("EXTENSION ID: ", chrome.runtime.id);
-
     const [search, setSearch] = useState("");
     const [notes, setNotes] = useState<any>([]);
     const [resetDisabled, setResetDisabled] = useState(false);
@@ -37,13 +35,8 @@ function IndexPopup () {
         return () => document.removeEventListener("keydown", handleSearch);
     }, []);
 
-    useEffect(() => {
-        console.log(isFetching);
-    }, [isFetching]);
-
     const getNotes = async () => {
         const response = await chrome.storage.local.get("notes");
-        console.log("UGG: ", response?.notes);
         return response?.notes ?? [];
     };
 
@@ -222,15 +215,12 @@ function IndexPopup () {
         // local notes = local synced + local unsynced
         const localNotes: NoteType[] = await getNotes();
 
-        console.log("NOTES xD: ", localNotes);
 
         // If user is not signed in -> only show local notes
         if (!session || !navigator.onLine) {
             setNotes(localNotes);
-            console.log("NO SESSION: ", session, localNotes);
             return;
         }
-        console.log("SESSION: ", session, localNotes);
 
         // remote notes = remote synced (might or might not exist locally)
         let remoteNotes: NoteType[] = [];
@@ -258,8 +248,6 @@ function IndexPopup () {
             if (!n.sync) return true; // if it is non synced note let it pass through
             return remoteIds.has(n.remoteId); // if it is synced and exists both locally and remotely let is pass through
         });
-
-        console.log("NOTES FILTERED xD: ", filterLocal);
 
         // Merge synced new, synced existing and local notes
         const localSynced = filterLocal.filter(n => n.sync);
@@ -305,7 +293,6 @@ function IndexPopup () {
         }
 
         await chrome.storage.local.set({ notes: merged });
-        console.log("MERGED: ", merged);
 
         setNotes(merged);
     }

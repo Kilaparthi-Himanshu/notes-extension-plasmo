@@ -159,7 +159,9 @@ function SignIn() {
     const signOut = async () => {
         const { error } = await supabase
             .auth
-            .signOut();
+            .signOut({
+                scope: 'local'
+            });
 
         if (error) {
             alert(`Error Signing Out, Please Try Again!, ${error.message}`);

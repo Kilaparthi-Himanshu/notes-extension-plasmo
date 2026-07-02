@@ -33,7 +33,9 @@ export default function DebugButtons ({
 
                 <button className="bg-blue-200 p-4"
                     onClick={async () => {
-                        const { error } = await supabase.auth.signOut();
+                        const { error } = await supabase.auth.signOut({
+                            scope: 'local'
+                        });
                         console.log(error);
                     }}
                 >

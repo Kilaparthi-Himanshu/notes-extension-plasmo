@@ -362,7 +362,7 @@ function IndexPopup () {
                                             <button
                                                 onClick={() =>
                                                     chrome.tabs.create({
-                                                        url: "https://notetogo.vercel.app/",
+                                                        url: "https://notetogo.vercel.app/?scroll=pricing",
                                                     })
                                                 }
                                                 className="

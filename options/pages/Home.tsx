@@ -56,9 +56,9 @@ function Home() {
                     </Link>
 
                     <Link
-                        to="https://notetogo.vercel.app/"
+                        to="https://notetogo.vercel.app/?scroll=pricing"
                         target='_blank'
-                        className="w-full h-[60px] text-violet-300 text-2xl outline-none border-2 border-transparent hover:border-2 hover:border-purple-400 bg-neutral-800 transition-all duration-[100ms] active:scale-95 flex items-center justify-between px-4 gap-4 rounded-xl"
+                        className="w-full h-[60px] text-violet-300 wtext-2xl outline-none border-2 border-transparent hover:border-2 hover:border-purple-400 bg-neutral-800 transition-all duration-[100ms] active:scale-95 flex items-center justify-between px-4 gap-4 rounded-xl"
                     >
                         <span className='text-center'>Get Pro!</span>
 

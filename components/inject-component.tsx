@@ -582,7 +582,7 @@ function InjectReact({
                         </button>
                     </div>
                     <DropdownContext.Provider value={{
-                            theme , handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached, showExportModal,setShowExportModal
+                            session, theme, handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached, showExportModal,setShowExportModal
                         }}
                     >
                         <DropDown />

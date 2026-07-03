@@ -11,22 +11,26 @@ const SyncToggle = ({
     handleClose: () => void;
 }) => {
 
-    const { sync, setShowSyncConfirmationModal, syncToggleEnable, theme, saved, maxSyncReached } = useContext(DropdownContext);
+    const { session, sync, setShowSyncConfirmationModal, syncToggleEnable, theme, saved, maxSyncReached } = useContext(DropdownContext);
 
     const handleToolbarToggle = () => {
         setShowSyncConfirmationModal(true);
         handleClose();
     }
 
+    console.log(session);
+
     const titleForSync = () => {
         return sync 
             ? 'You Cannot Turn Off Sync' 
-            : !saved 
-                ? 'Save The Note To Enable Sync' 
-                : !syncToggleEnable 
-                    ? maxSyncReached ? 'Free Tier Sync Limit Reached' 
-                    : 'Internet connection required to edit a synced note.' 
-                : 'Turn On Sync';
+            : !session 
+                ? 'Sign In To Turn On Sync'
+                : !saved 
+                    ? 'Save The Note To Enable Sync' 
+                    : !syncToggleEnable 
+                        ? maxSyncReached ? 'Free Tier Sync Limit Reached' 
+                        : 'Internet connection required to edit a synced note.' 
+                    : 'Turn On Sync';
     }
 
     return (

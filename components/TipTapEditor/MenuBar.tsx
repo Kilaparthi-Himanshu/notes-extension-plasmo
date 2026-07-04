@@ -17,7 +17,7 @@ export const getStyle = () => {
     return style
 }
 
-const MenuBar = ({ editor, editorState, theme }: { 
+const MenuBar = ({ editor, editorState, theme, canUseAdvancedEditor }: { 
     editor: Editor | null; 
     editorState: {
         fontSize: number;
@@ -27,6 +27,7 @@ const MenuBar = ({ editor, editorState, theme }: {
         canRedo: boolean;
     };
     theme: string;
+    canUseAdvancedEditor: boolean;
 }) => {
     if (!editor) return null;
 
@@ -64,21 +65,25 @@ const MenuBar = ({ editor, editorState, theme }: {
                     <Italic size={16} />
                 </button>
 
-                <button
-                    onClick={() => editor.chain().focus().toggleUnderline().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("underline") ? highlightColor : ""} cursor-pointer`}
-                    title="Underline"
-                >
-                    <Underline size={16} />
-                </button>
-
-                <button
-                    onClick={() => editor.chain().focus().toggleStrike().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("strike") ? highlightColor : ""} cursor-pointer`}
-                    title="Strikethrough"
+                {canUseAdvancedEditor && 
+                    <button
+                        onClick={() => editor.chain().focus().toggleUnderline().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("underline") ? highlightColor : ""} cursor-pointer`}
+                        title="Underline"
                     >
-                    <Strikethrough size={16} />
-                </button>
+                        <Underline size={16} />
+                    </button>
+                }
+
+                {canUseAdvancedEditor && 
+                    <button
+                        onClick={() => editor.chain().focus().toggleStrike().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("strike") ? highlightColor : ""} cursor-pointer`}
+                        title="Strikethrough"
+                        >
+                        <Strikethrough size={16} />
+                    </button>
+                }
 
                 {/* <button
                     onClick={() => editor.chain().focus().toggleTaskList().run()}
@@ -171,89 +176,91 @@ const MenuBar = ({ editor, editorState, theme }: {
                 />
             </div>
 
-            <div className="flex space-x-2">
-                <button
-                    onClick={() => editor.chain().focus().undo().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
-                    title="Undo"
-                    disabled={!editorState.canUndo}
-                >
-                    <IoMdUndo size={16} className={`${!editorState.canUndo && 'text-neutral-500'}`} />
-                </button>
+            {canUseAdvancedEditor &&
+                <div className="flex space-x-2">
+                    <button
+                        onClick={() => editor.chain().focus().undo().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                        title="Undo"
+                        disabled={!editorState.canUndo}
+                    >
+                        <IoMdUndo size={16} className={`${!editorState.canUndo && 'text-neutral-500'}`} />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().redo().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
-                    title="Redo"
-                    disabled={!editorState.canRedo}
-                >
-                    <IoMdRedo size={16} className={`${!editorState.canRedo && 'text-neutral-500'}`} />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().redo().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                        title="Redo"
+                        disabled={!editorState.canRedo}
+                    >
+                        <IoMdRedo size={16} className={`${!editorState.canRedo && 'text-neutral-500'}`} />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().toggleHighlight().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("highlight") ? highlightColor : ""} cursor-pointer`}
-                    title="Highlight"
-                >
-                    <FaHighlighter size={16} />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().toggleHighlight().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("highlight") ? highlightColor : ""} cursor-pointer`}
+                        title="Highlight"
+                    >
+                        <FaHighlighter size={16} />
+                    </button>
 
-                <button
-                    onClick={addImage}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
-                    title="Image URL Upload"
-                >
-                    <FaImages size={16} />
-                </button>
+                    <button
+                        onClick={addImage}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg cursor-pointer`}
+                        title="Image URL Upload"
+                    >
+                        <FaImages size={16} />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bulletList") ? highlightColor : ""} cursor-pointer`}
-                    title="Bullet List"
-                >
-                    <List size={16} />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("bulletList") ? highlightColor : ""} cursor-pointer`}
+                        title="Bullet List"
+                    >
+                        <List size={16} />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("orderedList") ? highlightColor : ""} cursor-pointer`}
-                    title="Numbered List"
-                >
-                    <ListOrdered size={16} />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive("orderedList") ? highlightColor : ""} cursor-pointer`}
+                        title="Numbered List"
+                    >
+                        <ListOrdered size={16} />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'left' }) ? highlightColor : ''} cursor-pointer`}
-                    title="Align Left"
-                >
-                    <FiAlignLeft />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'left' }) ? highlightColor : ''} cursor-pointer`}
+                        title="Align Left"
+                    >
+                        <FiAlignLeft />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'center' }) ? highlightColor : ''} cursor-pointer`}
-                    title="Align Center"
-                >
-                    <FiAlignCenter />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'center' }) ? highlightColor : ''} cursor-pointer`}
+                        title="Align Center"
+                    >
+                        <FiAlignCenter />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'right' }) ? highlightColor : ''} cursor-pointer`}
-                    title="Align Right"
-                >
-                    <FiAlignRight />
-                </button>
+                    <button
+                        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'right' }) ? highlightColor : ''} cursor-pointer`}
+                        title="Align Right"
+                    >
+                        <FiAlignRight />
+                    </button>
 
-                <button
-                    onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-                    className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'justify' }) ? highlightColor : ''} cursor-pointer`}
-                    title="Align Justify"
-                >
-                    <FiAlignJustify />
-                </button>
-            </div>
+                    <button
+                        onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                        className={`hover:bg-neutral-400 p-1 rounded-lg ${editor.isActive({ textAlign: 'justify' }) ? highlightColor : ''} cursor-pointer`}
+                        title="Align Justify"
+                    >
+                        <FiAlignJustify />
+                    </button>
+                </div>
+            }
         </div>
     );
 }

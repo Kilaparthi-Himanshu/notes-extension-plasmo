@@ -11,6 +11,7 @@ import { FREE_MAX_SYNCED_NOTES_COUNT } from './lib/constants';
 import { VisibleLimit } from "react-visible-limit";
 import { getLimitInfo } from "./lib/getLimitInfo";
 import NoteToGoIcon from "./assets/icon.png";
+import { FaCrown } from "react-icons/fa";
 
 function IndexPopup () {
     useEffect(() => {
@@ -353,9 +354,14 @@ function IndexPopup () {
                                                     : "bg-blue-700 text-blue-200"
                                             }`}
                                         >
-                                            {userDetails?.plan === "pro"
-                                                ? "⭐ Pro"
-                                                : "Free"}
+                                            {userDetails?.plan === "pro" ? (
+                                                <span className='flex items-center justify-center'>
+                                                    <FaCrown size={10} className="text-orange-300 inline mr-1" />
+                                                    Pro
+                                                </span>
+                                            ) : (
+                                                "Free"
+                                            )}
                                         </span>
 
                                         {userDetails?.plan === "free" && (
@@ -376,9 +382,13 @@ function IndexPopup () {
                                                     text-black
                                                     hover:opacity-90
                                                     transition-all
+                                                    border
+                                                    border-violet-300
                                                 "
                                             >
-                                                ✨ Get Pro
+                                                <span className='flex items-center justify-center'>
+                                                    <FaCrown size={10} className="text-orange-300 inline mr-1" /> Get Pro
+                                                </span>
                                             </button>
                                         )}
                                     </div>

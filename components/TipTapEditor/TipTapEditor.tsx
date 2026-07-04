@@ -526,9 +526,9 @@ export default function TipTapEditor({
                 data-lenis-prevent
             />
 
-            {canUseAdvancedEditor && showToolbar && (
+            {showToolbar && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                    <MenuBar editor={editor} editorState={editorState} theme={theme} />
+                    <MenuBar editor={editor} editorState={editorState} theme={theme} canUseAdvancedEditor={canUseAdvancedEditor} />
                 </div>
             )}
         </div>

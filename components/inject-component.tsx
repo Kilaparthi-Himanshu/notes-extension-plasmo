@@ -45,7 +45,7 @@ function InjectReact({
         queryClient.invalidateQueries({ queryKey: ['user'] });
     }, []);
 
-    const { isProUser, canHaveGlassEffect, canUseAdvancedEditor, canUseSync } = useFeatureFlags();
+    const { isProUser, canHaveGlassEffect } = useFeatureFlags();
     const session = useUser().data?.session;
 
     const [note, setNote] = useState<NoteType>(initialNote);
@@ -190,7 +190,7 @@ function InjectReact({
             setPassword(note.password);
             setEmail(note.email);
             setGlassEffect(canHaveGlassEffect && (note.glassEffect ?? false));
-            setShowToolbar(canUseAdvancedEditor && (note.showToolbar ?? false));
+            setShowToolbar(note.showToolbar ?? false);
             setSync(note.sync ?? false);
             setBaseVersion(note.baseVersion ?? 0);
 

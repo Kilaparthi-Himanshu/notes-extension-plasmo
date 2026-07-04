@@ -18,8 +18,6 @@ const SyncToggle = ({
         handleClose();
     }
 
-    console.log(session);
-
     const titleForSync = () => {
         return sync 
             ? 'You Cannot Turn Off Sync' 

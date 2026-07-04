@@ -52,9 +52,7 @@ const Dropdown = () => {
         };
     }, []);
 
-    const { canHaveGlassEffect } = useFeatureFlags();
-    const { canUseAdvancedEditor } = useFeatureFlags();
-    const { canExport } = useFeatureFlags();
+    const { canHaveGlassEffect, canExport } = useFeatureFlags();
 
     return (
         <div>
@@ -111,7 +109,7 @@ const Dropdown = () => {
                     {/* <FontToggle /> */}
                     <PasswordToggle />
                     {canHaveGlassEffect && <GlassEffectToggle />}
-                    {canUseAdvancedEditor && <ToolbarToggle />}
+                    <ToolbarToggle />
                     <SyncToggle handleClose={handleClose} />
                     {canExport && <ExportToggle handleClose={handleClose} />}
                 </div>

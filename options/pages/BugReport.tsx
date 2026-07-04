@@ -25,7 +25,7 @@ export default function BugReport() {
 			} = await supabase.auth.getUser();
 
 			if (!user) {
-				alert("Please sign in first");
+				alert("Please sign in first.");
 				return;
 			}
 

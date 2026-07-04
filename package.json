@@ -1,8 +1,8 @@
 {
   "name": "note-to-go",
-  "displayName": "NoteToGo - Save Notes, Password Protected!",
+  "displayName": "NoteToGo – Side Notes & Cloud Sync",
   "version": "3.0.0",
-  "description": "Simple and quick way to add small yet effective side notes!",
+  "description": "Take notes on any webpage with cloud sync, rich text editing, themes, and password protection.",
   "author": "Himanshu",
   "scripts": {
     "dev": "plasmo dev",

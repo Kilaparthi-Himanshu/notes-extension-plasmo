@@ -345,8 +345,6 @@ export default function TipTapEditor({
                     }
 
                     const blockedInputTypes = [
-                        "formatBold",
-                        "formatItalic",
                         "formatUnderline",
                         "formatStrikeThrough",
                         "formatRemove",

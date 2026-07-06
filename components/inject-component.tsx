@@ -260,17 +260,6 @@ function InjectReact({
         };
     }, [isDragging, dragOffset]);
 
-    const setTextAreaColor = (color: string) => {
-        setCustomColor(color); // Store the custom color
-        const noteElement = document.getElementById(noteId);
-        if (noteElement) {
-            const textArea = noteElement.shadowRoot?.querySelector('.textArea');
-            if (textArea) {
-                (textArea as HTMLElement).style.backgroundColor = color;
-            }
-        }
-    }
-
     const handleThemeChange = (newTheme: string) => {
         setTheme(newTheme);
         setCustomColor(newTheme === "light" ? "#ffffff" : "#262626"); // Reset custom color when theme changes
@@ -582,7 +571,7 @@ function InjectReact({
                         </button>
                     </div>
                     <DropdownContext.Provider value={{
-                            session, theme, handleThemeChange, customColor, setTextAreaColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached, showExportModal,setShowExportModal
+                            session, theme, handleThemeChange, customColor, setCustomColor, pinned, handlePin, active, handleActive, isPasswordProtected, setIsPasswordProtected, requirePassword, showNewPasswordForm, setShowNewPasswordForm, canHaveGlassEffect, glassEffect, setGlassEffect, showToolbar, setShowToolbar, sync, showSyncConfirmationModal, setShowSyncConfirmationModal, saved, syncToggleEnable, maxSyncReached: limitInfo.maxReached, showExportModal,setShowExportModal
                         }}
                     >
                         <DropDown />

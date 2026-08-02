@@ -408,6 +408,30 @@ function InjectReact({
         borderTop: '0px'
     }
 
+    const onResizeStart = (e) => {
+        e.stopPropagation();
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+
+        const startWidth = width;
+        const startHeight = height;
+
+        const move = (e) => {
+            setWidth(startWidth + e.clientX - startX);
+            setHeight(startHeight + e.clientY - startY);
+            console.log("MOVE");
+        };
+
+        const up = () => {
+            window.removeEventListener("mousemove", move);
+            window.removeEventListener("mouseup", up);
+        };
+
+        window.addEventListener("mousemove", move);
+        window.addEventListener("mouseup", up);
+    };
+
     return (
         <>
             {iconize ? 
@@ -459,8 +483,7 @@ function InjectReact({
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
                     msUserSelect: 'none',
-                    resize: 'both',     // Enable native resizing
-                    overflow: 'auto',    // Required for resize to work
+                    overflow: 'visible',    // Required for resize to work
                     position: pinned ? 'fixed' : 'absolute',
                     // backgroundImage: `url(${Falcon})`,
                     // backgroundSize: "cover",       // Fill the whole div
@@ -468,7 +491,6 @@ function InjectReact({
                     // backgroundPosition: "center",  // Center the image
                 }}
                 onMouseDown={bringToFront}
-                onMouseUp={handleResize}
             >
                 <div 
                     className={style.topbar}
@@ -493,7 +515,7 @@ function InjectReact({
                         title="Title"
                     />
 
-                    <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2`} style={{
+                    <div className={`w-[170px] h-[35px] absolute right-0 flex justify-end items-center space-x-3 pr-2 rounded-tr-[15px]`} style={{
                         backgroundColor: glassEffect ? theme === "light" ? "#D9D9D9" : "#454545" : customColor,
                     }}>
                         <svg viewBox="0 0 50 35" width="100%" height="100%" preserveAspectRatio="none">
@@ -668,6 +690,35 @@ function InjectReact({
                         );
                     }
                 })()}
+
+                <div
+                    className='absolute right-0 bottom-0 w-5 h-5 cursor-nwse-resize flex items-end justify-end pb-[6px] pr-[6px] opacity-20 hover:opacity-90 transition-opacity'
+                    onMouseDown={onResizeStart}
+                >
+                    <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        className="opacity-60 hover:opacity-100 transition-opacity"
+                    >
+                        <path
+                            d="M13 1L1 13"
+                            stroke={theme === "light" ? "#222" : "#fff"}
+                            strokeWidth="1.5"
+                        />
+                        <path
+                            d="M13 5L5 13"
+                            stroke={theme === "light" ? "#222" : "#fff"}
+                            strokeWidth="1.5"
+                        />
+                        <path
+                            d="M13 9L9 13"
+                            stroke={theme === "light" ? "#222" : "#fff"}
+                            strokeWidth="1.5"
+                        />
+                    </svg>
+                </div>
             </div>)}
         </>
     );
